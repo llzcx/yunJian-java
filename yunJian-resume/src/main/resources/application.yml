@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8092
   address: 0.0.0.0
 
 spring:
@@ -75,4 +75,4 @@ dubbo:
     password: nacos
 
 rocketmq:
-  addr: ${rocketmq.addr:127.0.0.1:9876}
+  addr: 127.0.0.1:9876

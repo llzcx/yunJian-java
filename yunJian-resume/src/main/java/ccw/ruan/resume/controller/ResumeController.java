@@ -2,8 +2,10 @@ package ccw.ruan.resume.controller;
 
 
 
+import ccw.ruan.resume.manager.http.PyClient;
 import ccw.ruan.service.JobDubboService;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +29,15 @@ public class ResumeController {
     @GetMapping("/test1")
     public String test1(){
         return jobDubboService.get();
+
+    }
+
+    @Autowired
+    PyClient pyClient;
+
+    @GetMapping("/testhttp")
+    public String testhttp(){
+        return pyClient.send("123111!!");
 
     }
 }

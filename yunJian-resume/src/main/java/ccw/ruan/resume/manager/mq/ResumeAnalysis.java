@@ -1,7 +1,6 @@
 package ccw.ruan.resume.manager.mq;
 
 import ccw.ruan.service.RocketMQ;
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;

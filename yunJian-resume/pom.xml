@@ -183,11 +183,17 @@
             <artifactId>rocketmq-client</artifactId>
             <version>4.7.0</version>
         </dependency>
-        <!-- rocketmq.common       -->
+        <!--rocketmq.common-->
         <dependency>
             <groupId>org.apache.rocketmq</groupId>
             <artifactId>rocketmq-common</artifactId>
             <version>4.7.0</version>
+        </dependency>
+        <!-- forest-->
+        <dependency>
+            <groupId>com.dtflys.forest</groupId>
+            <artifactId>forest-spring-boot-starter</artifactId>
+            <version>1.5.31</version>
         </dependency>
     </dependencies>
 

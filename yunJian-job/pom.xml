@@ -178,6 +178,12 @@
             <artifactId>dubbo-cluster-specify-address-dubbo3</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.dtflys.forest</groupId>
+            <artifactId>forest-core</artifactId>
+            <version>1.5.31</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

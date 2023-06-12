@@ -11,6 +11,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-common</artifactId>
+            <version>4.7.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
     <artifactId>yunJian-api</artifactId>
     <properties>

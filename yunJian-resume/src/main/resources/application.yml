@@ -74,3 +74,5 @@ dubbo:
     username: nacos
     password: nacos
 
+rocketmq:
+  addr: ${rocketmq.addr:127.0.0.1:9876}

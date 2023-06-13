@@ -26,6 +26,12 @@ public class ApplicationInit {
      * 初始化之后
      */
     public void afterBeanCreate(){
+        try {
+            resumeAnalysis.initConsumer();
+            resumeAnalysis.initProduct();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
 
     }
 }

@@ -1,11 +1,7 @@
 package ccw.ruan.resume.manager.http;
 
 import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
-import ccw.ruan.resume.manager.http.dto.PersonJobFitDto;
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.Get;
-import com.dtflys.forest.annotation.JSONBody;
-import com.dtflys.forest.annotation.Query;
+import com.dtflys.forest.annotation.*;
 
 /**
  * @author 陈翔
@@ -13,7 +9,9 @@ import com.dtflys.forest.annotation.Query;
 @BaseRequest(
         baseURL = "http://localhost:7070",     // 默认域名
         headers = {
-                "Accept:text/plain"                // 默认请求头
+                "Accept:text/plain",                // 默认请求头
+                "Content-Type:application/json",
+                "Accept:*/*",
         }
 )
 public interface PyClient {
@@ -30,7 +28,7 @@ public interface PyClient {
      * @param calculateSimilarityDto
      * @return
      */
-    @Get("/resume/similarity")
+    @Post("/resume/calculateSimilarity")
     String calculateSimilarity(@JSONBody CalculateSimilarityDto calculateSimilarityDto);
 
 }

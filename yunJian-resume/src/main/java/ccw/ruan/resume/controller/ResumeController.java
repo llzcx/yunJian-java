@@ -2,7 +2,9 @@ package ccw.ruan.resume.controller;
 
 
 
+import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.resume.manager.http.PyClient;
+import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
 import ccw.ruan.service.JobDubboService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +38,8 @@ public class ResumeController {
     PyClient pyClient;
 
     @GetMapping("/testhttp")
-    public String testhttp(){
-        return pyClient.send("123111!!");
+    public ApiResp testhttp(){
+        return ApiResp.success(pyClient.calculateSimilarity(new CalculateSimilarityDto("文本1111","文本222222222阿瓦达2222222")));
 
     }
 }

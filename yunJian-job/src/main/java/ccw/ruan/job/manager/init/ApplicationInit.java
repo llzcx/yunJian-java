@@ -2,7 +2,6 @@ package ccw.ruan.job.manager.init;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ccw.ruan.resume.manager.mq.ResumeAnalysis;
 /**
  * @author 陈翔
  */
@@ -17,8 +16,6 @@ public class ApplicationInit {
 
     }
 
-    @Autowired
-    ResumeAnalysis resumeAnalysis;
 
 
 

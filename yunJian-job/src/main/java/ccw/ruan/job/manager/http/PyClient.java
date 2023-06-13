@@ -22,7 +22,7 @@ public interface PyClient {
      * @param calculateSimilarityDto
      * @return
      */
-    @Get("/resume/person-job-fit")
+    @Get("/resume/calculateSimilarity")
     String personJobFit(@JSONBody PersonJobFitDto calculateSimilarityDto);
 
 }

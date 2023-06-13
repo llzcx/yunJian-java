@@ -30,6 +30,7 @@ public class ResumeAnalysis implements RocketMQ {
 
     static String MQ_RESUME_ANALYSIS_GROUP = "MQ_RESUME_ANALYSIS_GROUP";
     static String MQ_RESUME_ANALYSIS_CONSUMER = "MQ_RESUME_ANALYSIS_CONSUMER";
+    static String MQ_RESUME_ANALYSIS_PRODUCT = "MQ_RESUME_ANALYSIS_PRODUCT";
     static String MQ_RESUME_ANALYSIS_TOPIC = "MQ_RESUME_ANALYSIS_TOPIC";
     @Override
     public void initConsumer() throws Exception{
@@ -62,7 +63,7 @@ public class ResumeAnalysis implements RocketMQ {
         producer = new DefaultMQProducer(MQ_RESUME_ANALYSIS_GROUP);
         //输入nameserver服务的地址
         producer.setNamesrvAddr(MQ_ADDR);
-        producer.setInstanceName("cold-producer");
+        producer.setInstanceName(MQ_RESUME_ANALYSIS_PRODUCT);
         //启动生产者
         producer.start();
         log.info("product:{} Started.",MQ_RESUME_ANALYSIS_CONSUMER);

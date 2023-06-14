@@ -22,13 +22,20 @@ public interface PyClient {
      */
     @Get("/hello")
     String send(@Query("name") String name);
-
+    /**
+     * 用作向python发送请求处理简历文件
+     * @param fileName
+     * @param fileFormat
+     * @return resumeFile
+     */
+    @Get(value = "/ResumeFile",timeout = 1000000000)
+    String resumeFile(@Query("fileName") String fileName, @Query("fileFormat") String fileFormat);
     /**
      * 计算简历相似度
      * @param calculateSimilarityDto
      * @return
      */
-    @Post("/resume/calculateSimilarity")
+    @Post(value = "/resume/calculateSimilarity",timeout = 1000000000)
     String calculateSimilarity(@JSONBody CalculateSimilarityDto calculateSimilarityDto);
 
 }

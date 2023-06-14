@@ -1,6 +1,10 @@
 package ccw.ruan.resume.manager.mq;
 
+import ccw.ruan.resume.manager.http.PyClient;
 import ccw.ruan.service.RocketMQ;
+import cn.hutool.core.io.file.FileNameUtil;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.api.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -9,9 +13,11 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.apache.rocketmq.common.message.Message;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -27,11 +33,13 @@ public class ResumeAnalysis implements RocketMQ {
 
     DefaultMQPushConsumer consumer;
     public static DefaultMQProducer producer;
-
+    static String MQ_RESUME_ANALYSIS_PRODUCT = "MQ_RESUME_ANALYSIS_PRODUCT";
     static String MQ_RESUME_ANALYSIS_GROUP = "MQ_RESUME_ANALYSIS_GROUP";
     static String MQ_RESUME_ANALYSIS_CONSUMER = "MQ_RESUME_ANALYSIS_CONSUMER";
-    static String MQ_RESUME_ANALYSIS_PRODUCT = "MQ_RESUME_ANALYSIS_PRODUCT";
     static String MQ_RESUME_ANALYSIS_TOPIC = "MQ_RESUME_ANALYSIS_TOPIC";
+    @Autowired
+    PyClient pyClient;
+
     @Override
     public void initConsumer() throws Exception{
         consumer = new DefaultMQPushConsumer(MQ_RESUME_ANALYSIS_GROUP);
@@ -47,7 +55,20 @@ public class ResumeAnalysis implements RocketMQ {
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> messages, ConsumeConcurrentlyContext context) {
                 for (MessageExt message : messages) {
-
+                    byte[] body = message.getBody();
+                    String originalFilename = new String(body);
+                    System.out.println(originalFilename);
+                    String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+                    if(".docx".equals(suffix)){
+                        String result =pyClient.resumeFile(originalFilename,"docx");
+                        System.out.println(result);
+                    }else if(".pdf".equals(suffix)){
+                        String result = pyClient.resumeFile(originalFilename,"pdf");
+                        System.out.println(result);
+                    }else {
+                        String result = pyClient.resumeFile(originalFilename,"png");
+                        System.out.println(result);
+                    }
                 }
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }

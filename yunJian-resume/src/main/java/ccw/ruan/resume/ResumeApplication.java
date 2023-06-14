@@ -6,9 +6,11 @@ import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -20,8 +22,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableDiscoveryClient
 @EnableDubbo
+@EntityScan(basePackages="ccw.ruan.resume.manager.neo4j.data.node")
+@EnableNeo4jRepositories(basePackages="ccw.ruan.resume.manager.neo4j.data.repository")
 public class ResumeApplication {
-
     public static ApplicationContext applicationContext;
     public static void main(String[] args){
         ApplicationInit.beforeBeanCreate();

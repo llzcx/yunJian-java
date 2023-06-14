@@ -5,6 +5,7 @@ package ccw.ruan.resume.controller;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.resume.manager.http.PyClient;
 import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
+import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
 import ccw.ruan.service.JobDubboService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +43,14 @@ public class ResumeController {
         return ApiResp.success(pyClient.calculateSimilarity(new CalculateSimilarityDto("文本1111","文本222222222阿瓦达2222222")));
 
     }
+
+    @Autowired
+    SchoolRepository schoolRepository;
+
+    @GetMapping("/school/{name}")
+    public ApiResp school(String name){
+        return ApiResp.success(schoolRepository.findDiscipline("北京大学"));
+    }
+
 }
 

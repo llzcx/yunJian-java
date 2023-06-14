@@ -105,11 +105,11 @@
         </dependency>
 
         <!-- swagger3-->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>3.0.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-boot-starter</artifactId>-->
+<!--            <version>3.0.0</version>-->
+<!--        </dependency>-->
         <!--apache的commons-codec.jar包-->
         <dependency>
             <groupId>org.apache.directory.studio</groupId>
@@ -195,6 +195,13 @@
             <artifactId>forest-spring-boot-starter</artifactId>
             <version>1.5.31</version>
         </dependency>
+        <!-- neo4j-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-neo4j</artifactId>
+        </dependency>
+
+
     </dependencies>
 
 </project>

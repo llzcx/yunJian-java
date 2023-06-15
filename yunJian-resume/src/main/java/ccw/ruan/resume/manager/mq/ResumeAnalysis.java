@@ -36,7 +36,7 @@ public class ResumeAnalysis implements RocketMQ {
     static String MQ_RESUME_ANALYSIS_PRODUCT = "MQ_RESUME_ANALYSIS_PRODUCT";
     static String MQ_RESUME_ANALYSIS_GROUP = "MQ_RESUME_ANALYSIS_GROUP";
     static String MQ_RESUME_ANALYSIS_CONSUMER = "MQ_RESUME_ANALYSIS_CONSUMER";
-    static String MQ_RESUME_ANALYSIS_TOPIC = "MQ_RESUME_ANALYSIS_TOPIC";
+    public static String MQ_RESUME_ANALYSIS_TOPIC = "MQ_RESUME_ANALYSIS_TOPIC";
     @Autowired
     PyClient pyClient;
 
@@ -59,6 +59,7 @@ public class ResumeAnalysis implements RocketMQ {
                     String originalFilename = new String(body);
                     System.out.println(originalFilename);
                     String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+
                     if(".docx".equals(suffix)){
                         String result =pyClient.resumeFile(originalFilename,"docx");
                         result = decodeUnicode(result);

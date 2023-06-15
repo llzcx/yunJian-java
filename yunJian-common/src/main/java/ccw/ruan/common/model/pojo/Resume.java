@@ -58,6 +58,11 @@ public class Resume implements Serializable {
     private String content;
 
     /**
+     * 存储路径
+     */
+    private String path;
+
+    /**
      * 简历状态：0-未处理、1-处理完成
      */
     private Integer resumeStatus;

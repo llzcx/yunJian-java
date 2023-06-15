@@ -170,7 +170,7 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-        <!--        远程指定服务调用-->
+        <!--远程指定服务调用-->
         <dependency>
             <groupId>org.apache.dubbo.extensions</groupId>
             <artifactId>dubbo-cluster-specify-address-dubbo3</artifactId>
@@ -199,6 +199,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-neo4j</artifactId>
+        </dependency>
+        <!--elasticsearch-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
 
 

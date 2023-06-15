@@ -2,6 +2,7 @@ package ccw.ruan.resume.manager.neo4j.vo;
 
 import ccw.ruan.resume.manager.neo4j.data.node.*;
 import ccw.ruan.resume.manager.neo4j.data.relation.SimpleRelation;
+import com.sun.el.parser.SimpleNode;
 import lombok.Data;
 import java.io.Serializable;
 import java.util.List;
@@ -15,7 +16,7 @@ public class SchoolVo implements Serializable {
     /**
      * 大学基本信息
      */
-    private UniversityNode universityNode;
+    private List<UniversityNode> universityNode;
     /**
      * 各个学科
      */
@@ -23,17 +24,17 @@ public class SchoolVo implements Serializable {
     /**
      * 所在城市
      */
-    private CityNode cityNode;
+    private List<CityNode> cityNode;
     /**
      * 简写
      */
-    private SimpleRelation simpleRelation;
+    private List<UniversitySimpleNameNode> simpleNodes;
     /**
      * 主管单位
      */
-    private SponsorNode sponsorNode;
+    private List<SponsorNode> sponsorNode;
     /**
      * 学校层次
      */
-    private UniversityLevelNode universityLevelNode;
+    private List<UniversityLevelNode> universityLevelNode;
 }

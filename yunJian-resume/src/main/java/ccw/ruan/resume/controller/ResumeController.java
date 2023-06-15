@@ -3,15 +3,21 @@ package ccw.ruan.resume.controller;
 
 
 import ccw.ruan.common.request.ApiResp;
+import ccw.ruan.common.util.JwtUtil;
 import ccw.ruan.resume.manager.http.PyClient;
-import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
-import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
+import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
+import ccw.ruan.resume.manager.neo4j.vo.SimilarityVo;
+import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -25,31 +31,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class ResumeController {
 
     @DubboReference(version = "1.0.0", group = "job", check = false)
-    private JobDubboService jobDubboService;
+    JobDubboService jobDubboService;
 
+    @Autowired
+    IResumeService resumeService;
 
-
-    @GetMapping("/test1")
-    public String test1(){
-        return jobDubboService.get();
-
-    }
 
     @Autowired
     PyClient pyClient;
 
-    @GetMapping("/testhttp")
-    public ApiResp testhttp(){
-        return ApiResp.success(pyClient.calculateSimilarity(new CalculateSimilarityDto("文本1111","文本222222222阿瓦达2222222")));
-
+    @GetMapping("/test1")
+    public String test1(){
+        return jobDubboService.get();
     }
 
-    @Autowired
-    SchoolRepository schoolRepository;
+    @GetMapping("/similarity")
+    public ApiResp<SimilarityVo> similarity(HttpServletRequest request){
+        final Integer userId = JwtUtil.getId(request);
+        return ApiResp.success(resumeService.findSimilarity(userId));
+    }
 
-    @GetMapping("/school/{name}")
-    public ApiResp school(String name){
-        return ApiResp.success(schoolRepository.findDiscipline("北京大学"));
+
+
+    @GetMapping("/graph/{resumeId}")
+    public ApiResp<KnowledgeGraphVo> graph(@PathVariable String resumeId){
+        return ApiResp.success(resumeService.findKnowledgeGraphVo(Integer.valueOf(resumeId)));
     }
 
 }

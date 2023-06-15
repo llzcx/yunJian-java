@@ -10,12 +10,17 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 public class JwtUtil {
+
+
+
+    public static String AUTHORIZATION = "Authorization";
 
     /**
      * token过期时间     5小时
@@ -68,18 +73,18 @@ public class JwtUtil {
     }
 
     /**
-     * 获取token中的信息（包含用户名）
-     * @param token
+     * 获取用户id
+     * @param request
      * @return
      */
-    public static String getUsername(String token) {
+    public static Integer getId(HttpServletRequest request) {
+        final String token = request.getHeader(AUTHORIZATION);
         if (token==null || "".equals(token.trim())){
             throw new SystemException(ResultCode.COMMON_FAIL);
         }
         try {
             DecodedJWT jwt = JWT.decode(token);
-            log.info("token = " + jwt.getToken());
-            return jwt.getClaim(USERNAME).asString();
+            return Integer.valueOf(jwt.getClaim(ID).asString());
         } catch (JWTDecodeException e) {
             return null;
         }
@@ -119,11 +124,11 @@ public class JwtUtil {
      * @param token
      * @return
      */
-    public static Long getParam(String token,String field){
+    public static Integer getParam(String token,String field){
         try{
             DecodedJWT decodedJWT=JWT.decode(token);
             String sid = decodedJWT.getClaim(field).asString();
-            return Long.valueOf(sid);
+            return Integer.valueOf(sid);
         }catch (JWTCreationException e){
             return null;
         }

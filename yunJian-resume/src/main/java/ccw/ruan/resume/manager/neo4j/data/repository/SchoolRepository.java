@@ -13,6 +13,9 @@ import java.util.Map;
 @Component
 public interface SchoolRepository extends Neo4jRepository<UniversityLevelNode, Long> {
 
+    @Query("MATCH (p:大学) WHERE p.name =~ $name OPTIONAL MATCH (p)-[:属于]->(q:办学层次) RETURN collect(p)")
+    List<UniversityNode> findSchool(@Param("name") String name);
+
     @Query("MATCH (p:大学) WHERE p.name =~ $name OPTIONAL MATCH (p)-[:属于]->(q:办学层次) RETURN collect(q)")
     List<UniversityLevelNode> findSchoolLevel(@Param("name") String name);
 

@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
  * <p>
  * 用户表
  * </p>
- *
  * @author 陈翔
  * @since 2023-06-10
  */

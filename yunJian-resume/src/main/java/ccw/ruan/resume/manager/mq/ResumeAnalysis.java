@@ -61,6 +61,7 @@ public class ResumeAnalysis implements RocketMQ {
                     String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
                     if(".docx".equals(suffix)){
                         String result =pyClient.resumeFile(originalFilename,"docx");
+                        result = decodeUnicode(result);
                         System.out.println(result);
                     }else if(".pdf".equals(suffix)){
                         String result = pyClient.resumeFile(originalFilename,"pdf");
@@ -94,7 +95,22 @@ public class ResumeAnalysis implements RocketMQ {
     public void send(Message message) throws Exception {
         producer.send(message);
     }
-
+    public static String decodeUnicode(String s) {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while (i < s.length()) {
+            if (s.charAt(i) == '\\' && i + 1 < s.length() && s.charAt(i + 1) == 'u') {
+                String hex = s.substring(i + 2, i + 6);
+                int code = Integer.parseInt(hex, 16);
+                sb.append((char) code);
+                i += 6;
+            } else {
+                sb.append(s.charAt(i));
+                i++;
+            }
+        }
+        return sb.toString();
+    }
     public static void main(String[] args) throws Exception{
 
         ResumeAnalysis resumeAnalysis = new ResumeAnalysis();

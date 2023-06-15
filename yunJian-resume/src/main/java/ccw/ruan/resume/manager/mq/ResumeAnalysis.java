@@ -96,6 +96,7 @@ public class ResumeAnalysis implements RocketMQ {
     }
 
     public static void main(String[] args) throws Exception{
+
         ResumeAnalysis resumeAnalysis = new ResumeAnalysis();
         String json = "...";
         resumeAnalysis.send(new Message(MQ_RESUME_ANALYSIS_TOPIC,

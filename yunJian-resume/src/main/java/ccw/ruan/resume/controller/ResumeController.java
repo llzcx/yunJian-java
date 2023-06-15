@@ -57,7 +57,7 @@ public class ResumeController {
 
     @Autowired
     PyClient pyClient;
-    private JobDubboService jobDubboService;
+
     @Value("${resume.path}")
     private String basePath;
     static String MQ_RESUME_ANALYSIS_TOPIC = "MQ_RESUME_ANALYSIS_TOPIC";

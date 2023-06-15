@@ -1,5 +1,6 @@
 package ccw.ruan.resume.service;
 
+
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.resume.manager.neo4j.vo.SimilarityVo;

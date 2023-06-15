@@ -59,6 +59,7 @@ public class ResumeAnalysis implements RocketMQ {
                     String originalFilename = new String(body);
                     System.out.println(originalFilename);
                     String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+
                     if(".docx".equals(suffix)){
                         String result =pyClient.resumeFile(originalFilename,"docx");
                         result = decodeUnicode(result);

@@ -2,13 +2,14 @@ package ccw.ruan.common.model.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author 周威宇
  */
 @Data
-public class ResumeAnalysisVo {
+public class ResumeAnalysisVo implements Serializable {
     /**
      * id
      */

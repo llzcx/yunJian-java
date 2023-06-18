@@ -1,10 +1,10 @@
 package ccw.ruan.resume.manager.es;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * @author 陈翔
@@ -12,10 +12,10 @@ import java.util.List;
 @Repository
 public interface ResumeRepository extends ElasticsearchRepository<ResumeAnalysisEntity, String> {
     /**
-     * 搜索项目经历
-     * @param relatedKeywords
+     * 分页查询简历
+     * @param pageable
      * @return
      */
-    @Query("{\"bool\":{\"should\":[{\"match\":{\"workExperiences.jobName\":\"related_keywords\"}},{\"match\":{\"workExperiences.description\":\"related_keywords\"}}]}}")
-    List<ResumeAnalysisEntity> findByWorkExperiencesJobNameOrDescription(String relatedKeywords);
+    @Query("{\"nested\":{\"path\":\"workExperiences\",\"query\":{\"bool\":{\"should\":[{\"match\":{\"workExperiences.jobName\":\"软件工程师\"}},{\"match\":{\"workExperiences.description\":\"软件工程师\"}}]}}}}")
+    Page<ResumeAnalysisEntity> findResumeWithJavaWorkExperience(Pageable pageable);
 }

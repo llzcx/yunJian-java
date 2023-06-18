@@ -2,6 +2,8 @@ package ccw.ruan.resume.service.impl;
 
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.util.MybatisPlusUtil;
+import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
+import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.mq.ResumeAnalysis;
 import ccw.ruan.resume.manager.neo4j.data.node.*;
 import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
@@ -41,6 +43,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     private String basePath;
     @Autowired
     private ResumeAnalysis resumeAnalysis;
+
+    @Autowired
+    ResumeRepository repository;
 
     @Override
     public KnowledgeGraphVo findKnowledgeGraphVo(Integer resumeId) {
@@ -118,5 +123,10 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             e.printStackTrace();
         }
         return fileName;
+    }
+
+    private Boolean saveToElasticsearch(ResumeAnalysisEntity resumeAnalysisEntity){
+        repository.save(resumeAnalysisEntity);
+        return true;
     }
 }

@@ -3,6 +3,7 @@ package ccw.ruan.resume.manager.es;
 
 import lombok.Data;
 import org.apache.dubbo.config.support.Nested;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
 import java.util.List;
@@ -13,6 +14,10 @@ import java.util.List;
 @Document(indexName = "resume")
 @Data
 public class ResumeAnalysisEntity {
+
+    @Id
+    private String id;
+
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String name;
 
@@ -59,9 +64,9 @@ public class ResumeAnalysisEntity {
     private String selfEvaluation;
 
     @Nested
-    private List<PracticeExperienceEntity> practiceExperienceEntities;
+    private List<PracticeExperienceEntity> practiceExperiences;
 
     @Nested
-    private List<WorkExperienceEntity> workExperienceEntities;
+    private List<WorkExperienceEntity> workExperiences;
 
 }

@@ -1,16 +1,18 @@
 package ccw.ruan.resume.manager.es;
 
 import lombok.Data;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.annotations.InnerField;
-import org.springframework.data.elasticsearch.annotations.MultiField;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.*;
 
 /**
  * @author 陈翔
  */
 @Data
 public class PracticeExperienceEntity {
+
+        @Id
+        private String id;
+
         @Field(type = FieldType.Text, analyzer = "keyword")
         private String startTime;
 
@@ -40,6 +42,4 @@ public class PracticeExperienceEntity {
                 }
         )
         private String description;
-
-        // getters and setters
     }

@@ -3,6 +3,7 @@ package ccw.ruan.user.controller;
 
 
 import ccw.ruan.common.model.dto.LoginDto;
+import ccw.ruan.common.model.dto.RegisterDto;
 import ccw.ruan.common.model.pojo.User;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.request.ResultCode;
@@ -12,10 +13,7 @@ import ccw.ruan.user.mapper.UserMapper;
 import ccw.ruan.user.service.IUserService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -42,11 +40,15 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ApiResp<String> login(LoginDto loginDto){
+    public ApiResp<String> login(@RequestBody LoginDto loginDto){
         final String token = userService.login(loginDto);
         return ApiResp.judge(token!=null,token, ResultCode.COMMON_FAIL);
     }
 
-
+    @PostMapping("/register")
+    public ApiResp<User> register(@RequestBody RegisterDto registerDto){
+        User user = userService.register(registerDto);
+        return ApiResp.success(user);
+    }
 }
 

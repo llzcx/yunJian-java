@@ -63,7 +63,7 @@ public class Resume implements Serializable {
     private String path;
 
     /**
-     * 简历状态：0-未处理、1-处理完成
+     * 简历状态
      */
     private Integer resumeStatus;
 

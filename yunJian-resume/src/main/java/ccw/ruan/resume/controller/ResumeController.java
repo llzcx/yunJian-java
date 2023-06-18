@@ -2,6 +2,7 @@ package ccw.ruan.resume.controller;
 
 
 
+import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
@@ -16,11 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -74,6 +71,8 @@ public class ResumeController {
 
     @Autowired
     ResumeRepository repository;
+
+
     @GetMapping("/testES")
     public List<ResumeAnalysisEntity> testEs(){
         Pageable pageable = PageRequest.of(0, 10); // 查询第1页，每页10条记录
@@ -81,6 +80,10 @@ public class ResumeController {
         return result.getContent();
     }
 
+    @GetMapping("/search")
+    public List<ResumeAnalysisEntity> search(@RequestBody SearchDto searchDto){
+        return resumeService.search(searchDto);
+    }
 
 
 

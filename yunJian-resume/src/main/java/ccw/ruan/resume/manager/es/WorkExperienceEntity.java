@@ -27,12 +27,12 @@ public class WorkExperienceEntity {
         @Id
         private String id;
 
+        /**
+         * 范围
+         */
+        @Field(type = FieldType.Date_Range)
+        private ResumeAnalysisEntity.DateRange range;
 
-        @Field(type = FieldType.Text, analyzer = "keyword")
-        private String startTime;
-
-        @Field(type = FieldType.Text, analyzer = "keyword")
-        private String endTime;
 
         @MultiField(
                 mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),

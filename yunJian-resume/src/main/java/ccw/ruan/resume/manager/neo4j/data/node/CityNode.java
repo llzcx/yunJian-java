@@ -13,9 +13,6 @@ import org.neo4j.ogm.annotation.Property;
 @NodeEntity(label="城市")
 @Data
 public class CityNode {
-
     @Property("name")
     private String name;
-
-    
 }

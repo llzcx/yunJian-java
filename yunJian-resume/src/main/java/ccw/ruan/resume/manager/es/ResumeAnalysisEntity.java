@@ -6,6 +6,7 @@ import org.apache.dubbo.config.support.Nested;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,14 +22,14 @@ public class ResumeAnalysisEntity {
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String name;
 
-    @Field(type = FieldType.Text, analyzer = "keyword")
-    private String dateOfBirth;
+    @Field(type = FieldType.Date)
+    private Date dateOfBirth;
 
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String graduationInstitution;
 
-    @Field(type = FieldType.Text, analyzer = "keyword")
-    private String sex;
+    @Field(type = FieldType.Boolean)
+    private Boolean sex;
 
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String phone;
@@ -38,6 +39,9 @@ public class ResumeAnalysisEntity {
 
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String education;
+
+    @Field(type = FieldType.Integer)
+    private Integer workYear;
 
     @MultiField(
             mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
@@ -68,5 +72,18 @@ public class ResumeAnalysisEntity {
 
     @Nested
     private List<WorkExperienceEntity> workExperiences;
+
+    @Data
+    public static class DateRange {
+        @Field(type = FieldType.Date)
+        private Date from;
+        @Field(type = FieldType.Date)
+        private Date to;
+
+        public DateRange(Date from, Date to) {
+            this.from = from;
+            this.to = to;
+        }
+    }
 
 }

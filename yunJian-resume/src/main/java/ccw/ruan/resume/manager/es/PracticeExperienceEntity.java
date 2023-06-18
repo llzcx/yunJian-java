@@ -10,36 +10,46 @@ import org.springframework.data.elasticsearch.annotations.*;
 @Data
 public class PracticeExperienceEntity {
 
-        @Id
-        private String id;
+    @Id
+    private String id;
 
-        @Field(type = FieldType.Text, analyzer = "keyword")
-        private String startTime;
+    @Field(type = FieldType.Date_Range)
+    private ResumeAnalysisEntity.DateRange range;
 
-        @Field(type = FieldType.Text, analyzer = "keyword")
-        private String endTime;
 
-        @MultiField(
-                mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-                otherFields = {
-                        @InnerField(suffix = "keyword", type = FieldType.Keyword)
-                }
-        )
-        private String jobName;
+    @MultiField(
+            mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
+            }
+    )
+    private String jobName;
 
-        @MultiField(
-                mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-                otherFields = {
-                        @InnerField(suffix = "keyword", type = FieldType.Keyword)
-                }
-        )
-        private String companyName;
+    @MultiField(
+            mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
+            }
+    )
+    private String companyName;
 
-        @MultiField(
-                mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-                otherFields = {
-                        @InnerField(suffix = "keyword", type = FieldType.Keyword)
-                }
-        )
-        private String description;
-    }
+    @MultiField(
+            mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
+            }
+    )
+    private String description;
+
+        public PracticeExperienceEntity(String id, ResumeAnalysisEntity.DateRange range,
+                                        String jobName, String companyName, String description) {
+                this.id = id;
+                this.range = range;
+                this.jobName = jobName;
+                this.companyName = companyName;
+                this.description = description;
+        }
+
+        public PracticeExperienceEntity() {
+        }
+}

@@ -13,7 +13,7 @@ public class ResumeAnalysisVo implements Serializable {
     /**
      * id
      */
-    private Integer id;
+    private String id;
     /**
      * 名字
      */

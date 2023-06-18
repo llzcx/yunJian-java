@@ -1,6 +1,7 @@
 package ccw.ruan.resume.manager.es;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.apache.dubbo.config.support.Nested;
 import org.springframework.data.annotation.Id;
@@ -22,7 +23,8 @@ public class ResumeAnalysisEntity {
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String name;
 
-    @Field(type = FieldType.Date)
+    @Field(type = FieldType.Date,format = DateFormat.date)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
 
     @Field(type = FieldType.Text, analyzer = "keyword")
@@ -43,28 +45,13 @@ public class ResumeAnalysisEntity {
     @Field(type = FieldType.Integer)
     private Integer workYear;
 
-    @MultiField(
-            mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-            otherFields = {
-                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
-            }
-    )
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String major;
 
-    @MultiField(
-            mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-            otherFields = {
-                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
-            }
-    )
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String expectedJob;
 
-    @MultiField(
-            mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-            otherFields = {
-                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
-            }
-    )
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String selfEvaluation;
 
     @Nested
@@ -73,17 +60,5 @@ public class ResumeAnalysisEntity {
     @Nested
     private List<WorkExperienceEntity> workExperiences;
 
-    @Data
-    public static class DateRange {
-        @Field(type = FieldType.Date)
-        private Date from;
-        @Field(type = FieldType.Date)
-        private Date to;
-
-        public DateRange(Date from, Date to) {
-            this.from = from;
-            this.to = to;
-        }
-    }
 
 }

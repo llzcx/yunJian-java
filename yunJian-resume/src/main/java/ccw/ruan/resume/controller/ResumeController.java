@@ -81,7 +81,7 @@ public class ResumeController {
     }
 
     @GetMapping("/search")
-    public List<ResumeAnalysisEntity> search(@RequestBody SearchDto searchDto){
+    public List<ResumeAnalysisEntity> search(@RequestBody SearchDto searchDto) throws Exception{
         return resumeService.search(searchDto);
     }
 

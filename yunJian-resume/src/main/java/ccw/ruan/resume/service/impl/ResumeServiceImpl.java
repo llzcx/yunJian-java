@@ -25,14 +25,12 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
 import org.apache.rocketmq.common.message.Message;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.*;
 
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Range;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -45,6 +43,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,15 +113,15 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @Override
     public SimilarityVo findSimilarity(Integer userId) {
-        final List<Resume> resumes = resumeMapper.selectByMap(MybatisPlusUtil.getMap("user_id",userId));
+        final List<Resume> resumes = resumeMapper.selectByMap(MybatisPlusUtil.getMap("user_id", userId));
         SimilarityVo similarityVo = new SimilarityVo();
         List<ResumePair> resumePairs = new ArrayList<>();
         int length = resumes.size();
-        for (int i = 0; i < length-1; i++) {
-            for (int j = i+1 ; j < length; j++) {
-                ResumePair pair = new ResumePair(resumes.get(i),resumes.get(j));
+        for (int i = 0; i < length - 1; i++) {
+            for (int j = i + 1; j < length; j++) {
+                ResumePair pair = new ResumePair(resumes.get(i), resumes.get(j));
                 final CalculateSimilarityDto calculateSimilarityDto = new CalculateSimilarityDto(pair.getResume1().getSource()
-                        ,pair.getResume2().getSource());
+                        , pair.getResume2().getSource());
                 final String s = pyClient.calculateSimilarity(calculateSimilarityDto);
                 Float score = Float.valueOf(s);
                 pair.setScore(score);
@@ -168,22 +169,25 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     }
 
     @Override
-    public List<ResumeAnalysisEntity> search(SearchDto searchDto) {
+    public List<ResumeAnalysisEntity> search(SearchDto searchDto) throws Exception{
         final QueryBuilder build = build(searchDto);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withPageable(PageRequest.of(searchDto.getPageNum(), searchDto.getPageSize()))
+                .withPageable(PageRequest.of(searchDto.getPageNum()-1, searchDto.getPageSize()))
                 .withQuery(build)
                 .build();
         SearchHits<ResumeAnalysisEntity> searchHits = elasticsearchRestTemplate.search(searchQuery, ResumeAnalysisEntity.class);
+        System.out.println("size:" + searchHits.toList().size());
+        System.out.println("total:" + searchHits.getTotalHits());
         return searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
     }
 
     /**
      * 把解析结果存储到es当中
+     *
      * @param resumeAnalysisVo
      * @return
      */
-    private Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo){
+    private Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo) {
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
         resumeAnalysisEntity.setId(resumeAnalysisVo.getId());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());
@@ -200,13 +204,13 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resumeAnalysisEntity.setWorkYear(ResumeHandle.calculateWorkYears(resumeAnalysisVo.getWorkExperiences()));
 
         List<PracticeExperienceEntity> practice = new ArrayList<>();
-        resumeAnalysisVo.getPracticeExperiences().forEach(item->{
+        resumeAnalysisVo.getPracticeExperiences().forEach(item -> {
             PracticeExperienceEntity praEntity = new PracticeExperienceEntity();
             praEntity.setDescription(item.getDescription());
-            praEntity.setRange(new ResumeAnalysisEntity.DateRange(
-                    ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getStartTime())),
-                    ResumeHandle.toDate(ResumeHandle.parseEndTime(item.getEndTime()))
-            ));
+            final Date startTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getStartTime()));
+            praEntity.setStartTime(startTime);
+            final Date endTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getEndTime()));
+            praEntity.setEndTime(endTime);
             praEntity.setCompanyName(item.getCompanyName());
             praEntity.setJobName(item.getJobName());
             praEntity.setDescription(item.getDescription());
@@ -214,15 +218,14 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         });
         resumeAnalysisEntity.setPracticeExperiences(practice);
 
-
         List<WorkExperienceEntity> work = new ArrayList<>();
-        resumeAnalysisVo.getWorkExperiences().forEach(item->{
+        resumeAnalysisVo.getWorkExperiences().forEach(item -> {
             WorkExperienceEntity worEntity = new WorkExperienceEntity();
             worEntity.setDescription(item.getDescription());
-            worEntity.setRange(new ResumeAnalysisEntity.DateRange(
-                    ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getStartTime())),
-                    ResumeHandle.toDate(ResumeHandle.parseEndTime(item.getEndTime()))
-            ));
+            final Date startTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getStartTime()));
+            worEntity.setStartTime(startTime);
+            final Date endTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getEndTime()));
+            worEntity.setEndTime(endTime);
             worEntity.setCompanyName(item.getCompanyName());
             worEntity.setJobName(item.getJobName());
             worEntity.setDescription(item.getDescription());
@@ -233,55 +236,99 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         return true;
     }
 
-    public static QueryBuilder build(SearchDto searchDto) {
+    public static QueryBuilder build(SearchDto searchDto) throws Exception {
         BoolQueryBuilder boolQuery = boolQuery();
+        final String fullText = searchDto.getFullText();
+        if(StringUtils.isNotBlank(fullText)){
+            //TODO 进行全文检索
+            boolQuery.should(boolQuery()
+                    .should(matchQuery("name", fullText).operator(Operator.AND))
+                    .should(termQuery("name.keyword", fullText)))
+                    .should(matchQuery("major", fullText))
+                    .should(matchQuery("expectedJob", fullText))
+                    .should(matchQuery("graduationInstitution", fullText));
+            BoolQueryBuilder nestedQuery = boolQuery();
+            nestedQuery.should(matchQuery("practiceExperiences.jobName", fullText));
+            nestedQuery.should(matchQuery("workExperiences.jobName", fullText));
+            nestedQuery.should(matchQuery("practiceExperiences.companyName", fullText));
+            nestedQuery.should(matchQuery("workExperiences.companyName", fullText));
+            nestedQuery.should(matchQuery("practiceExperiences.description", fullText));
+            nestedQuery.should(matchQuery("workExperiences.description", fullText));
+            boolQuery.should(nestedQuery);
+            return boolQuery;
+        }
         //基本信息
         SearchDto.Basic basic = searchDto.getBasic();
-        if (StringUtils.isNotBlank(basic.getName())) {
-            boolQuery.must(boolQuery()
-                    .should(matchQuery("name", basic.getName()).operator(Operator.AND))
-                    .should(termQuery("name.keyword", basic.getName())));
-        }
-        if (basic.getSex() != null) {
-            boolQuery.must(matchQuery("sex", basic.getSex()));
-        }
-        RangeQueryBuilder ageRange = rangeQuery("dateOfBirth");
-        if (basic.getMaxAge() != null) {
-            ageRange.gte(basic.getMaxAge() + "||-100y");
-        }
-        if (basic.getMinAge() != null) {
-            ageRange.lte(basic.getMinAge() + "||now/d");
-        }
-        if (basic.getMaxAge() != null || basic.getMinAge() != null) {
-            boolQuery.must(ageRange);
+        if (basic != null) {
+            if (StringUtils.isNotBlank(basic.getName())) {
+                boolQuery.must(boolQuery()
+                        .should(matchQuery("name", basic.getName()).operator(Operator.AND))
+                        .should(termQuery("name.keyword", basic.getName())));
+            }
+            if (basic.getSex() != null) {
+                boolQuery.must(matchQuery("sex", basic.getSex()));
+            }
+            Integer minAge = searchDto.getBasic().getMinAge();
+            Integer maxAge = searchDto.getBasic().getMaxAge();
+            // 获取当前日期
+            Date currentDate = new Date();
+            // 获取指定年龄范围（20-25）的生日时间范围
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            int currentYear = Integer.parseInt(new SimpleDateFormat("yyyy").format(currentDate));
+            Date minBirthDateTime = null;
+
+            if (maxAge != null) {
+                Integer minBirthYear = currentYear - maxAge;
+                String minBirthDate = minBirthYear + "-01-01";
+                minBirthDateTime = sdf.parse(minBirthDate);
+            }
+            Date maxBirthDateTime = null;
+            if (minAge != null) {
+                Integer maxBirthYear = currentYear - minAge;
+                String maxBirthDate = maxBirthYear + "-12-31";
+                maxBirthDateTime = sdf.parse(maxBirthDate);
+            }
+
+            final RangeQueryBuilder dateRange = rangeQuery("dateOfBirth");
+            if (minAge != null) {
+                dateRange.from(sdf.format(minBirthDateTime));
+            }
+            if (maxAge != null) {
+                dateRange.to(sdf.format(maxBirthDateTime));
+            }
+            boolQuery.must(dateRange);
+            if (StringUtils.isNotBlank(basic.getMajor())) {
+                boolQuery.must(matchQuery("major", basic.getMajor()));
+            }
+            if (StringUtils.isNotBlank(basic.getExpectedJob())) {
+                boolQuery.must(matchQuery("expectedJob", basic.getExpectedJob()));
+            }
+            if (StringUtils.isNotBlank(basic.getGraduationInstitution())) {
+                boolQuery.must(matchQuery("graduationInstitution", basic.getGraduationInstitution()));
+            }
         }
         //工作年限
         final SearchDto.WorkYear workYear = searchDto.getWorkYear();
-        RangeQueryBuilder workYearRange = rangeQuery("workYear");
-        if (workYear.getUpperLimit() != null) {
-            workYearRange.gte(workYear.getUpperLimit());
-        }
-        if (workYear.getLowerLimit() != null) {
-            workYearRange.lte(workYear.getLowerLimit());
-        }
-        if (workYear.getLowerLimit()!=null || workYear.getUpperLimit()!=null) {
-            boolQuery.must(workYearRange);
-        }
-        if (StringUtils.isNotBlank(basic.getMajor())) {
-            boolQuery.must(matchQuery("major", basic.getMajor()));
-        }
-        if (StringUtils.isNotBlank(basic.getExpectedJob())) {
-            boolQuery.must(matchQuery("expectedJob", basic.getExpectedJob()));
-        }
-        if (StringUtils.isNotBlank(basic.getGraduationInstitution())) {
-            boolQuery.must(matchQuery("graduationInstitution", basic.getGraduationInstitution()));
+        if (workYear != null) {
+            RangeQueryBuilder workYearRange = rangeQuery("workYear");
+            if (workYear.getUpperLimit() != null) {
+                workYearRange.gte(workYear.getLowerLimit());
+            }
+            if (workYear.getLowerLimit() != null) {
+                workYearRange.lte(workYear.getUpperLimit());
+            }
+            if (workYear.getLowerLimit() != null || workYear.getUpperLimit() != null) {
+                boolQuery.must(workYearRange);
+            }
         }
         //联系方式
         SearchDto.Contact contact = searchDto.getContact();
-        if (StringUtils.isNotBlank(contact.getEmail()) || StringUtils.isNotBlank(contact.getPhone())) {
-            boolQuery.must(boolQuery()
-                    .should(matchQuery("mailBox", contact.getEmail()))
-                    .should(termQuery("phone.keyword", contact.getPhone())));
+        if (contact != null) {
+            if (StringUtils.isNotBlank(contact.getEmail()) || StringUtils.isNotBlank(contact.getPhone())) {
+                boolQuery.must(boolQuery()
+                        .should(matchQuery("mailBox", contact.getEmail()))
+                        .should(termQuery("phone.keyword", contact.getPhone())));
+            }
         }
         //工作经历
         SearchDto.WorkExperience workExperience = searchDto.getWorkExperience();
@@ -303,11 +350,15 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                 boolQuery.must(nestedQuery);
             }
         }
-        //其他区
+        //其他
         SearchDto.Other other = searchDto.getOther();
-        if (StringUtils.isNotBlank(other.getSelfEvaluation())) {
-            boolQuery.must(matchQuery("selfEvaluation", other.getSelfEvaluation()));
+        if (other != null) {
+            if (StringUtils.isNotBlank(other.getSelfEvaluation())) {
+                boolQuery.must(matchQuery("selfEvaluation", other.getSelfEvaluation()));
+            }
         }
+        System.out.println(boolQuery.toString());
         return boolQuery;
     }
+
 }

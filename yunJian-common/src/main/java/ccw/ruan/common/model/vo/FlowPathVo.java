@@ -16,6 +16,7 @@ public class FlowPathVo implements Serializable {
     private List<FlowPathNode> fail;
 
     public FlowPathVo() {
+
     }
 
     public FlowPathVo(List<FlowPathNode> active, List<FlowPathNode> success, List<FlowPathNode> fail) {

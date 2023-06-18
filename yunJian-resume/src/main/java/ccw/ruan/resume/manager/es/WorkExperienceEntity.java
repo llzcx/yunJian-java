@@ -1,22 +1,13 @@
 package ccw.ruan.resume.manager.es;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.apache.http.HttpHost;
-import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.NestedQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.annotations.InnerField;
-import org.springframework.data.elasticsearch.annotations.MultiField;
-import java.io.IOException;
+
+import java.util.Date;
 
 
 /**
@@ -27,34 +18,22 @@ public class WorkExperienceEntity {
         @Id
         private String id;
 
-        /**
-         * 范围
-         */
-        @Field(type = FieldType.Date_Range)
-        private ResumeAnalysisEntity.DateRange range;
+        @Field(type = FieldType.Date,format = DateFormat.date)
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private Date startTime;
 
 
-        @MultiField(
-                mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-                otherFields = {
-                        @InnerField(suffix = "keyword", type = FieldType.Keyword)
-                }
-        )
+        @Field(type = FieldType.Date,format = DateFormat.date)
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private Date endTime;
+
+
+        @Field(type = FieldType.Text, analyzer = "ik_max_word")
         private String jobName;
 
-        @MultiField(
-                mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-                otherFields = {
-                        @InnerField(suffix = "keyword", type = FieldType.Keyword)
-                }
-        )
+        @Field(type = FieldType.Text, analyzer = "ik_max_word")
         private String companyName;
 
-        @MultiField(
-                mainField = @Field(type = FieldType.Text, analyzer = "ik_max_word"),
-                otherFields = {
-                        @InnerField(suffix = "keyword", type = FieldType.Keyword)
-                }
-        )
+        @Field(type = FieldType.Text, analyzer = "ik_max_word")
         private String description;
 }

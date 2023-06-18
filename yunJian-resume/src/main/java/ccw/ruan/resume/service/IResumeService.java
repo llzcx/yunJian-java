@@ -43,7 +43,7 @@ public interface IResumeService extends IService<Resume> {
      * @param searchDto
      * @return
      */
-    List<ResumeAnalysisEntity> search(SearchDto searchDto);
+    List<ResumeAnalysisEntity> search(SearchDto searchDto) throws Exception;
 
 
 }

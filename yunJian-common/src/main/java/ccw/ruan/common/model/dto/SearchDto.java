@@ -14,6 +14,7 @@ public class SearchDto {
     private WorkYear workYear;
     private WorkExperience workExperience;
     private Other other;
+    private String fullText;
     private Integer pageNum;
     private Integer pageSize;
     /**

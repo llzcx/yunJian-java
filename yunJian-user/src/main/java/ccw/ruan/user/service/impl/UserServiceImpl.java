@@ -14,7 +14,6 @@ import ccw.ruan.user.service.IUserService;
 import ccw.ruan.user.util.RedisUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,7 +60,7 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
         BeanUtils.copyProperties(registerDto, user);
         userMapper.insert(user);
         Integer userId = user.getId();
-        //TODO 初始化面试流程
+        //TODO 初始化流程
         FlowPathNode node1 = new FlowPathNode("投递人选", "#123", userId);
         FlowPathNode node2 = new FlowPathNode("笔试阶段", "#123", userId);
         FlowPathNode node3 = new FlowPathNode("面试阶段", "#123", userId);

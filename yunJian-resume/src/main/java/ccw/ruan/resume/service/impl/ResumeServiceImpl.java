@@ -1,15 +1,18 @@
 package ccw.ruan.resume.service.impl;
 
 import ccw.ruan.common.model.pojo.Resume;
+import ccw.ruan.common.model.vo.ResumePair;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
+import ccw.ruan.resume.manager.http.PyClient;
+import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
 import ccw.ruan.resume.manager.mq.ResumeAnalysis;
 import ccw.ruan.resume.manager.neo4j.data.node.*;
 import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.resume.manager.neo4j.vo.SchoolVo;
-import ccw.ruan.resume.manager.neo4j.vo.SimilarityVo;
+import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -47,6 +50,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     @Autowired
     ResumeRepository repository;
 
+    @Autowired
+    PyClient pyClient;
+
     @Override
     public KnowledgeGraphVo findKnowledgeGraphVo(Integer resumeId) {
         final Resume resume = resumeMapper.selectById(resumeId);
@@ -80,13 +86,22 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     @Override
     public SimilarityVo findSimilarity(Integer userId) {
         final List<Resume> resumes = resumeMapper.selectByMap(MybatisPlusUtil.getMap("user_id",userId));
+        SimilarityVo similarityVo = new SimilarityVo();
+        List<ResumePair> resumePairs = new ArrayList<>();
         int length = resumes.size();
         for (int i = 0; i < length-1; i++) {
             for (int j = i+1 ; j < length; j++) {
-
+                ResumePair pair = new ResumePair(resumes.get(i),resumes.get(j));
+                final CalculateSimilarityDto calculateSimilarityDto = new CalculateSimilarityDto(pair.getResume1().getSource()
+                        ,pair.getResume2().getSource());
+                final String s = pyClient.calculateSimilarity(calculateSimilarityDto);
+                Float score = Float.valueOf(s);
+                pair.setScore(score);
+                resumePairs.add(pair);
             }
         }
-        return null;
+        similarityVo.setResumes(resumePairs);
+        return similarityVo;
     }
 
     /**

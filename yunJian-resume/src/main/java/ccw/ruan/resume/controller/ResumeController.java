@@ -8,7 +8,7 @@ import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.http.PyClient;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
-import ccw.ruan.resume.manager.neo4j.vo.SimilarityVo;
+import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 import javax.servlet.http.HttpServletRequest;

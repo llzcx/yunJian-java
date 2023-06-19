@@ -8,7 +8,7 @@ import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.service.ResumeDubboService;
-import ccw.ruan.user.service.FlowPathService;
+import ccw.ruan.user.service.IFlowPathService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.util.List;
 public class FlowPathController {
 
     @Autowired
-    private FlowPathService flowPathService;
+    private IFlowPathService flowPathService;
 
 
     @DubboReference(version = "1.0.0", group = "resume", check = false)
@@ -51,7 +51,7 @@ public class FlowPathController {
     }
 
     /**
-     * 更新面试流程
+     * 更新流程
      * @param request 从request解析出用户id
      * @param updateFlowPathDto
      */
@@ -62,7 +62,7 @@ public class FlowPathController {
     }
 
     /**
-     * 添加一个面试流程节点
+     * 添加一个流程节点
      * @param request 从request解析出用户id
      * @param addFlowPathNodeDto
      */
@@ -75,8 +75,8 @@ public class FlowPathController {
     }
 
     /**
-     * 更新一个面试流程节点
-     * @param request
+     * 更新一个流程节点
+     * @param request 从request解析出用户id
      * @param updateFlowPathNodeDto
      * @return
      */
@@ -91,8 +91,9 @@ public class FlowPathController {
     }
 
     /**
-     * 删除一个面试流程节点
+     * 删除一个流程节点
      * @param nodeId
+     * @return
      */
     @DeleteMapping("/{nodeId}")
     public ApiResp<Boolean> deleteFlowPath(@PathVariable Integer nodeId) {
@@ -101,6 +102,9 @@ public class FlowPathController {
 
     /**
      * 更新简历当前所属节点
+     * @param nodeId 更新到某一个流程节点
+     * @param resumeId 简历id
+     * @return
      */
     @PutMapping("/updateState/{resumeId}")
     public ApiResp<Boolean> updateState(Integer nodeId, @PathVariable Integer resumeId) {

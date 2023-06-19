@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 /**
  * @author 陈翔
  */
-public interface FlowPathService extends IService<FlowPathNode> {
+public interface IFlowPathService extends IService<FlowPathNode> {
     /**
      * 获取一个人的流程
      * @param userId

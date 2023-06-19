@@ -13,5 +13,10 @@ import java.util.List;
 @Data
 public class PersonJobFitDto {
     private Job job;
-    private List<Resume> resumes;
+    private Resume resume;
+
+    public PersonJobFitDto(Job job, Resume resume) {
+        this.job = job;
+        this.resume = resume;
+    }
 }

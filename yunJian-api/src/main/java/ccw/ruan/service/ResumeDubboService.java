@@ -1,5 +1,9 @@
 package ccw.ruan.service;
 
+import ccw.ruan.common.model.pojo.Resume;
+
+import java.util.List;
+
 /**
  * @author 陈翔
  */
@@ -11,4 +15,13 @@ public interface ResumeDubboService {
      * @return
      */
     Boolean updateResumeState(Integer resumeId,Integer nodeId);
+
+
+    /**
+     * 查询一个用户的所有简历
+     * @param userId
+     * @return
+     */
+    List<Resume> getResumesByUserId(Integer userId);
+
 }

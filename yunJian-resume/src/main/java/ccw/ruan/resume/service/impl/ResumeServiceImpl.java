@@ -3,6 +3,7 @@ package ccw.ruan.resume.service.impl;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.vo.ResumeAnalysisVo;
+import ccw.ruan.common.model.vo.ResumeMqMessageVo;
 import ccw.ruan.common.model.vo.ResumePair;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.PracticeExperienceEntity;
@@ -21,6 +22,7 @@ import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
 import cn.hutool.core.lang.Pair;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
@@ -47,10 +49,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static ccw.ruan.resume.manager.mq.ResumeAnalysis.MQ_RESUME_ANALYSIS_TOPIC;
+import static ccw.ruan.resume.manager.mq.ResumeAnalysis.decodeUnicode;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
@@ -58,7 +64,6 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  */
 @Service
 public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> implements IResumeService {
-
     @Autowired
     ResumeMapper resumeMapper;
 
@@ -135,17 +140,19 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     /**
      * 简历文件上传
      *
+     * @param userId
      * @param file
      * @return
      */
     @Override
-    public String resumeUpload(MultipartFile file) {
+    public String resumeUpload(Integer userId,MultipartFile file){
         //file是一个临时文件，需要转存到指定位置，否则本次请求完成后临时文件会删除
         //原始文件名
         String originalFilename = file.getOriginalFilename();
         String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
         //使用UUID重新生成文件名，防止文件名称重复造成文件覆盖
-        String fileName = UUID.randomUUID().toString() + suffix;
+        String fileName1 = UUID.randomUUID().toString();
+        String fileName = fileName1 + suffix;
         //创建一个目录对象
         File dir = new File(basePath);
         //判断当前目录是否存在
@@ -159,14 +166,49 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Date currentDate = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = format.format(currentDate);
+        Resume resume = new Resume();
+        String id =UUID.randomUUID().toString();
+        resume.setId(id);
+        resume.setResumeStatus(0);
+        resume.setCreateTime(LocalDateTime.parse(dateString));
+        resume.setUpdateTime(LocalDateTime.parse(dateString));
+        resume.setUserId(userId);
+        resume.setPath("E:/img2/"+fileName1+".png");
+        resumeMapper.insert(resume);
+        ResumeMqMessageVo resumeMqMessageVo = new ResumeMqMessageVo();
+        resumeMqMessageVo.setResumeId(id);
+        resumeMqMessageVo.setFilePath(fileName);
+        String jsonString = JSON.toJSONString(resumeMqMessageVo);
         try {
             resumeAnalysis.send(new Message(MQ_RESUME_ANALYSIS_TOPIC,
-                    fileName.getBytes(StandardCharsets.UTF_8)));
-        } catch (Exception e) {
+                    jsonString.getBytes(StandardCharsets.UTF_8)));
+        }catch (Exception e) {
             e.printStackTrace();
         }
         return fileName;
     }
+
+
+    /**
+     * 简历文件解析函数
+     *
+     * @param originalFilename
+     * @param format
+     * @param resumeId
+     * @return
+     */
+    @Override
+    public void resumeAnalysis(String originalFilename,String format,String resumeId) {
+        String result =pyClient.resumeFile(originalFilename,format);
+        result = decodeUnicode(result);
+        ResumeAnalysisVo resumeAnalysisVo = JSON.parseObject(result, ResumeAnalysisVo.class);
+        System.out.println(resumeAnalysisVo);
+        //Resume resume1 = resumeMapper.selectById(resumeId);
+    }
+
 
     @Override
     public List<ResumeAnalysisEntity> search(SearchDto searchDto) throws Exception{

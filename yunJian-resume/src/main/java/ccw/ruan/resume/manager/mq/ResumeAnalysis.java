@@ -1,26 +1,29 @@
 package ccw.ruan.resume.manager.mq;
 
+import ccw.ruan.common.model.pojo.Resume;
+import ccw.ruan.common.model.vo.ResumeAnalysisVo;
+import ccw.ruan.common.model.vo.ResumeMqMessageVo;
 import ccw.ruan.resume.manager.http.PyClient;
+import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.RocketMQ;
-import cn.hutool.core.io.file.FileNameUtil;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.extension.api.R;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.rocketmq.common.message.Message;
+import com.alibaba.fastjson.JSON;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static ccw.ruan.resume.constant.OssApplicationConstant.MQ_ADDR;
 
@@ -37,8 +40,11 @@ public class ResumeAnalysis implements RocketMQ {
     public static String MQ_RESUME_ANALYSIS_GROUP = "MQ_RESUME_ANALYSIS_GROUP";
     public static String MQ_RESUME_ANALYSIS_CONSUMER = "MQ_RESUME_ANALYSIS_CONSUMER";
     public static String MQ_RESUME_ANALYSIS_TOPIC = "MQ_RESUME_ANALYSIS_TOPIC";
+
     @Autowired
     PyClient pyClient;
+    @Autowired
+    IResumeService resumeService;
 
     @Override
     public void initConsumer() throws Exception{
@@ -56,20 +62,17 @@ public class ResumeAnalysis implements RocketMQ {
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> messages, ConsumeConcurrentlyContext context) {
                 for (MessageExt message : messages) {
                     byte[] body = message.getBody();
-                    String originalFilename = new String(body);
+                    String json = new String(body);
+                    ResumeMqMessageVo resumeMqMessageVo = JSON.parseObject(json, ResumeMqMessageVo.class);
+                    String originalFilename = resumeMqMessageVo.getFilePath();
                     System.out.println(originalFilename);
                     String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
-
                     if(".docx".equals(suffix)){
-                        String result =pyClient.resumeFile(originalFilename,"docx");
-                        result = decodeUnicode(result);
-                        System.out.println(result);
+                        resumeService.resumeAnalysis(originalFilename,"docx",resumeMqMessageVo.getResumeId());
                     }else if(".pdf".equals(suffix)){
-                        String result = pyClient.resumeFile(originalFilename,"pdf");
-                        System.out.println(result);
+                        resumeService.resumeAnalysis(originalFilename,"pdf",resumeMqMessageVo.getResumeId());
                     }else {
-                        String result = pyClient.resumeFile(originalFilename,"png");
-                        System.out.println(result);
+                        resumeService.resumeAnalysis(originalFilename,"png",resumeMqMessageVo.getResumeId());
                     }
                 }
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;

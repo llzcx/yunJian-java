@@ -12,6 +12,9 @@ public class ResumePair {
     private Resume resume2;
     private Float score;
 
+    public ResumePair() {
+    }
+
     public ResumePair(Resume resume1, Resume resume2) {
         this.resume1 = resume1;
         this.resume2 = resume2;

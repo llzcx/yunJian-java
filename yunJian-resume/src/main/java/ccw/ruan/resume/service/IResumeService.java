@@ -30,12 +30,23 @@ public interface IResumeService extends IService<Resume> {
      * @return
      */
     SimilarityVo findSimilarity(Integer userId);
+
     /**
      * 简历文件上传
+     * @param userId
      * @param file
      * @return
      */
-    String resumeUpload(MultipartFile file);
+    String resumeUpload(Integer userId,MultipartFile file);
+
+    /**
+     * 简历文件解析函数
+     * @param originalFilename
+     * @param format
+     * @return
+     */
+    void resumeAnalysis(String originalFilename,String format,String resumeId);
+
 
 
     /**

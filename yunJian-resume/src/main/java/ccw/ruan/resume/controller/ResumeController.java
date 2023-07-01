@@ -52,8 +52,9 @@ public class ResumeController {
         return jobDubboService.get();
     }
     @PostMapping("/upload")
-    public ApiResp<String> upload(MultipartFile file) {
-        return ApiResp.success(resumeService.resumeUpload(file));
+    public ApiResp<String> upload(HttpServletRequest request,MultipartFile file) {
+        final Integer userId = JwtUtil.getId(request);
+        return ApiResp.success(resumeService.resumeUpload(userId,file));
     }
 
     @GetMapping("/similarity")

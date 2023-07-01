@@ -16,15 +16,16 @@ public interface LogDubboService {
     /**
      * 入职日志
      * @param resumeId
-     * @param detail
+     * @param templateName
      * @return
      */
-    Integer onBoardingLog(Integer resumeId,String detail);
+    Integer onBoardingLog(Integer resumeId,String templateName);
 
     /**
      * 面试日志
      * @param resumeId
+     * @param templateName
      * @return
      */
-    Integer interviewLog(Integer resumeId);
+    Integer interviewLog(Integer resumeId,String templateName);
 }

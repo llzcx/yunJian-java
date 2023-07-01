@@ -35,15 +35,15 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, InvitationT
     @Override
     public Boolean sendInvitation(Integer tempId, Integer resumeId) throws Exception {
         final Resume resume = resumeDubboService.getResumeById(resumeId);
-        final InvitationTemplate invitationTemplate = templateMapper.selectById(tempId);
+        final InvitationTemplate template = templateMapper.selectById(tempId);
         if(resume.getEmail()!=null){
-            final String afterHandle = handleTemplate(invitationTemplate.getTemplate(), resume);
+            final String afterHandle = handleTemplate(template.getTemplate(), resume);
             SendEmail.sendEmail(resume.getEmail(), afterHandle);
             // 插入日志
-            if(invitationTemplate.getType().equals(TemplateType.ON_BOARDING.getCode())){
-                operationLogService.interviewLog(resume.getId());
-            }else if(invitationTemplate.getType().equals(TemplateType.INTERVIEW.getCode())){
-                operationLogService.onBoardingLog(resume.getId());
+            if(template.getType().equals(TemplateType.ON_BOARDING.getCode())){
+                operationLogService.interviewLog(resume.getId(),template.getTemplateName());
+            }else if(template.getType().equals(TemplateType.INTERVIEW.getCode())){
+                operationLogService.onBoardingLog(resume.getId(),template.getTemplateName());
             }
             return true;
         }else{

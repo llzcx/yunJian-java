@@ -40,10 +40,10 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     }
 
     @Override
-    public Integer onBoardingLog(Integer resumeId) {
+    public Integer onBoardingLog(Integer resumeId,String templateName) {
         OperationLog operationLog = new OperationLog();
         operationLog.setTime(LocalDateTime.now());
-        operationLog.setDetail(LogTypeEnum.ON_BOARDING.getMessage());
+        operationLog.setDetail(LogTypeEnum.ON_BOARDING.getMessage()+"，模板为"+templateName);
         operationLog.setResumeId(resumeId);
         operationLog.setAction(LogTypeEnum.ON_BOARDING.getCode());
         operationLogMapper.insert(operationLog);
@@ -51,10 +51,10 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     }
 
     @Override
-    public Integer interviewLog(Integer resumeId) {
+    public Integer interviewLog(Integer resumeId,String templateName) {
         OperationLog operationLog = new OperationLog();
         operationLog.setTime(LocalDateTime.now());
-        operationLog.setDetail(LogTypeEnum.ON_BOARDING.getMessage());
+        operationLog.setDetail(LogTypeEnum.ON_BOARDING.getMessage()+"，模板为"+templateName);
         operationLog.setResumeId(resumeId);
         operationLog.setAction(LogTypeEnum.INTERVIEW.getCode());
         operationLogMapper.insert(operationLog);

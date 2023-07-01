@@ -24,14 +24,14 @@ public interface IOperationLogService extends IService<OperationLog> {
          * @param resumeId
          * @return
          */
-        Integer onBoardingLog(Integer resumeId);
+        Integer onBoardingLog(Integer resumeId,String templateName);
 
         /**
          * 面试日志
          * @param resumeId
          * @return
          */
-        Integer interviewLog(Integer resumeId);
+        Integer interviewLog(Integer resumeId,String templateName);
 
 
 }

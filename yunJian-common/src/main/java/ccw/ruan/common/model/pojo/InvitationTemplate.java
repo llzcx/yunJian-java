@@ -28,6 +28,11 @@ public class InvitationTemplate implements Serializable {
     private Integer userId;
 
     /**
+     * 模板名字
+     */
+    private String templateName;
+
+    /**
      * 模板
      */
     private String template;

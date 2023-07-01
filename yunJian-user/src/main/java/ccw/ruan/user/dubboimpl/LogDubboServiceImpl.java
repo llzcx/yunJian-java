@@ -26,12 +26,12 @@ public class LogDubboServiceImpl implements LogDubboService {
     }
 
     @Override
-    public Integer onBoardingLog(Integer resumeId, String detail) {
-        return logService.onBoardingLog(resumeId);
+    public Integer onBoardingLog(Integer resumeId,String templateName) {
+        return logService.onBoardingLog(resumeId,templateName);
     }
 
     @Override
-    public Integer interviewLog(Integer resumeId) {
-        return logService.interviewLog(resumeId);
+    public Integer interviewLog(Integer resumeId,String templateName) {
+        return logService.interviewLog(resumeId,templateName);
     }
 }

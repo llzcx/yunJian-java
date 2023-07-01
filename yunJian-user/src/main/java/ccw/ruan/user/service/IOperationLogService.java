@@ -1,6 +1,7 @@
 package ccw.ruan.user.service;
 
 import ccw.ruan.common.model.pojo.OperationLog;
+import ccw.ruan.common.model.pojo.Resume;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 
@@ -20,19 +21,17 @@ public interface IOperationLogService extends IService<OperationLog> {
 
         /**
          * 入职日志
-         * @param resumeId 简历id
-         * @param detail 备注
+         * @param resumeId
          * @return
          */
-        Integer onBoardingLog(Integer resumeId,String detail);
+        Integer onBoardingLog(Integer resumeId);
 
         /**
          * 面试日志
-         * @param resumeId 简历id
-         * @param detail 备注
+         * @param resumeId
          * @return
          */
-        Integer interviewLog(Integer resumeId,String detail);
+        Integer interviewLog(Integer resumeId);
 
 
 }

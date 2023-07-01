@@ -2,50 +2,35 @@ package ccw.ruan.common.model.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * <p>
- * 岗位表
- * </p>
- *
+ * 邀约模板
  * @author 陈翔
- * @since 2023-06-10
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class Job implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@TableName("invitation_template")
+public class InvitationTemplate implements Serializable {
 
     /**
-     * 岗位ID
+     * 主键
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 用户ID
+     * 用户id
      */
     private Integer userId;
 
     /**
-     * 岗位名
+     * 模板
      */
-    private String name;
-
-    /**
-     * 岗位职责
-     */
-    private String responsibility;
-
-    /**
-     * 岗位要求
-     */
-    private String require;
+    private String template;
 
     /**
      * 创建时间
@@ -56,4 +41,10 @@ public class Job implements Serializable {
      * 更新时间
      */
     private LocalDateTime updateTime;
+
+    /**
+     * 模板类型
+     */
+    private Integer type;
+
 }

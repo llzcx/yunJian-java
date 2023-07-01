@@ -3,6 +3,7 @@ package ccw.ruan.user.service.impl;
 import ccw.ruan.common.constant.LogTypeEnum;
 import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.pojo.OperationLog;
+import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.user.mapper.FlowPathMapper;
 import ccw.ruan.user.mapper.OperationLogMapper;
 import ccw.ruan.user.service.IOperationLogService;
@@ -39,10 +40,10 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     }
 
     @Override
-    public Integer onBoardingLog(Integer resumeId,String detail) {
+    public Integer onBoardingLog(Integer resumeId) {
         OperationLog operationLog = new OperationLog();
         operationLog.setTime(LocalDateTime.now());
-        operationLog.setDetail(detail);
+        operationLog.setDetail(LogTypeEnum.ON_BOARDING.getMessage());
         operationLog.setResumeId(resumeId);
         operationLog.setAction(LogTypeEnum.ON_BOARDING.getCode());
         operationLogMapper.insert(operationLog);
@@ -50,10 +51,10 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     }
 
     @Override
-    public Integer interviewLog(Integer resumeId,String detail) {
+    public Integer interviewLog(Integer resumeId) {
         OperationLog operationLog = new OperationLog();
         operationLog.setTime(LocalDateTime.now());
-        operationLog.setDetail(detail);
+        operationLog.setDetail(LogTypeEnum.ON_BOARDING.getMessage());
         operationLog.setResumeId(resumeId);
         operationLog.setAction(LogTypeEnum.INTERVIEW.getCode());
         operationLogMapper.insert(operationLog);

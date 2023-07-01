@@ -19,6 +19,10 @@ public class SystemException extends RuntimeException {
 
     public SystemException() {
         super();
+        this.resultCode = ResultCode.COMMON_FAIL;
+        this.code = resultCode.getCode();
+        this.msg = resultCode.getMessage();
+
     }
 
     public SystemException(ResultCode resultCode) {

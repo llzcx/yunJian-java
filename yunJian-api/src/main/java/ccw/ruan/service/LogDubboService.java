@@ -24,8 +24,7 @@ public interface LogDubboService {
     /**
      * 面试日志
      * @param resumeId
-     * @param detail
      * @return
      */
-    Integer interviewLog(Integer resumeId,String detail);
+    Integer interviewLog(Integer resumeId);
 }

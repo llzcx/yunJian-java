@@ -42,4 +42,11 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
     public List<Resume> getResumesByUserId(Integer userId) {
         return resumeMapper.selectList(MybatisPlusUtil.queryWrapperEq("user_id", userId));
     }
+
+    @Override
+    public Resume getResumeById(Integer resumeId) {
+        return resumeMapper.selectById(resumeId);
+    }
+
+
 }

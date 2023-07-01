@@ -75,6 +75,20 @@ public class ApiResp<T> implements Serializable {
         }
     }
 
+    /**
+     * 简化控制器if控制返回
+     * @param value 条件
+     * @param object 条件成功则返回的数据
+     * @return
+     */
+    public static ApiResp judge(Boolean value, Object object){
+        if(value){
+            return ApiResp.success(object);
+        }else{
+            return ApiResp.fail(ResultCode.COMMON_FAIL);
+        }
+    }
+
     public static ApiResp success() {
         return new ApiResp(true);
     }

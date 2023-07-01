@@ -24,4 +24,11 @@ public interface ResumeDubboService {
      */
     List<Resume> getResumesByUserId(Integer userId);
 
+    /**
+     * 根据简历id获取简历
+     * @param resumeId
+     * @return
+     */
+    Resume getResumeById(Integer resumeId);
+
 }

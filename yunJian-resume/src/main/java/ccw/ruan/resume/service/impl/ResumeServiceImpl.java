@@ -25,6 +25,8 @@ import cn.hutool.core.lang.Pair;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.apache.rocketmq.common.message.Message;
 import org.elasticsearch.index.query.*;
@@ -50,6 +52,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -167,16 +170,16 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             e.printStackTrace();
         }
         Date currentDate = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = format.format(currentDate);
         Resume resume = new Resume();
         String id =UUID.randomUUID().toString();
         resume.setId(id);
         resume.setResumeStatus(0);
-        resume.setCreateTime(LocalDateTime.parse(dateString));
-        resume.setUpdateTime(LocalDateTime.parse(dateString));
+        LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
+        resume.setCreateTime(dateTime);
+        resume.setUpdateTime(dateTime);
         resume.setUserId(userId);
         resume.setPath("E:/img2/"+fileName1+".png");
+        System.out.println(resume);
         resumeMapper.insert(resume);
         ResumeMqMessageVo resumeMqMessageVo = new ResumeMqMessageVo();
         resumeMqMessageVo.setResumeId(id);
@@ -202,11 +205,35 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      */
     @Override
     public void resumeAnalysis(String originalFilename,String format,String resumeId) {
-        String result =pyClient.resumeFile(originalFilename,format);
+        String result = pyClient.resumeFile(originalFilename, format);
+        System.out.println(result);
         result = decodeUnicode(result);
-        ResumeAnalysisVo resumeAnalysisVo = JSON.parseObject(result, ResumeAnalysisVo.class);
-        System.out.println(resumeAnalysisVo);
-        //Resume resume1 = resumeMapper.selectById(resumeId);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ResumeAnalysisVo resume = null;
+        try {
+            resume = objectMapper.readValue(result, ResumeAnalysisVo.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(resume.toString());
+        System.out.println(resumeId);
+        Resume resume1 = null;
+        try {
+            resume1 = resumeMapper.selectById(resumeId);
+            System.out.println(resume1.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        resume1.setFullName(resume.getName());
+        resume1.setEmail(resume.getMailBox());
+        resume1.setPhone(resume.getPhone());
+        resume1.setContent(result);
+        resume1.setResumeStatus(1);
+        Date currentDate = new Date();
+        LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
+        resume1.setUpdateTime(dateTime);
+        resumeMapper.updateById(resume1);
     }
 
 
@@ -252,8 +279,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             worEntity.setStartTime(startTime);
             final Date endTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getEndTime()));
             worEntity.setEndTime(endTime);
-            worEntity.setCompanyName(item.getCompanyName());
-            worEntity.setJobName(item.getJobName());
+            worEntity.setCompanyName(item.getCompanyName().getText());
+            worEntity.setJobName(item.getJobName().getText());
             worEntity.setDescription(item.getDescription());
             work.add(worEntity);
         });

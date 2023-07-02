@@ -53,7 +53,7 @@ public class ResumeController {
     }
     @PostMapping("/upload")
     public ApiResp<String> upload(HttpServletRequest request,MultipartFile file) {
-        final Integer userId = JwtUtil.getId(request);
+        int userId = 1;
         return ApiResp.success(resumeService.resumeUpload(userId,file));
     }
 

@@ -19,46 +19,37 @@ public class ResumeAnalysisEntity {
 
     @Id
     private String id;
-
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String name;
-
     @Field(type = FieldType.Date,format = DateFormat.date)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
-
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String graduationInstitution;
-
     @Field(type = FieldType.Boolean)
     private Boolean sex;
-
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String phone;
-
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String mailBox;
-
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String education;
-
-    @Field(type = FieldType.Integer)
-    private Integer workYear;
-
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String major;
-
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String expectedJob;
-
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
-    private String selfEvaluation;
-
-    @Nested
-    private List<PracticeExperienceEntity> practiceExperiences;
-
+    private String projectExperiences;
+    @Field(type = FieldType.Integer)
+    private Integer workYear;
     @Nested
     private List<WorkExperienceEntity> workExperiences;
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    private String skillsCertificate;
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
+    private String awardsHonors;
+
+
 
 
 }

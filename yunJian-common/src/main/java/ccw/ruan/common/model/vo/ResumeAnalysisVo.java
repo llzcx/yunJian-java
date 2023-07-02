@@ -33,6 +33,7 @@ public class ResumeAnalysisVo implements Serializable {
      * 性别
      */
     private String sex;
+
     /**
      * 年龄
      */
@@ -65,7 +66,7 @@ public class ResumeAnalysisVo implements Serializable {
     /**
      * 项目经历
      */
-    private String practiceExperiences;
+    private String projectExperiences;
 
     /**
      * 工作年限

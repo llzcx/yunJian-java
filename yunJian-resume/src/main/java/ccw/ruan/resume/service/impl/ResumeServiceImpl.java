@@ -125,8 +125,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         for (int i = 0; i < length - 1; i++) {
             for (int j = i + 1; j < length; j++) {
                 ResumePair pair = new ResumePair(resumes.get(i), resumes.get(j));
-                final CalculateSimilarityDto calculateSimilarityDto = new CalculateSimilarityDto(pair.getResume1().getSource()
-                        , pair.getResume2().getSource());
+                final CalculateSimilarityDto calculateSimilarityDto = new CalculateSimilarityDto(pair.getResume1().getContent()
+                        , pair.getResume2().getContent());
                 final String s = pyClient.calculateSimilarity(calculateSimilarityDto);
                 Float score = Float.valueOf(s);
                 pair.setScore(score);
@@ -233,33 +233,17 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
         resumeAnalysisEntity.setId(resumeAnalysisVo.getId());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());
-        resumeAnalysisEntity.setEducation(resumeAnalysisVo.getEducation());
-        resumeAnalysisEntity.setExpectedJob(resumeAnalysisVo.getExpectedJob());
         resumeAnalysisEntity.
                 setDateOfBirth(ResumeHandle.toDate(ResumeHandle.parseStartTime(resumeAnalysisVo.getDateOfBirth())));
-        resumeAnalysisEntity.setMailBox(resumeAnalysisVo.getMailBox());
-        resumeAnalysisEntity.setMajor(resumeAnalysisVo.getMajor());
-        resumeAnalysisEntity.setPhone(resumeAnalysisVo.getPhone());
-        resumeAnalysisEntity.setSelfEvaluation(resumeAnalysisVo.getSelfEvaluation());
-        resumeAnalysisEntity.setSex(resumeAnalysisVo.getSex().contains("女"));
         resumeAnalysisEntity.setGraduationInstitution(resumeAnalysisVo.getGraduationInstitution());
+        resumeAnalysisEntity.setSex(resumeAnalysisVo.getSex().contains("女"));
+        resumeAnalysisEntity.setPhone(resumeAnalysisVo.getPhone());
+        resumeAnalysisEntity.setMailBox(resumeAnalysisVo.getMailBox());
+        resumeAnalysisEntity.setEducation(resumeAnalysisVo.getEducation());
+        resumeAnalysisEntity.setMajor(resumeAnalysisVo.getMajor());
+        resumeAnalysisEntity.setExpectedJob(resumeAnalysisVo.getExpectedJob());
+        resumeAnalysisEntity.setProjectExperiences(resumeAnalysisVo.getProjectExperiences());
         resumeAnalysisEntity.setWorkYear(ResumeHandle.calculateWorkYears(resumeAnalysisVo.getWorkExperiences()));
-
-        List<PracticeExperienceEntity> practice = new ArrayList<>();
-        resumeAnalysisVo.getPracticeExperiences().forEach(item -> {
-            PracticeExperienceEntity praEntity = new PracticeExperienceEntity();
-            praEntity.setDescription(item.getDescription());
-            final Date startTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getStartTime()));
-            praEntity.setStartTime(startTime);
-            final Date endTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getEndTime()));
-            praEntity.setEndTime(endTime);
-            praEntity.setCompanyName(item.getCompanyName());
-            praEntity.setJobName(item.getJobName());
-            praEntity.setDescription(item.getDescription());
-            practice.add(praEntity);
-        });
-        resumeAnalysisEntity.setPracticeExperiences(practice);
-
         List<WorkExperienceEntity> work = new ArrayList<>();
         resumeAnalysisVo.getWorkExperiences().forEach(item -> {
             WorkExperienceEntity worEntity = new WorkExperienceEntity();
@@ -274,6 +258,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             work.add(worEntity);
         });
         resumeAnalysisEntity.setWorkExperiences(work);
+        resumeAnalysisEntity.setSkillsCertificate(resumeAnalysisVo.getSkillsCertificate());
+        resumeAnalysisEntity.setAwardsHonors(resumeAnalysisVo.getAwardsHonors());
         repository.save(resumeAnalysisEntity);
         return true;
     }

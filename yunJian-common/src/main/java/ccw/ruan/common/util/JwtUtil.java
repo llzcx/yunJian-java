@@ -150,4 +150,11 @@ public class JwtUtil {
             return null;
         }
     }
+
+    public static void main(String[] args) {
+        final String sign = JwtUtil.sign(Long.valueOf("1"), "123", "123");
+        System.out.println(sign);
+        final Integer id = JwtUtil.getParam(sign, "id");
+        System.out.println(id);
+    }
 }

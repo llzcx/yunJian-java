@@ -25,7 +25,7 @@ public class Resume implements Serializable {
      * 简历ID
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private String id;
+    private Integer id;
 
     /**
      * 用户ID

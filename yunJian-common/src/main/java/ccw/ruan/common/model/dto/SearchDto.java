@@ -112,9 +112,18 @@ public class SearchDto {
     @Data
     public static class Other {
         /**
-         * 自我描述
+         * 技能
          */
-        private String selfEvaluation;
+        private String skillsCertificate;
+        /**
+         * 项目经历
+         */
+        private String projectExperiences;
+
+        /**
+         * 奖项荣誉
+         */
+        private String awardsHonors;
     }
 
 

@@ -236,7 +236,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resumeAnalysisEntity.
                 setDateOfBirth(ResumeHandle.toDate(ResumeHandle.parseStartTime(resumeAnalysisVo.getDateOfBirth())));
         resumeAnalysisEntity.setGraduationInstitution(resumeAnalysisVo.getGraduationInstitution());
-        resumeAnalysisEntity.setSex(resumeAnalysisVo.getSex().contains("女"));
+        resumeAnalysisEntity.setSex(resumeAnalysisVo.getSex().contains("男"));
         resumeAnalysisEntity.setPhone(resumeAnalysisVo.getPhone());
         resumeAnalysisEntity.setMailBox(resumeAnalysisVo.getMailBox());
         resumeAnalysisEntity.setEducation(resumeAnalysisVo.getEducation());
@@ -266,22 +266,23 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     public static QueryBuilder build(SearchDto searchDto) throws Exception {
         BoolQueryBuilder boolQuery = boolQuery();
-        final String fullText = searchDto.getFullText();
-        if(StringUtils.isNotBlank(fullText)){
+        final String kw = searchDto.getFullText();
+        if(StringUtils.isNotBlank(kw)){
             //TODO 进行全文检索
             boolQuery.should(boolQuery()
-                    .should(matchQuery("name", fullText).operator(Operator.AND))
-                    .should(termQuery("name.keyword", fullText)))
-                    .should(matchQuery("major", fullText))
-                    .should(matchQuery("expectedJob", fullText))
-                    .should(matchQuery("graduationInstitution", fullText));
+                    .should(matchQuery("name", kw).operator(Operator.AND))
+                    .should(termQuery("name.keyword", kw)))
+                    .should(matchQuery("major", kw))
+                    .should(matchQuery("expectedJob", kw))
+                    .should(matchQuery("projectExperiences", kw))
+                    .should(matchQuery("education", kw))
+                    .should(matchQuery("skillsCertificate", kw))
+                    .should(matchQuery("awardsHonors", kw))
+                    .should(matchQuery("graduationInstitution", kw));
             BoolQueryBuilder nestedQuery = boolQuery();
-            nestedQuery.should(matchQuery("practiceExperiences.jobName", fullText));
-            nestedQuery.should(matchQuery("workExperiences.jobName", fullText));
-            nestedQuery.should(matchQuery("practiceExperiences.companyName", fullText));
-            nestedQuery.should(matchQuery("workExperiences.companyName", fullText));
-            nestedQuery.should(matchQuery("practiceExperiences.description", fullText));
-            nestedQuery.should(matchQuery("workExperiences.description", fullText));
+            nestedQuery.should(matchQuery("workExperiences.jobName", kw));
+            nestedQuery.should(matchQuery("workExperiences.companyName", kw));
+            nestedQuery.should(matchQuery("workExperiences.description", kw));
             boolQuery.should(nestedQuery);
             return boolQuery;
         }
@@ -381,8 +382,14 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         //其他
         SearchDto.Other other = searchDto.getOther();
         if (other != null) {
-            if (StringUtils.isNotBlank(other.getSelfEvaluation())) {
-                boolQuery.must(matchQuery("selfEvaluation", other.getSelfEvaluation()));
+            if (StringUtils.isNotBlank(other.getAwardsHonors())) {
+                boolQuery.must(matchQuery("awardsHonors", other.getAwardsHonors()));
+            }
+            if (StringUtils.isNotBlank(other.getProjectExperiences())) {
+                boolQuery.must(matchQuery("projectExperiences", other.getProjectExperiences()));
+            }
+            if (StringUtils.isNotBlank(other.getSkillsCertificate())) {
+                boolQuery.must(matchQuery("skillsCertificate", other.getSkillsCertificate()));
             }
         }
         System.out.println(boolQuery.toString());

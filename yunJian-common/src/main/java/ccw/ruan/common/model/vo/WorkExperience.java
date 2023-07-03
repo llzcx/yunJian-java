@@ -20,13 +20,15 @@ public class WorkExperience implements Serializable {
     /**
      * 工作名称
      */
-    private String jobName;
+    private Dish jobName;
     /**
      * 公司名称
      */
-    private String companyName;
+    private Dish companyName;
     /**
      * 工作描述
      */
     private String description;
+
+
 }

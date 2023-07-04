@@ -171,8 +171,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         Date currentDate = new Date();
         Resume resume = new Resume();
-        String id =UUID.randomUUID().toString();
-        resume.setId(id);
         resume.setResumeStatus(0);
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume.setCreateTime(dateTime);
@@ -182,7 +180,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         System.out.println(resume);
         resumeMapper.insert(resume);
         ResumeMqMessageVo resumeMqMessageVo = new ResumeMqMessageVo();
-        resumeMqMessageVo.setResumeId(id);
+        resumeMqMessageVo.setResumeId(resume.getId());
         resumeMqMessageVo.setFilePath(fileName);
         String jsonString = JSON.toJSONString(resumeMqMessageVo);
         try {
@@ -204,7 +202,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      * @return
      */
     @Override
-    public void resumeAnalysis(String originalFilename,String format,String resumeId) {
+    public void resumeAnalysis(String originalFilename,String format,Integer resumeId) {
         String result = pyClient.resumeFile(originalFilename, format);
         System.out.println(result);
         result = decodeUnicode(result);

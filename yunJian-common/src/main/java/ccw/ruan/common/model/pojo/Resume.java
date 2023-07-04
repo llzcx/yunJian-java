@@ -24,7 +24,7 @@ public class Resume implements Serializable {
     /**
      * 简历ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id",type = IdType.ASSIGN_UUID)
     private Integer id;
 
     /**
@@ -41,10 +41,6 @@ public class Resume implements Serializable {
      * 邮箱
      */
     private String email;
-    /**
-     * 年龄
-     */
-    private String age;
     /**
      * 手机号
      */

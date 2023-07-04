@@ -12,6 +12,7 @@ import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,15 +26,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+
 /**
- * <p>
- * 用户表 前端控制器
- * </p>
- * @author 陈翔
- * @since 2023-06-10
+ * 简历接口
+ * @author 86173
  */
 @RestController
 @RequestMapping("/resume")
+@Slf4j
 public class ResumeController {
 
     @DubboReference(version = "1.0.0", group = "job", check = false)
@@ -53,7 +53,8 @@ public class ResumeController {
     }
     @PostMapping("/upload")
     public ApiResp<String> upload(HttpServletRequest request,MultipartFile file) {
-        int userId = 1;
+        final Integer userId = JwtUtil.getId(request);
+        log.info(String.valueOf(userId));
         return ApiResp.success(resumeService.resumeUpload(userId,file));
     }
 

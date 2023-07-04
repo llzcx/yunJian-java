@@ -8,5 +8,5 @@ import lombok.Data;
 @Data
 public class ResumeMqMessageVo {
     private String filePath;
-    private String resumeId;
+    private Integer resumeId;
 }

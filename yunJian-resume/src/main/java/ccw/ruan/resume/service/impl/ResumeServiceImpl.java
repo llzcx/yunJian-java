@@ -259,7 +259,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      */
     private Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo) {
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
-        resumeAnalysisEntity.setId(resumeAnalysisVo.getId());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());
         resumeAnalysisEntity.
                 setDateOfBirth(ResumeHandle.toDate(ResumeHandle.parseStartTime(resumeAnalysisVo.getDateOfBirth())));

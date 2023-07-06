@@ -30,5 +30,14 @@ public class WorkExperience implements Serializable {
      */
     private String description;
 
+    public WorkExperience() {
+    }
 
+    public WorkExperience(String startTime, String endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.jobName = jobName;
+        this.companyName = companyName;
+        this.description = description;
+    }
 }

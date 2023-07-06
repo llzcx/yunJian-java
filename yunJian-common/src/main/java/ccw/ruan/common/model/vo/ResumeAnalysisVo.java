@@ -11,10 +11,6 @@ import java.util.List;
 @Data
 public class ResumeAnalysisVo implements Serializable {
     /**
-     * id
-     */
-    private String id;
-    /**
      * 名字
      */
     private String name;

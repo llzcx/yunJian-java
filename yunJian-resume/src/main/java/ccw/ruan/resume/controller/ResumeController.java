@@ -49,7 +49,7 @@ public class ResumeController {
 
     @GetMapping("/test1")
     public String test1(){
-        return jobDubboService.get();
+        return "succsww";
     }
     @PostMapping("/upload")
     public ApiResp<String> upload(HttpServletRequest request,MultipartFile file) {

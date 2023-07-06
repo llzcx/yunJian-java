@@ -215,6 +215,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             e.printStackTrace();
         }
         System.out.println(resume.toString());
+
         System.out.println(resumeId);
         Resume resume1 = null;
         try {
@@ -223,11 +224,13 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         } catch (Exception e) {
             e.printStackTrace();
         }
+        String jsonString = JSON.toJSONString(resume.getLabelProcessing());
         resume1.setFullName(resume.getName());
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
         resume1.setContent(result);
         resume1.setResumeStatus(1);
+        resume1.setLabelProcessing(jsonString);
         Date currentDate = new Date();
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume1.setUpdateTime(dateTime);
@@ -277,8 +280,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             worEntity.setStartTime(startTime);
             final Date endTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getEndTime()));
             worEntity.setEndTime(endTime);
-            worEntity.setCompanyName(item.getCompanyName().getText());
-            worEntity.setJobName(item.getJobName().getText());
+            worEntity.setCompanyName(item.getCompanyName());
+            worEntity.setJobName(item.getJobName());
             worEntity.setDescription(item.getDescription());
             work.add(worEntity);
         });

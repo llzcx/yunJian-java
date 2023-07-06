@@ -158,10 +158,5 @@ public class JwtUtil {
         System.out.println(id);
     }
 
-    public static void main(String[] args) {
-        String token = "eyJ0eXBlIjoiSnd0IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJjdXJyZW50VGltZSI6MTY4ODM2OTE3MzU4OCwicGFzc3dvcmQiOiIxMjMiLCJpZCI6IjEiLCJleHAiOjE2ODgzNjkxNzMsInVzZXJuYW1lIjoiMTIzIn0.pnI7tKjjO0byKdmHNLY5o04YljMYAGRBOGyhsAENb_o";
 
-        Integer param = JwtUtil.getParam(token, ID);
-        System.out.println(param);
-    }
 }

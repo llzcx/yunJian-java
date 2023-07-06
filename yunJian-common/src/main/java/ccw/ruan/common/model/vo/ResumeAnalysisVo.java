@@ -77,8 +77,6 @@ public class ResumeAnalysisVo implements Serializable {
      * 工作经历
      */
     private List<WorkExperience> workExperiences;
-
-
     /**
      * 技能证书
      */
@@ -88,7 +86,9 @@ public class ResumeAnalysisVo implements Serializable {
      * 奖项荣誉
      */
     private String awardsHonors;
-
-
+    /**
+     * 人才画像解析结果
+     */
+    private ResumeLabelsVo labelProcessing;
 
 }

@@ -7,6 +7,12 @@ import lombok.Data;
  */
 @Data
 public class ResumeMqMessageVo {
+    /**
+     * 文件路径
+     */
     private String filePath;
+    /**
+     * 简历Id
+     */
     private Integer resumeId;
 }

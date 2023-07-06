@@ -32,7 +32,6 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
         final Resume resume = resumeMapper.selectById(resumeId);
         final Integer state1 = resume.getResumeStatus();
         resume.setResumeStatus(nodeId);
-
         logDubboService.stateChangeLog(resumeId, state1,nodeId);
         resumeMapper.updateById(resume);
         return true;

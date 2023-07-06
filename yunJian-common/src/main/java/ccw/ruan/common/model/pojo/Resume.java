@@ -24,7 +24,7 @@ public class Resume implements Serializable {
     /**
      * 简历ID
      */
-    @TableId(value = "id",type = IdType.ASSIGN_UUID)
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -59,12 +59,14 @@ public class Resume implements Serializable {
      * 简历状态
      */
     private Integer resumeStatus;
-
+    /**
+     * 简历技能标签解析结果
+     */
+    private String labelProcessing;
     /**
      * 创建时间
      */
     private LocalDateTime createTime;
-
     /**
      * 更新时间
      */

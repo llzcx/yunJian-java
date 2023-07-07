@@ -9,13 +9,37 @@ import lombok.Data;
 @Data
 public class SearchDto {
 
+    /**
+     * 基本信息检索
+     */
     private Basic basic;
+    /**
+     * 联系方式检索
+     */
     private Contact contact;
+    /**
+     * 工作年限检索
+     */
     private WorkYear workYear;
+    /**
+     * 工作经历检索
+     */
     private WorkExperience workExperience;
+    /**
+     * 其他检索
+     */
     private Other other;
+    /**
+     * 基本信息检索
+     */
     private String fullText;
+    /**
+     * 基本信息检索
+     */
     private Integer pageNum;
+    /**
+     * 基本信息检索
+     */
     private Integer pageSize;
     /**
      * 基本信息

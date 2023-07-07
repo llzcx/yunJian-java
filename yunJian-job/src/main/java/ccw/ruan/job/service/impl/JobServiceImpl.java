@@ -52,7 +52,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         for(int i = 0 ; i < resumes.size() ; i++) {
             PersonJobVo.PJResumeVo pjResumeVo = new PersonJobVo.PJResumeVo();
             final Resume resume = resumes.get(i);
-            pjResumeVo.setResume(resume);
+//            pjResumeVo.setResume(resume);
             pjResumeVo.setSkills(resumeLabelsVoList.get(i).getSkillTags());
             pjResumeVo.setScore(scores.get(i));
             pjResumeVos.add(pjResumeVo);

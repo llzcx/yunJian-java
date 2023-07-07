@@ -2,12 +2,14 @@ package ccw.ruan.common.model.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author 周威宇
  * 背景行业表判断数据
  */
 @Data
-public class BackgroundIndustry {
+public class BackgroundIndustry implements Serializable {
     /**
      * 产品领域标签数量
      */

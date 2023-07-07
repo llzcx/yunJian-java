@@ -6,7 +6,6 @@ import ccw.ruan.common.model.vo.ResumeAnalysisVo;
 import ccw.ruan.common.model.vo.ResumeMqMessageVo;
 import ccw.ruan.common.model.vo.ResumePair;
 import ccw.ruan.common.util.MybatisPlusUtil;
-import ccw.ruan.resume.manager.es.PracticeExperienceEntity;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.es.WorkExperienceEntity;
@@ -21,20 +20,20 @@ import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
-import cn.hutool.core.lang.Pair;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import org.apache.rocketmq.common.message.Message;
 import org.elasticsearch.index.query.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Range;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -47,19 +46,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static ccw.ruan.resume.manager.mq.ResumeAnalysis.MQ_RESUME_ANALYSIS_TOPIC;
 import static ccw.ruan.resume.manager.mq.ResumeAnalysis.decodeUnicode;
+import static ccw.ruan.resume.util.ResumeHandle.calculateWorkYears;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
@@ -191,7 +186,15 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         return fileName;
     }
-
+    @Override
+    public IPage<Resume> searchResume(Integer userId, Integer page, Integer size) throws  Exception{
+     Page<Resume> page1 = new Page<>(page,size);
+     QueryWrapper<Resume> wrapper = new QueryWrapper<>();
+     wrapper.ge("user_id",userId);
+     IPage<Resume> iPage = resumeMapper.selectPage(page1,wrapper);
+        System.out.println(iPage);
+     return iPage;
+     }
 
     /**
      * 简历文件解析函数
@@ -224,12 +227,27 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String jsonString = JSON.toJSONString(resume.getLabelProcessing());
+
         resume1.setFullName(resume.getName());
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
         resume1.setContent(result);
         resume1.setResumeStatus(1);
+
+        System.out.println(resume.getWorkExperiences());
+        int workYears = calculateWorkYears(resume.getWorkExperiences());
+        System.out.println(workYears);
+        resume.setWorkYears(workYears);
+        if(workYears> 10){
+            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);
+        }else if(workYears<10&&workYears>5){
+            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(4);
+        }else if(workYears>0){
+            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(3);
+        }else {
+            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(2);
+        }
+        String jsonString = JSON.toJSONString(resume.getLabelProcessing());
         resume1.setLabelProcessing(jsonString);
         Date currentDate = new Date();
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
@@ -270,7 +288,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resumeAnalysisEntity.setMajor(resumeAnalysisVo.getMajor());
         resumeAnalysisEntity.setExpectedJob(resumeAnalysisVo.getExpectedJob());
         resumeAnalysisEntity.setProjectExperiences(resumeAnalysisVo.getProjectExperiences());
-        resumeAnalysisEntity.setWorkYear(ResumeHandle.calculateWorkYears(resumeAnalysisVo.getWorkExperiences()));
+        resumeAnalysisEntity.setWorkYear(calculateWorkYears(resumeAnalysisVo.getWorkExperiences()));
         List<WorkExperienceEntity> work = new ArrayList<>();
         resumeAnalysisVo.getWorkExperiences().forEach(item -> {
             WorkExperienceEntity worEntity = new WorkExperienceEntity();

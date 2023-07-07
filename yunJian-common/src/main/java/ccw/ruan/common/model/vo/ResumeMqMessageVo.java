@@ -2,11 +2,13 @@ package ccw.ruan.common.model.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author 周威宇
  */
 @Data
-public class ResumeMqMessageVo {
+public class ResumeMqMessageVo implements Serializable {
     /**
      * 文件路径
      */

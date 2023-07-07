@@ -43,7 +43,6 @@ public class ResumeAnalysisVo implements Serializable {
      * 邮箱
      */
     private String mailBox;
-
     /**
      * 学历
      */
@@ -67,7 +66,7 @@ public class ResumeAnalysisVo implements Serializable {
     /**
      * 工作年限
      */
-    private String workYears;
+    private Integer workYears;
 
     /**
      * 工作经历

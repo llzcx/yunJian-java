@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 /**
  * 简历处理工具类
+ * @author 陈翔
  */
 public class ResumeHandle {
 
@@ -42,9 +43,10 @@ public class ResumeHandle {
         for (WorkExperience workExperience : workExperiences) {
             final String start = workExperience.getStartTime();
             final String end = workExperience.getEndTime();
-            if((start!=null && end!=null) && (isFourDigitNumber(start) && isFourDigitNumber(end) || isFourDigitNumber(start) && end.contains("至今"))) {
-                final Integer i = Integer.parseInt(start);
-                Integer j;
+            if((start!=null && end!=null) &&
+                    ((isFourDigitNumber(start) && isFourDigitNumber(end))|| (isFourDigitNumber(start) && end.contains("至今")))) {
+                int i = Integer.parseInt(start);
+                int j;
                 if(end.contains("至今")){
                     j = 2023;
                 }else{
@@ -77,18 +79,6 @@ public class ResumeHandle {
         }
 
         return totalWorkMonths / 12;
-    }
-
-    public static LocalDate parseLocalDate(String dateString) {
-        // 将非数字字符替换为-
-        dateString = dateString.replaceAll("[^0-9]", "-");
-        // 去掉末尾的-或.
-        dateString = dateString.replaceAll("[-.]+$", "");
-        try {
-            return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-M-d"));
-        } catch (DateTimeParseException e) {
-            return null;
-        }
     }
 
     public static LocalDate parseStartTime(String dateString) {
@@ -149,14 +139,12 @@ public class ResumeHandle {
     }
     public static void main(String[] args) {
         List<WorkExperience> list = new ArrayList<>();
-        WorkExperience workExperience1 = new WorkExperience("2011.1", "2013");
+        WorkExperience workExperience1 = new WorkExperience("2011-1", "2013-2");
         WorkExperience workExperience2 = new WorkExperience("2020.4", "至今");
         list.add(workExperience1);
         list.add(workExperience2);
         final int year = calculateWorkYears(list);
         System.out.println(year);
-        final String s = formatDate("2020");
-        System.out.println(s);
     }
 
 }

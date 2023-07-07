@@ -7,6 +7,8 @@ import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.annotation.Query;
 
+import java.util.List;
+
 /**
  * @author 陈翔
  */
@@ -19,10 +21,10 @@ import com.dtflys.forest.annotation.Query;
 public interface PyClient {
     /**
      * 计算人岗匹配度
-     * @param calculateSimilarityDto
+     * @param personJobFitDto
      * @return
      */
     @Get("/resume/personJob")
-    Float personJobFit(@JSONBody PersonJobFitDto calculateSimilarityDto);
+    List<Float> personJobFit(@JSONBody PersonJobFitDto personJobFitDto);
 
 }

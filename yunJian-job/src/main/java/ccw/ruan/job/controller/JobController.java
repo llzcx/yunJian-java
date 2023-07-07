@@ -29,7 +29,7 @@ public class JobController {
      * @param request 从request的token当中解析出用户id
      * @return
      */
-    @GetMapping("/personJob/{jobId}")
+    @GetMapping("/match/{jobId}")
     public ApiResp<PersonJobVo> personJob(@PathVariable Integer jobId, HttpServletRequest request) {
         final Integer id = JwtUtil.getId(request);
         return ApiResp.success(jobService.personJob(jobId,id));

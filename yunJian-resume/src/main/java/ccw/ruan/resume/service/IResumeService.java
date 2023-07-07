@@ -8,6 +8,7 @@ import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.common.model.vo.SimilarityVo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,8 +47,11 @@ public interface IResumeService extends IService<Resume> {
      * @return
      */
     void resumeAnalysis(String originalFilename,String format,Integer resumeId);
-
-
+    /**
+     * 人才库分页查找简历
+     * @return
+     */
+    IPage<Resume> searchResume(Integer userId, Integer page, Integer size) throws  Exception;
 
     /**
      * 搜索简历

@@ -1,6 +1,9 @@
 package ccw.ruan.service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import ccw.ruan.common.model.pojo.Resume;
 import org.apache.rocketmq.common.message.Message;
 /**
  * @author 陈翔

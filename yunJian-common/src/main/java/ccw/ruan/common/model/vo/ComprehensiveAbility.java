@@ -2,12 +2,14 @@ package ccw.ruan.common.model.vo;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author 周威宇
  * 综合能力表判断数据
  */
 @Data
-public class ComprehensiveAbility {
+public class ComprehensiveAbility implements Serializable {
     /**
      * 所获荣誉
      */

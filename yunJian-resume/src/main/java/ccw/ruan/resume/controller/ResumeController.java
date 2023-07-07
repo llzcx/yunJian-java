@@ -3,6 +3,7 @@ package ccw.ruan.resume.controller;
 
 
 import ccw.ruan.common.model.dto.SearchDto;
+import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
@@ -12,6 +13,7 @@ import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,12 @@ public class ResumeController {
         return ApiResp.success(resumeService.findSimilarity(userId));
     }
 
-
+    @GetMapping("/selectResume/{page}/{size}")
+    public ApiResp<IPage<Resume>> selectResume(HttpServletRequest request,@PathVariable String page,@PathVariable String size) throws Exception {
+        final Integer userId = JwtUtil.getId(request);
+        IPage<Resume> resumes =  resumeService.searchResume(userId,Integer.valueOf(page),Integer.valueOf(size));
+        return ApiResp.success(resumes);
+    }
 
     @GetMapping("/graph/{resumeId}")
     public ApiResp<KnowledgeGraphVo> graph(@PathVariable String resumeId){

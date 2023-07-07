@@ -49,7 +49,6 @@ public class Resume implements Serializable {
      * 简历内容
      */
     private String content;
-
     /**
      * 存储路径
      */

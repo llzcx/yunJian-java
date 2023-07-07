@@ -7,7 +7,7 @@ import com.dtflys.forest.annotation.*;
  * @author 陈翔
  */
 @BaseRequest(
-        baseURL = "http://localhost:7070",     // 默认域名
+        baseURL = "http://192.168.50.47:7070",     // 默认域名
         headers = {
                 "Accept:text/plain",                // 默认请求头
                 "Content-Type:application/json",

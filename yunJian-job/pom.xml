@@ -172,7 +172,7 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
-        <!--        远程指定服务调用-->
+        <!--远程指定服务调用-->
         <dependency>
             <groupId>org.apache.dubbo.extensions</groupId>
             <artifactId>dubbo-cluster-specify-address-dubbo3</artifactId>
@@ -183,6 +183,12 @@
             <artifactId>forest-core</artifactId>
             <version>1.5.31</version>
             <scope>compile</scope>
+        </dependency>
+        <!--forest-->
+        <dependency>
+            <groupId>com.dtflys.forest</groupId>
+            <artifactId>forest-spring-boot-starter</artifactId>
+            <version>1.5.31</version>
         </dependency>
     </dependencies>
 

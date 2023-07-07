@@ -4,6 +4,7 @@ import ccw.ruan.common.model.pojo.Resume;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +24,7 @@ public class PersonJobVo implements Serializable {
     public static class PJResumeVo {
         private Resume resume;
         private List<String> skills;
-        private Float score;
+        private BigDecimal score;
     }
 
     public void sortListByScore() {
@@ -32,7 +33,7 @@ public class PersonJobVo implements Serializable {
             @Override
             public int compare(PJResumeVo o1, PJResumeVo o2) {
                 // 根据 score 进行比较
-                return Float.compare(o1.getScore(), o2.getScore());
+                return o2.getScore().compareTo(o1.getScore());
             }
         });
     }

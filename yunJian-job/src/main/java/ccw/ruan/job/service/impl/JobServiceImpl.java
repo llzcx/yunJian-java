@@ -9,13 +9,13 @@ import ccw.ruan.job.manager.http.PyClient;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import ccw.ruan.job.mapper.JobMapper;
 import ccw.ruan.job.service.IJobService;
-import ccw.ruan.service.LogDubboService;
 import ccw.ruan.service.ResumeDubboService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,18 +36,17 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Autowired
     PyClient pyClient;
 
-    @Override
-    public PersonJobVo personJob(Integer jobId,Integer userId) {
+    private PersonJobVo match(String postInfo,Integer userId){
+        System.out.println("postInfo:"+postInfo);
         PersonJobVo personJobVo = new PersonJobVo();
-        final Job job = jobMapper.selectById(jobId);
-        String post = null;
         final List<Resume> resumes = resumeDubboService.getResumesByUserId(userId);
         List<ResumeLabelsVo> resumeLabelsVoList = new ArrayList<>();
         for (int i = 0 ; i < resumes.size() ; i++) {
             resumeLabelsVoList.add(JsonUtil.deserialize(resumes.get(i).getLabelProcessing(),ResumeLabelsVo.class));
         }
         final List<String> resumeInfo = getResumeInfo(resumeLabelsVoList);
-        final List<Float> scores = pyClient.personJobFit(new PersonJobFitDto(post, resumeInfo));
+
+        final List<BigDecimal> scores = pyClient.personJobFit(new PersonJobFitDto(postInfo, resumeInfo));
         List<PersonJobVo.PJResumeVo> pjResumeVos = new ArrayList<>();
         personJobVo.setList(pjResumeVos);
         for(int i = 0 ; i < resumes.size() ; i++) {
@@ -63,12 +62,31 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         return personJobVo;
     }
 
+    @Override
+    public PersonJobVo personJob(Integer jobId,Integer userId) {
+        final Job job = jobMapper.selectById(jobId);
+        return match("132",userId);
+    }
+
+    @Override
+    public PersonJobVo personJob(String postInfo, Integer userId) {
+        return match(postInfo,userId);
+
+    }
 
     private List<String> getResumeInfo(List<ResumeLabelsVo> resumeLabelsVos){
         List<String> list = new ArrayList<>();
         for (int i = 0 ; i < resumeLabelsVos.size() ; i++) {
             final ResumeLabelsVo resumeLabelsVo = resumeLabelsVos.get(i);
-            list.add(shuffleWords(resumeLabelsVo.getSkillTags() + " " +  resumeLabelsVo.getJobTags()));
+            StringBuilder resumeInfo = new StringBuilder(" ");
+            for (String skillTag : resumeLabelsVo.getSkillTags()) {
+                resumeInfo.append(skillTag).append(" ");
+            }
+            for (String jobTag : resumeLabelsVo.getJobTags()) {
+                resumeInfo.append(jobTag).append(" ");
+            }
+            list.add(resumeInfo.toString());
+            System.out.println("resumeInfo:"+ resumeInfo.toString());
         }
         return list;
     }

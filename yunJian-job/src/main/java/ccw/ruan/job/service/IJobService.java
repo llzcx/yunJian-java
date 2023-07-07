@@ -18,4 +18,11 @@ public interface IJobService extends IService<Job> {
      */
     PersonJobVo personJob(Integer jobId,Integer userId);
 
+    /**
+     * 人岗匹配
+     * @param postInfo
+     * @param userId
+     * @return
+     */
+    PersonJobVo personJob(String postInfo,Integer userId);
 }

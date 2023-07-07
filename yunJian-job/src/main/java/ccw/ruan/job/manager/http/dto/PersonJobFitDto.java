@@ -1,8 +1,6 @@
 package ccw.ruan.job.manager.http.dto;
 
 
-import ccw.ruan.common.model.pojo.Job;
-import ccw.ruan.common.model.pojo.Resume;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,13 +11,14 @@ import java.util.List;
  */
 @Data
 public class PersonJobFitDto implements Serializable {
-    private String host;
+    private String post;
     private List<String> resumes;
 
-    public PersonJobFitDto(String host, List<String> resumes) {
-        this.host = host;
+    public PersonJobFitDto(String post, List<String> resumes) {
+        this.post = post;
         this.resumes = resumes;
     }
 
-
+    public PersonJobFitDto() {
+    }
 }

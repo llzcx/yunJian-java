@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 简历日志信息
@@ -14,6 +15,7 @@ import lombok.Data;
  */
 @Data
 @TableName("operation_log")
+@EqualsAndHashCode
 public class OperationLog {
     /**
      * 主键
@@ -40,4 +42,5 @@ public class OperationLog {
      * 简历id
      */
     private Integer resumeId;
+
 }

@@ -54,7 +54,7 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     public Integer interviewLog(Integer resumeId,String templateName) {
         OperationLog operationLog = new OperationLog();
         operationLog.setTime(LocalDateTime.now());
-        operationLog.setDetail(LogTypeEnum.ON_BOARDING.getMessage()+"，模板为"+templateName);
+        operationLog.setDetail(LogTypeEnum.INTERVIEW.getMessage()+"，模板为"+templateName);
         operationLog.setResumeId(resumeId);
         operationLog.setAction(LogTypeEnum.INTERVIEW.getCode());
         operationLogMapper.insert(operationLog);

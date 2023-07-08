@@ -1,17 +1,25 @@
 package ccw.ruan.user.controller;
 
 import ccw.ruan.common.model.pojo.OperationLog;
+import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.vo.LogVo;
 import ccw.ruan.common.request.ApiResp;
+import ccw.ruan.common.util.JwtUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
+import ccw.ruan.service.ResumeDubboService;
+import ccw.ruan.user.mapper.OperationLogMapper;
 import ccw.ruan.user.service.IOperationLogService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 日志接口
@@ -24,6 +32,14 @@ public class LogController {
     @Autowired
     IOperationLogService logService;
 
+    @Autowired
+    OperationLogMapper operationLogMapper;
+
+    @Autowired
+    ResumeDubboService resumeDubboService;
+
+
+
     /**
      * 查询一个简历的日志
      * @param resumeId 简历id
@@ -35,4 +51,15 @@ public class LogController {
     }
 
 
+    /**
+     * 查询一个用户的所有操作日志
+     */
+    @GetMapping("")
+    public ApiResp<List<OperationLog>> log(HttpServletRequest request) {
+        final Integer userId = JwtUtil.getId(request);
+        final List<Resume> resumes = resumeDubboService.getResumesByUserId(userId);
+        LambdaQueryWrapper<OperationLog> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(OperationLog::getResumeId, resumes.stream().map(Resume::getId).collect(Collectors.toList()));
+        return ApiResp.success(operationLogMapper.selectList(queryWrapper));
+    }
 }

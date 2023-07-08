@@ -48,7 +48,7 @@ public class InvitationTemplate implements Serializable {
     private LocalDateTime updateTime;
 
     /**
-     * 模板类型
+     * 模板类型 面试：1 入职：2
      */
     private Integer type;
 

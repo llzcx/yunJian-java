@@ -40,7 +40,10 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, InvitationT
         final InvitationTemplate template = templateMapper.selectById(tempId);
         if(resume.getEmail()!=null){
             final String afterHandle = handleTemplate(template.getTemplate(), resume);
-            SendEmail.sendEmail(resume.getEmail(), afterHandle);
+            //SendEmail.sendEmail(resume.getEmail(), afterHandle);
+            System.out.println("--------------------邮件发送中...--------------");
+            System.out.println(afterHandle);
+            System.out.println("--------------------邮件发送成功--------------");
             // 插入日志
             if(template.getType().equals(TemplateType.ON_BOARDING.getCode())){
                 operationLogService.interviewLog(resume.getId(),template.getTemplateName());

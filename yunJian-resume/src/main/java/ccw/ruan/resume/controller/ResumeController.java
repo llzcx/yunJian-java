@@ -1,7 +1,6 @@
 package ccw.ruan.resume.controller;
 
 
-
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.request.ApiResp;
@@ -33,7 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * 简历接口7.8号版
+ * 简历接口
+ *
  * @author 86173
  */
 @RestController
@@ -54,33 +54,38 @@ public class ResumeController {
 
 
     @GetMapping("/test1")
-    public String test1(){
+    public String test1() {
         return "succsww";
     }
+
     @PostMapping("/upload")
-    public ApiResp<String> upload(HttpServletRequest request,MultipartFile file) {
+    public ApiResp<String> upload(HttpServletRequest request, MultipartFile file) {
         final Integer userId = JwtUtil.getId(request);
         log.info(String.valueOf(userId));
-        return ApiResp.success(resumeService.resumeUpload(userId,file));
+        return ApiResp.success(resumeService.resumeUpload(userId, file));
     }
+
     @GetMapping("/similarity")
-    public ApiResp<SimilarityVo> similarity(HttpServletRequest request){
+    public ApiResp<SimilarityVo> similarity(HttpServletRequest request) {
         final Integer userId = JwtUtil.getId(request);
         return ApiResp.success(resumeService.findSimilarity(userId));
     }
+
     @GetMapping("/selectResume/{page}/{size}")
-    public ApiResp<IPage<Resume>> selectResume(HttpServletRequest request,@PathVariable String page,@PathVariable String size) throws Exception {
+    public ApiResp<IPage<Resume>> selectResume(HttpServletRequest request, @PathVariable String page, @PathVariable String size) throws Exception {
         final Integer userId = JwtUtil.getId(request);
-        IPage<Resume> resumes =  resumeService.searchResume(userId,Integer.valueOf(page),Integer.valueOf(size));
+        IPage<Resume> resumes = resumeService.searchResume(userId, Integer.valueOf(page), Integer.valueOf(size));
         return ApiResp.success(resumes);
     }
+
     @GetMapping("/analysisResults/{resumeId}")
-    public  ApiResp<Resume> analysisResults(HttpServletRequest request,@PathVariable String resumeId){
+    public ApiResp<Resume> analysisResults(HttpServletRequest request, @PathVariable String resumeId) {
         Resume resume1 = resumeMapper.selectById(resumeId);
         return ApiResp.success(resume1);
     }
+
     @GetMapping("/graph/{resumeId}")
-    public ApiResp<KnowledgeGraphVo> graph(@PathVariable String resumeId){
+    public ApiResp<KnowledgeGraphVo> graph(@PathVariable String resumeId) {
         return ApiResp.success(resumeService.findKnowledgeGraphVo(Integer.valueOf(resumeId)));
     }
 
@@ -89,19 +94,16 @@ public class ResumeController {
 
 
     @GetMapping("/testES")
-    public List<ResumeAnalysisEntity> testEs(){
+    public List<ResumeAnalysisEntity> testEs() {
         Pageable pageable = PageRequest.of(0, 10); // 查询第1页，每页10条记录
         Page<ResumeAnalysisEntity> result = repository.findResumeWithJavaWorkExperience(pageable);
         return result.getContent();
     }
 
     @GetMapping("/search")
-    public List<Resume> search(@RequestBody SearchDto searchDto) throws Exception{
+    public List<Resume> search(@RequestBody SearchDto searchDto) throws Exception {
         return resumeService.search(searchDto);
     }
-
-
-
 
 
 }

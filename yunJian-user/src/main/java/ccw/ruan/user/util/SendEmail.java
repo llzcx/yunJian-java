@@ -28,7 +28,7 @@ public class SendEmail {
             email.addTo(to);
 
             //设置发送的内容
-            email.setMsg("尊敬的用户:"+to+",您本次找回密码的验证码为:"+test);
+            email.setMsg(test);
 
             //设置邮箱标题
             email.setSubject("找回密码");

@@ -1,14 +1,19 @@
 package ccw.ruan.user.controller;
 
 import ccw.ruan.common.constant.TemplateType;
+import ccw.ruan.common.model.dto.AddTemplateDto;
 import ccw.ruan.common.model.pojo.InvitationTemplate;
 import ccw.ruan.common.model.pojo.OperationLog;
 import ccw.ruan.common.request.ApiResp;
+import ccw.ruan.common.util.JwtUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.user.service.ITemplateService;
+import cn.hutool.jwt.JWT;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +29,7 @@ public class TemplateController {
     ITemplateService templateService;
 
     /**
-     * 发送邀约
+     * 发送邀约（自动根据模板id判断邀约类型）
      * @param resumeId
      * @param templateId 模板id
      * @return
@@ -38,11 +43,11 @@ public class TemplateController {
 
     /**
      * 获取用户定义的所有模板
-     * @param userId
      * @return
      */
-    @GetMapping("/list/{userId}")
-    public ApiResp<List<InvitationTemplate>> list(Integer userId) throws Exception{
+    @GetMapping("/list")
+    public ApiResp<List<InvitationTemplate>> list(HttpServletRequest request) throws Exception{
+        final Integer userId = JwtUtil.getId(request);
         final List<InvitationTemplate> list = templateService.list(MybatisPlusUtil.queryWrapperEq("user_id", userId));
         return ApiResp.success(list);
     }
@@ -50,12 +55,16 @@ public class TemplateController {
 
     /**
      * 添加一个模板
-     * @param invitationTemplate
+     * @param addTemplateDto
      * @return
      */
     @PostMapping("")
-    public ApiResp<Boolean> add(@RequestBody InvitationTemplate invitationTemplate) throws Exception{
-        final boolean save = templateService.save(invitationTemplate);
+    public ApiResp<Boolean> add(@RequestBody AddTemplateDto addTemplateDto, HttpServletRequest request) throws Exception{
+        final Integer id = JwtUtil.getId(request);
+        InvitationTemplate template = new InvitationTemplate();
+        BeanUtils.copyProperties(addTemplateDto,template);
+        template.setUserId(id);
+        final boolean save = templateService.save(template);
         return ApiResp.judge(save,save);
     }
 

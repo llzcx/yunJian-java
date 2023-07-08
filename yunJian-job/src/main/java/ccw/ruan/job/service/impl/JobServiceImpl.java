@@ -2,15 +2,20 @@ package ccw.ruan.job.service.impl;
 
 import ccw.ruan.common.model.pojo.Job;
 import ccw.ruan.common.model.pojo.Resume;
+import ccw.ruan.common.model.vo.JobVo;
 import ccw.ruan.common.model.vo.PersonJobVo;
+import ccw.ruan.common.model.vo.ResumeAnalysisVo;
 import ccw.ruan.common.model.vo.ResumeLabelsVo;
 import ccw.ruan.common.util.JsonUtil;
 import ccw.ruan.job.manager.http.PyClient;
+import ccw.ruan.job.manager.http.PyClient1;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import ccw.ruan.job.mapper.JobMapper;
 import ccw.ruan.job.service.IJobService;
 import ccw.ruan.service.ResumeDubboService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
 
     @Autowired
     PyClient pyClient;
+    @Autowired
+    PyClient1 pyClient1;
+
 
     private PersonJobVo match(String postInfo,Integer userId){
         System.out.println("postInfo:"+postInfo);
@@ -107,5 +115,46 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }
 
         return shuffledSentence.toString().trim();
+    }
+
+    /**
+     * 岗位解析
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public String jobAnalysis(Integer userId,String jobContent) {
+        String jobJson = pyClient1.jobAnalysis(jobContent);
+        System.out.println(jobJson);
+        jobJson = decodeUnicode(jobJson);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JobVo resume = null;
+        try {
+            resume = objectMapper.readValue(jobJson, JobVo.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(resume.toString());
+        return "解析完成";
+    }
+
+
+    public static String decodeUnicode(String s) {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        while (i < s.length()) {
+            if (s.charAt(i) == '\\' && i + 1 < s.length() && s.charAt(i + 1) == 'u') {
+                String hex = s.substring(i + 2, i + 6);
+                int code = Integer.parseInt(hex, 16);
+                sb.append((char) code);
+                i += 6;
+            } else {
+                sb.append(s.charAt(i));
+                i++;
+            }
+        }
+        return sb.toString();
     }
 }

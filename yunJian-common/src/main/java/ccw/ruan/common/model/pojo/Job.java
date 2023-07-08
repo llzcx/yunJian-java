@@ -46,7 +46,26 @@ public class Job implements Serializable {
      * 岗位要求
      */
     private String require;
-
+    /**
+     * 岗位要求标签集合
+     */
+    private String professionalLabel;
+    /**
+     * 学历要求
+     */
+    private Integer educationalRequirements;
+    /**
+     * 专业要求
+     */
+    private String professionalRequirements;
+    /**
+     * 性别要求
+     */
+    private Integer sexRequirements;
+    /**
+     * 工作经验要求
+     */
+    private Integer workExperienceRequirements;
     /**
      * 创建时间
      */

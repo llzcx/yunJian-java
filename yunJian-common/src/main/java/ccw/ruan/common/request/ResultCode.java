@@ -2,6 +2,7 @@ package ccw.ruan.common.request;
 
 /**
  *
+ * @author cx
  */
 public enum ResultCode {
     /* 成功 */

@@ -3,6 +3,7 @@ package ccw.ruan.job.manager.http;
 
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import com.dtflys.forest.annotation.*;
+import com.dtflys.forest.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.math.BigDecimal;
@@ -29,9 +30,11 @@ public interface PyClient {
     String send(@Query("name") String name);
     /**
      * 计算人岗匹配度
-     * @param personJobFitDto
+     * @param
      * @return
      */
     @Post("/resume/getScore")
     List<BigDecimal> personJobFit(@JSONBody PersonJobFitDto personJobFitDto);
+
+
 }

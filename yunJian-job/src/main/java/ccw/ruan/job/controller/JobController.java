@@ -66,6 +66,11 @@ public class JobController {
         final Integer id = JwtUtil.getId(request);
         return ApiResp.success(jobService.personJob(jobId,id));
     }
+    @PostMapping("/jobAnalysis")
+    public  ApiResp<String> jobAnalysis(HttpServletRequest request,String jobContent){
+        final Integer id = JwtUtil.getId(request);
+        return ApiResp.success(jobService.jobAnalysis(id,jobContent));
+    }
 
     /**
      * 人岗匹配接口

@@ -31,8 +31,10 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
 
     @Override
     public Boolean updateResumeState(Integer resumeId, Integer nodeId) {
+        System.out.println("resumeId:"+resumeId+",nodeId:"+nodeId);
         final Resume resume = resumeMapper.selectById(resumeId);
         final Integer state1 = resume.getProcessStage();
+        System.out.println("state1:"+state1);
         resume.setProcessStage(nodeId);
         logDubboService.stateChangeLog(resumeId, state1,nodeId);
         resumeMapper.updateById(resume);

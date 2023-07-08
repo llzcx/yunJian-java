@@ -3,7 +3,6 @@ package ccw.ruan.user.service.impl;
 import ccw.ruan.common.constant.LogTypeEnum;
 import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.pojo.OperationLog;
-import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.user.mapper.FlowPathMapper;
 import ccw.ruan.user.mapper.OperationLogMapper;
 import ccw.ruan.user.service.IOperationLogService;
@@ -32,6 +31,7 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
         final FlowPathNode flowPathNode2 = flowPathMapper.selectById(state2);
         OperationLog operationLog = new OperationLog();
         operationLog.setTime(LocalDateTime.now());
+        System.out.println("state1:"+state1+",state2:"+state2);
         operationLog.setDetail("从"+flowPathNode1.getName()+"切换至"+flowPathNode2.getName());
         operationLog.setResumeId(resumeId);
         operationLog.setAction(LogTypeEnum.STATE_CHANGE.getCode());

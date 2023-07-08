@@ -3,6 +3,10 @@ server:
   address: 0.0.0.0
 
 spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
   data:
     neo4j:
       uri: bolt://localhost:7687

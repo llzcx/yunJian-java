@@ -1,6 +1,8 @@
 package ccw.ruan.user.test;
  
 import ccw.ruan.common.model.dto.RegisterDto;
+import ccw.ruan.common.request.ApiResp;
+import ccw.ruan.service.ResumeDubboService;
 import ccw.ruan.user.service.impl.UserServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +31,16 @@ public class MyTest {
         registerDto.setPassword("123");
         registerDto.setEmail("123@163.com");
         userService.register(registerDto);
+    }
+
+
+    @Autowired
+    ResumeDubboService resumeDubboService;
+
+    @Test
+    public void update(){
+        System.out.println("getProcessStage:"+resumeDubboService.getResumeById(22).getProcessStage());
+        ApiResp.success(resumeDubboService.updateResumeState(22, 66));
     }
 
 }

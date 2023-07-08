@@ -24,10 +24,10 @@ public class MyTest {
    @Autowired
    ResumeServiceImpl resumeService;
 
-   @Autowired
 
- 
-    @org.junit.Test
+
+
+   @Test
     public void es()
     {
         final List<Resume> list = resumeService.list();
@@ -36,6 +36,12 @@ public class MyTest {
             final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(content, ResumeAnalysisVo.class);
             resumeService.saveToElasticsearch(resumeAnalysisVo,resume.getId());
         }
+    }
+
+    @Test
+    public void te() {
+        final Resume resume = resumeService.getById(22);
+        System.out.println("getProcessStage:"+resume.getProcessStage());
     }
 
 }

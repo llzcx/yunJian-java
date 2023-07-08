@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * 简历接口
+ * 简历接口7.8号版
  * @author 86173
  */
 @RestController
@@ -90,7 +90,7 @@ public class ResumeController {
     }
 
     @GetMapping("/search")
-    public List<ResumeAnalysisEntity> search(@RequestBody SearchDto searchDto) throws Exception{
+    public List<Resume> search(@RequestBody SearchDto searchDto) throws Exception{
         return resumeService.search(searchDto);
     }
 

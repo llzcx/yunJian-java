@@ -5,6 +5,7 @@ import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.vo.ResumeAnalysisVo;
 import ccw.ruan.common.model.vo.ResumeMqMessageVo;
 import ccw.ruan.common.model.vo.ResumePair;
+import ccw.ruan.common.util.JsonUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
@@ -188,12 +189,12 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     }
     @Override
     public IPage<Resume> searchResume(Integer userId, Integer page, Integer size) throws  Exception{
-     Page<Resume> page1 = new Page<>(page,size);
-     QueryWrapper<Resume> wrapper = new QueryWrapper<>();
-     wrapper.ge("user_id",userId);
-     IPage<Resume> iPage = resumeMapper.selectPage(page1,wrapper);
-        System.out.println(iPage);
-     return iPage;
+         Page<Resume> page1 = new Page<>(page,size);
+         QueryWrapper<Resume> wrapper = new QueryWrapper<>();
+         wrapper.ge("user_id",userId);
+         IPage<Resume> iPage = resumeMapper.selectPage(page1,wrapper);
+            System.out.println(iPage);
+         return iPage;
      }
 
     /**
@@ -209,16 +210,10 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         String result = pyClient.resumeFile(originalFilename, format);
         System.out.println(result);
         result = decodeUnicode(result);
-
-        ObjectMapper objectMapper = new ObjectMapper();
         ResumeAnalysisVo resume = null;
-        try {
-            resume = objectMapper.readValue(result, ResumeAnalysisVo.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        resume = JsonUtil.deserialize(result, ResumeAnalysisVo.class);
+        resume.setWorkYears(calculateWorkYears(resume.getWorkExperiences()));
         System.out.println(resume.toString());
-
         System.out.println(resumeId);
         Resume resume1 = null;
         try {
@@ -231,7 +226,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1.setFullName(resume.getName());
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
-        resume1.setContent(result);
+        resume1.setContent(JsonUtil.Object2StringSlice(resume));
         resume1.setResumeStatus(1);
 
         System.out.println(resume.getWorkExperiences());
@@ -257,7 +252,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
 
     @Override
-    public List<ResumeAnalysisEntity> search(SearchDto searchDto) throws Exception{
+    public List<Resume> search(SearchDto searchDto) throws Exception{
         final QueryBuilder build = build(searchDto);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withPageable(PageRequest.of(searchDto.getPageNum()-1, searchDto.getPageSize()))
@@ -266,7 +261,12 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         SearchHits<ResumeAnalysisEntity> searchHits = elasticsearchRestTemplate.search(searchQuery, ResumeAnalysisEntity.class);
         System.out.println("size:" + searchHits.toList().size());
         System.out.println("total:" + searchHits.getTotalHits());
-        return searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
+        final List<ResumeAnalysisEntity> resumeAnalysisEntityList = searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
+        List<Resume> resumes = new ArrayList<>();
+        resumeAnalysisEntityList.forEach(item->{
+            resumes.add(resumeMapper.selectById(item.getId()));
+        });
+        return resumes;
     }
 
     /**
@@ -275,8 +275,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      * @param resumeAnalysisVo
      * @return
      */
-    private Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo) {
+    public Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo,Integer resumeId) {
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
+        resumeAnalysisEntity.setId(resumeId.toString());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());
         resumeAnalysisEntity.
                 setDateOfBirth(ResumeHandle.toDate(ResumeHandle.parseStartTime(resumeAnalysisVo.getDateOfBirth())));
@@ -295,7 +296,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             worEntity.setDescription(item.getDescription());
             final Date startTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getStartTime()));
             worEntity.setStartTime(startTime);
-            final Date endTime = ResumeHandle.toDate(ResumeHandle.parseStartTime(item.getEndTime()));
+            final Date endTime = ResumeHandle.toDate(ResumeHandle.parseEndTime(item.getEndTime()));
             worEntity.setEndTime(endTime);
             worEntity.setCompanyName(item.getCompanyName());
             worEntity.setJobName(item.getJobName());

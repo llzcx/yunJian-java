@@ -22,6 +22,10 @@ public class SearchDto {
      */
     private WorkYear workYear;
     /**
+     * 项目经历检索
+     */
+    private String projectExperiences;
+    /**
      * 工作经历检索
      */
     private WorkExperience workExperience;
@@ -30,15 +34,15 @@ public class SearchDto {
      */
     private Other other;
     /**
-     * 基本信息检索
+     * 全文检索
      */
     private String fullText;
     /**
-     * 基本信息检索
+     * 页码
      */
     private Integer pageNum;
     /**
-     * 基本信息检索
+     * 每页大小
      */
     private Integer pageSize;
     /**
@@ -102,11 +106,11 @@ public class SearchDto {
     @Data
     public static class WorkYear {
         /**
-         * 一共最少了工作多长时间
+         * 下限
          */
         private Integer lowerLimit;
         /**
-         * 一共最多了工作多长时间
+         * 上限
          */
         private Integer upperLimit;
     }

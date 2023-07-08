@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
  * 简历处理工具类
  * @author 陈翔
  */
+
 public class ResumeHandle {
 
     public static LocalDate currentDate = LocalDate.of(2023, 4, 1);
@@ -82,6 +83,7 @@ public class ResumeHandle {
     }
 
     public static LocalDate parseStartTime(String dateString) {
+        System.out.println("dateString:"+dateString);
         try {
             return LocalDate.parse(formatDate(reg(dateString)), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         } catch (DateTimeParseException e) {

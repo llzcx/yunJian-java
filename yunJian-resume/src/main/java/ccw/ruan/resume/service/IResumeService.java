@@ -58,7 +58,7 @@ public interface IResumeService extends IService<Resume> {
      * @param searchDto
      * @return
      */
-    List<ResumeAnalysisEntity> search(SearchDto searchDto) throws Exception;
+    List<Resume> search(SearchDto searchDto) throws Exception;
 
 
 }

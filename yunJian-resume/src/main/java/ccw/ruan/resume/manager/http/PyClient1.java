@@ -14,21 +14,17 @@ import com.dtflys.forest.annotation.*;
                 "Accept:*/*",
         }
 )
-public interface PyClient {
-    /**
-     * 测试
-     * @param name
-     * @return
-     */
-    @Get("/hello")
-    String send(@Query("name") String name);
+public interface PyClient1 {
 
     /**
-     * 计算简历相似度
-     * @param calculateSimilarityDto
-     * @return
+     * 用作向python发送请求处理简历文件
+     * @param fileName
+     * @param fileFormat
+     * @return resumeFile
      */
-    @Post(value = "/resume/calculateSimilarity",timeout = 1000000000)
-    String calculateSimilarity(@JSONBody CalculateSimilarityDto calculateSimilarityDto);
+    @Get(value = "/ResumeFile",timeout = 1000000000)
+    String resumeFile(@Query("fileName") String fileName, @Query("fileFormat") String fileFormat);
+
+
 
 }

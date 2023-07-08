@@ -10,6 +10,7 @@ import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.es.WorkExperienceEntity;
 import ccw.ruan.resume.manager.http.PyClient;
+import ccw.ruan.resume.manager.http.PyClient1;
 import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
 import ccw.ruan.resume.manager.mq.ResumeAnalysis;
 import ccw.ruan.resume.manager.neo4j.data.node.*;
@@ -74,10 +75,10 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @Autowired
     ResumeRepository repository;
-
     @Autowired
     PyClient pyClient;
-
+    @Autowired
+    PyClient1 pyClient1;
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
@@ -206,7 +207,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      */
     @Override
     public void resumeAnalysis(String originalFilename,String format,Integer resumeId) {
-        String result = pyClient.resumeFile(originalFilename, format);
+        String result = pyClient1.resumeFile(originalFilename, format);
         System.out.println(result);
         result = decodeUnicode(result);
 

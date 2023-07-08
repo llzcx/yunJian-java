@@ -11,11 +11,14 @@ import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.http.PyClient;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.common.model.vo.SimilarityVo;
+import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.dtflys.forest.annotation.Post;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +46,8 @@ public class ResumeController {
 
     @Autowired
     IResumeService resumeService;
-
+    @Autowired
+    ResumeMapper resumeMapper;
 
     @Autowired
     PyClient pyClient;
@@ -59,20 +63,22 @@ public class ResumeController {
         log.info(String.valueOf(userId));
         return ApiResp.success(resumeService.resumeUpload(userId,file));
     }
-
     @GetMapping("/similarity")
     public ApiResp<SimilarityVo> similarity(HttpServletRequest request){
         final Integer userId = JwtUtil.getId(request);
         return ApiResp.success(resumeService.findSimilarity(userId));
     }
-
     @GetMapping("/selectResume/{page}/{size}")
     public ApiResp<IPage<Resume>> selectResume(HttpServletRequest request,@PathVariable String page,@PathVariable String size) throws Exception {
         final Integer userId = JwtUtil.getId(request);
         IPage<Resume> resumes =  resumeService.searchResume(userId,Integer.valueOf(page),Integer.valueOf(size));
         return ApiResp.success(resumes);
     }
-
+    @GetMapping("/analysisResults/{resumeId}")
+    public  ApiResp<Resume> analysisResults(HttpServletRequest request,@PathVariable String resumeId){
+        Resume resume1 = resumeMapper.selectById(resumeId);
+        return ApiResp.success(resume1);
+    }
     @GetMapping("/graph/{resumeId}")
     public ApiResp<KnowledgeGraphVo> graph(@PathVariable String resumeId){
         return ApiResp.success(resumeService.findKnowledgeGraphVo(Integer.valueOf(resumeId)));

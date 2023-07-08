@@ -17,6 +17,13 @@ public interface IJobService extends IService<Job> {
      * @return
      */
     PersonJobVo personJob(Integer jobId,Integer userId);
+    /**
+     * 岗位解析
+     * @param userId
+     * @Param jobContent
+     * @return
+     */
+    String jobAnalysis(Integer userId,String jobContent);
 
     /**
      * 人岗匹配

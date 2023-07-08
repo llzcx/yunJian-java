@@ -226,16 +226,15 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             e.printStackTrace();
         }
 
+        System.out.println(resume.getWorkExperiences());
+        int workYears = calculateWorkYears(resume.getWorkExperiences());
+        System.out.println(workYears);
+        resume.setWorkYears(workYears);
         resume1.setFullName(resume.getName());
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
         resume1.setContent(JsonUtil.Object2StringSlice(resume));
         resume1.setResumeStatus(1);
-
-        System.out.println(resume.getWorkExperiences());
-        int workYears = calculateWorkYears(resume.getWorkExperiences());
-        System.out.println(workYears);
-        resume.setWorkYears(workYears);
         if(workYears> 10){
             resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);
         }else if(workYears<10&&workYears>5){

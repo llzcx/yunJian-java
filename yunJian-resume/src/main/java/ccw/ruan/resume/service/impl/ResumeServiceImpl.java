@@ -22,6 +22,7 @@ import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
+import ccw.ruan.service.LogDubboService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -69,17 +70,26 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @Autowired
     SchoolRepository schoolRepository;
+
     @Value("${resume.path}")
     private String basePath;
+
     @Autowired
     private ResumeAnalysis resumeAnalysis;
 
     @Autowired
     ResumeRepository repository;
+
     @Autowired
     PyClient pyClient;
+
     @Autowired
     PyClient1 pyClient1;
+
+    @Autowired
+    LogDubboService logDubboService;
+
+
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
@@ -175,6 +185,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume.setUserId(userId);
         resume.setPath("E:/img2/"+fileName1+".png");
         System.out.println(resume);
+        //设置流程节点
+        resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
+        //插入简历
         resumeMapper.insert(resume);
         ResumeMqMessageVo resumeMqMessageVo = new ResumeMqMessageVo();
         resumeMqMessageVo.setResumeId(resume.getId());

@@ -2,6 +2,7 @@ package ccw.ruan.user.controller;
 
 import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
+import ccw.ruan.common.model.dto.UpdateFlowPathNodeDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.vo.FlowPathVo;
 import ccw.ruan.common.request.ApiResp;
@@ -86,13 +87,9 @@ public class FlowPathController {
      * @return
      */
     @PutMapping("/{nodeId}")
-    public ApiResp<Boolean> updateFlowPath(HttpServletRequest request,Integer nodeId,@RequestBody AddFlowPathNodeDto updateFlowPathNodeDto) {
-        FlowPathNode flowPathNode = new FlowPathNode();
-        BeanUtils.copyProperties(updateFlowPathNodeDto, flowPathNode);
-        final Integer userId = JwtUtil.getId(request);
-        flowPathNode.setUserId(userId);
-        flowPathNode.setId(nodeId);
-        return ApiResp.success(flowPathService.updateById(flowPathNode));
+    public ApiResp<FlowPathVo> updateFlowPath(HttpServletRequest request,@RequestBody UpdateFlowPathNodeDto updateFlowPathNodeDto, @PathVariable Integer nodeId) {
+        final Integer id = JwtUtil.getId(request);
+        return ApiResp.success(flowPathService.updateColor(id,updateFlowPathNodeDto,nodeId));
     }
 
     /**

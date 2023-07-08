@@ -4,6 +4,7 @@ import ccw.ruan.common.constant.FlowType;
 import ccw.ruan.common.exception.SystemException;
 import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
+import ccw.ruan.common.model.dto.UpdateFlowPathNodeDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.vo.FlowPathVo;
 import ccw.ruan.common.request.ResultCode;
@@ -40,19 +41,20 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
 
 
     private FlowPathVo getFlowPathVo(Integer userId) {
-        return JSONObject.parseObject(redisUtil.get(RAS+FLOW_PATH+userId), FlowPathVo.class);
+        return JSONObject.parseObject(redisUtil.get(RAS + FLOW_PATH + userId), FlowPathVo.class);
     }
+
 
     @Override
     public FlowPathVo flowPathService(Integer userId) {
-       return getFlowPathVo(userId);
+        return getFlowPathVo(userId);
     }
 
     @Override
-    public Boolean updateFlowPath(Integer userId ,UpdateFlowPathDto updateFlowPathDto) {
+    public Boolean updateFlowPath(Integer userId, UpdateFlowPathDto updateFlowPathDto) {
         // 检查大小（多个节点情况）
         final Set<FlowPathNode> set1 = new HashSet<>(flowPathMapper.selectList(MybatisPlusUtil.queryWrapperEq("user_id", userId)));
-        if(updateFlowPathDto.getTotal()!=set1.size()){
+        if (updateFlowPathDto.getTotal() != set1.size()) {
             throw new SystemException(ResultCode.PARAM_ERROR);
         }
         // 只允许顺序不一致
@@ -60,12 +62,12 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
         set2.addAll(updateFlowPathDto.getActive());
         set2.addAll(updateFlowPathDto.getSuccess());
         set2.addAll(updateFlowPathDto.getFail());
-        if(!set1.equals(set2)){
-            System.out.println("set1:"+set1);
-            System.out.println("set2:"+set2);
+        if (!set1.equals(set2)) {
+            System.out.println("set1:" + set1);
+            System.out.println("set2:" + set2);
             throw new SystemException(ResultCode.PARAM_ERROR);
         }
-        redisUtil.set(RAS+ FLOW_PATH+userId,JSONObject.toJSONString(updateFlowPathDto));
+        redisUtil.set(RAS + FLOW_PATH + userId, JSONObject.toJSONString(updateFlowPathDto));
         return true;
     }
 
@@ -83,14 +85,14 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
         flowPathMapper.insert(flowPath);
         final Integer flowType = addFlowPathNodeDto.getFlowType();
         final FlowPathVo flowPathVo = getFlowPathVo(userId);
-        if(flowType.equals(FlowType.ACTIVE.getCode())){
+        if (flowType.equals(FlowType.ACTIVE.getCode())) {
             flowPathVo.getActive().add(flowPath);
-        }else if(flowType.equals(FlowType.SUCCESS.getCode())){
+        } else if (flowType.equals(FlowType.SUCCESS.getCode())) {
             flowPathVo.getSuccess().add(flowPath);
-        }else if(flowType.equals(FlowType.FAIL.getCode())){
+        } else if (flowType.equals(FlowType.FAIL.getCode())) {
             flowPathVo.getFail().add(flowPath);
         }
-        redisUtil.set(RAS+ FLOW_PATH+userId,JSONObject.toJSONString(flowPathVo));
+        redisUtil.set(RAS + FLOW_PATH + userId, JSONObject.toJSONString(flowPathVo));
         return flowPathVo;
     }
 
@@ -101,7 +103,38 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
         flowPathVo.getActive().remove(flowPathNode);
         flowPathVo.getSuccess().remove(flowPathNode);
         flowPathVo.getFail().remove(flowPathNode);
-        redisUtil.set(RAS+ FLOW_PATH+flowPathNode.getUserId(),JSONObject.toJSONString(flowPathVo));
+        redisUtil.set(RAS + FLOW_PATH + flowPathNode.getUserId(), JSONObject.toJSONString(flowPathVo));
         return flowPathVo;
     }
+
+    @Override
+    public FlowPathVo updateColor(Integer userId, UpdateFlowPathNodeDto updateFlowPathNodeDto, Integer nodeId) {
+        FlowPathNode flowPathNode = new FlowPathNode();
+        BeanUtils.copyProperties(updateFlowPathNodeDto, flowPathNode);
+        flowPathNode.setUserId(userId);
+        flowPathNode.setId(nodeId);
+        flowPathMapper.updateById(flowPathNode);
+        final FlowPathVo flowPathVo = getFlowPathVo(userId);
+        for (int i = 0; i < flowPathVo.getActive().size(); i++) {
+            if (flowPathVo.getActive().get(i).getId().equals(flowPathNode.getId())) {
+                flowPathVo.getActive().set(i, flowPathNode);
+                break;
+            }
+        }
+        for (int i = 0; i < flowPathVo.getSuccess().size(); i++) {
+            if (flowPathVo.getSuccess().get(i).getId().equals(flowPathNode.getId())) {
+                flowPathVo.getSuccess().set(i, flowPathNode);
+                break;
+            }
+        }
+        for (int i = 0; i < flowPathVo.getFail().size(); i++) {
+            if (flowPathVo.getFail().get(i).getId().equals(flowPathNode.getId())) {
+                flowPathVo.getFail().set(i, flowPathNode);
+                break;
+            }
+        }
+        redisUtil.set(RAS + FLOW_PATH + userId, JSONObject.toJSONString(flowPathVo));
+        return flowPathVo;
+    }
+
 }

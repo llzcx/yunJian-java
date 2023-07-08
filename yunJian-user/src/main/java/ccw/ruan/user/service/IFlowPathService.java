@@ -3,6 +3,7 @@ package ccw.ruan.user.service;
 
 import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
+import ccw.ruan.common.model.dto.UpdateFlowPathNodeDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.vo.FlowPathVo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -41,4 +42,12 @@ public interface IFlowPathService extends IService<FlowPathNode> {
     FlowPathVo addFlowPathNode(AddFlowPathNodeDto addFlowPathNodeDto, Integer userId);
 
     FlowPathVo removeFlowPathNode(Integer nodeId);
+
+    /**
+     * 更新节点
+     * @param id
+     * @param updateFlowPathNodeDto
+     * @param nodeId
+     */
+    FlowPathVo updateColor(Integer id, UpdateFlowPathNodeDto updateFlowPathNodeDto, Integer nodeId);
 }

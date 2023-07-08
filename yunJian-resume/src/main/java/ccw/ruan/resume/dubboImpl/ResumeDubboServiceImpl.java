@@ -27,11 +27,13 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
     @DubboReference(version = "1.0.0", group = "log", check = false)
     LogDubboService logDubboService;
 
+
+
     @Override
     public Boolean updateResumeState(Integer resumeId, Integer nodeId) {
         final Resume resume = resumeMapper.selectById(resumeId);
-        final Integer state1 = resume.getResumeStatus();
-        resume.setResumeStatus(nodeId);
+        final Integer state1 = resume.getProcessStage();
+        resume.setProcessStage(nodeId);
         logDubboService.stateChangeLog(resumeId, state1,nodeId);
         resumeMapper.updateById(resume);
         return true;
@@ -46,6 +48,7 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
     public Resume getResumeById(Integer resumeId) {
         return resumeMapper.selectById(resumeId);
     }
+
 
 
 }

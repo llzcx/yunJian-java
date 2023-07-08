@@ -17,10 +17,12 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @author 陈翔
  */
+@Component
 public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, InvitationTemplate> implements ITemplateService {
 
     @Autowired

@@ -58,6 +58,12 @@ public class Resume implements Serializable {
      * 简历状态
      */
     private Integer resumeStatus;
+
+    /**
+     * 流程状态
+     */
+    private Integer processStage;
+
     /**
      * 简历技能标签解析结果
      */

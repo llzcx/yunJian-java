@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
+ * 流程接口
  * @author 陈翔
  */
 @RestController
@@ -31,7 +32,7 @@ public class FlowPathController {
     ResumeDubboService resumeDubboService;
 
     /**
-     * 获取一个用户的面试流程
+     * 获取一个用户管理的流程顺序（分类给出）
      * @param request 从request解析出用户id
      */
     @GetMapping
@@ -41,7 +42,7 @@ public class FlowPathController {
     }
 
     /**
-     * 获取一个用户的所有面试节点
+     * 获取一个用户的所有流程节点（不分类给出）
      * @param request 从request解析出用户id
      */
     @GetMapping("/allNode")
@@ -51,7 +52,10 @@ public class FlowPathController {
     }
 
     /**
-     * 更新流程
+     * 更新流程顺序
+     * 流程包含了三种类型：active success fail
+     * 1.一种流程只能属于一种类型
+     * 2.数据库中该用户所有的流程节点都需要在这三个类型里面
      * @param request 从request解析出用户id
      * @param updateFlowPathDto
      */
@@ -63,19 +67,20 @@ public class FlowPathController {
 
     /**
      * 添加一个流程节点
+     * 新添加的流程只能在某个类型的后面，可以通过更新流程顺序改变位置
      * @param request 从request解析出用户id
      * @param addFlowPathNodeDto
      */
     @PostMapping
-    public ApiResp<Boolean> addFlowPath(HttpServletRequest request,@RequestBody AddFlowPathNodeDto addFlowPathNodeDto) {
+    public ApiResp<FlowPathVo> addFlowPath(HttpServletRequest request,@RequestBody AddFlowPathNodeDto addFlowPathNodeDto) {
         FlowPathNode flowPath = new FlowPathNode();
-        flowPath.setUserId(JwtUtil.getId(request));
+        final Integer userId = JwtUtil.getId(request);
         BeanUtils.copyProperties(addFlowPathNodeDto, flowPath);
-        return ApiResp.success(flowPathService.save(flowPath));
+        return ApiResp.success(flowPathService.addFlowPathNode(addFlowPathNodeDto,userId));
     }
 
     /**
-     * 更新一个流程节点
+     * 更新一个流程节点（修改颜色，修改名字）
      * @param request 从request解析出用户id
      * @param updateFlowPathNodeDto
      * @return
@@ -91,13 +96,13 @@ public class FlowPathController {
     }
 
     /**
-     * 删除一个流程节点
+     * 删除一个流程节点，在对应的类型当中也会被删除
      * @param nodeId
      * @return
      */
     @DeleteMapping("/{nodeId}")
-    public ApiResp<Boolean> deleteFlowPath(@PathVariable Integer nodeId) {
-        return ApiResp.success(flowPathService.removeById(nodeId));
+    public ApiResp<FlowPathVo> deleteFlowPath(@PathVariable Integer nodeId) {
+        return ApiResp.success(flowPathService.removeFlowPathNode(nodeId));
     }
 
     /**

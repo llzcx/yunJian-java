@@ -8,10 +8,10 @@ public interface RedisConstant {
     /**
      * 系统名字
      */
-    String RAS = "RAS_";
+    String RAS = "RAS:";
 
     /**
      * 业务名称
      */
-    String FLOW_PATH = "FLOWPATH_";
+    String FLOW_PATH = "FLOWPATH:";
 }

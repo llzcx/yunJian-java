@@ -1,5 +1,7 @@
 package ccw.ruan.service;
 
+import ccw.ruan.common.model.pojo.FlowPathNode;
+
 /**
  * @author 陈翔
  */
@@ -28,4 +30,11 @@ public interface LogDubboService {
      * @return
      */
     Integer interviewLog(Integer resumeId,String templateName);
+
+    /**
+     * 获取第一个状态
+     * @param userId
+     * @return
+     */
+    FlowPathNode getFirstProcessStage(Integer userId);
 }

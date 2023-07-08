@@ -19,13 +19,16 @@ import java.util.List;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class OrderServiceTest {
+public class MyTest {
  
    @Autowired
    ResumeServiceImpl resumeService;
+
+   @Autowired
+
  
-    @Test
-    public void getOrderTest()
+    @org.junit.Test
+    public void es()
     {
         final List<Resume> list = resumeService.list();
         for (Resume resume : list) {
@@ -34,5 +37,5 @@ public class OrderServiceTest {
             resumeService.saveToElasticsearch(resumeAnalysisVo,resume.getId());
         }
     }
- 
+
 }

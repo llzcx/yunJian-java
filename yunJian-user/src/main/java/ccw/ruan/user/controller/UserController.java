@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * <p>
- * 用户表 前端控制器
- * </p>
- *
+ * 用户接口
  * @author 陈翔
  * @since 2023-06-10
  */

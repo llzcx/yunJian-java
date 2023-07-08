@@ -45,12 +45,5 @@ public enum LogTypeEnum {
         this.code = code;
         this.message = message;
     }
-    public static LogTypeEnum getEnum(Integer code) {
-        for (LogTypeEnum item : values()) {
-            if (item.getCode().equals(code)) {
-                return item;
-            }
-        }
-        return null;
-    }
+
 }

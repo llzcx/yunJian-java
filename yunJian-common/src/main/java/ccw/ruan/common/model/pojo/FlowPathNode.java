@@ -22,6 +22,8 @@ public class FlowPathNode {
 
     private Integer userId;
 
+
+
     public FlowPathNode() {
 
     }

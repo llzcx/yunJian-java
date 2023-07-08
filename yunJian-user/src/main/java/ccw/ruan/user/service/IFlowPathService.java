@@ -1,6 +1,7 @@
 package ccw.ruan.user.service;
 
 
+import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.vo.FlowPathVo;
@@ -30,4 +31,14 @@ public interface IFlowPathService extends IService<FlowPathNode> {
      * @return
      */
     FlowPathNode getFirstFlowPathNoe(Integer userId);
+
+    /**
+     * 添加一个面试流程
+     * @param addFlowPathNodeDto
+     * @param userId
+     * @return
+     */
+    FlowPathVo addFlowPathNode(AddFlowPathNodeDto addFlowPathNodeDto, Integer userId);
+
+    FlowPathVo removeFlowPathNode(Integer nodeId);
 }

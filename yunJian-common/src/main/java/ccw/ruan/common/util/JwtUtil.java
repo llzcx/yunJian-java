@@ -9,8 +9,10 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.MimeHeaders;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -145,7 +147,6 @@ public class JwtUtil {
         try{
             DecodedJWT decodedJWT=JWT.decode(token);
             return decodedJWT.getClaim(CURRENT_TIME).asLong();
-
         }catch (JWTCreationException e){
             return null;
         }
@@ -156,6 +157,38 @@ public class JwtUtil {
         System.out.println(sign);
         final Integer id = JwtUtil.getParam(sign, "id");
         System.out.println(id);
+    }
+
+
+    public static Boolean authTest(HttpServletRequest request){
+        reflectSetparam(request,"Authorization","eyJ0eXBlIjoiSnd0IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJjdXJyZW50VGltZSI6MTY4ODM2OTE3MzU4OCwicGFzc3dvcmQiOiIxMjMiLCJpZCI6IjEiLCJleHAiOjE2ODgzNjkxNzMsInVzZXJuYW1lIjoiMTIzIn0.pnI7tKjjO0byKdmHNLY5o04YljMYAGRBOGyhsAENb_o");
+        return true;
+    }
+
+    /**
+     * 修改header信息，key-value键值对儿加入到header中
+     * @param request
+     * @param key
+     * @param value
+     */
+    private static void reflectSetparam(HttpServletRequest request,String key,String value){
+        Class<? extends HttpServletRequest> requestClass = request.getClass();
+        System.out.println("request实现类="+requestClass.getName());
+        try {
+            Field request1 = requestClass.getDeclaredField("request");
+            request1.setAccessible(true);
+            Object o = request1.get(request);
+            Field coyoteRequest = o.getClass().getDeclaredField("coyoteRequest");
+            coyoteRequest.setAccessible(true);
+            Object o1 = coyoteRequest.get(o);
+            System.out.println("coyoteRequest实现类="+o1.getClass().getName());
+            Field headers = o1.getClass().getDeclaredField("headers");
+            headers.setAccessible(true);
+            MimeHeaders o2 = (MimeHeaders)headers.get(o1);
+            o2.addValue(key).setString(value);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -37,6 +37,11 @@ public class SearchDto {
      * 全文检索
      */
     private String fullText;
+
+    /**
+     * 简历流程id
+     */
+    private Integer processStage;
     /**
      * 页码
      */

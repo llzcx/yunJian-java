@@ -13,6 +13,7 @@ public enum ResultCode {
     ERROR_404(404,"网页或文件未找到"),
 
     ERROR_505(500,"出错了"),
+    PARAM_ERROR(501,"参数错误"),
 
     /* 默认失败 */
     COMMON_FAIL(999, "失败"),

@@ -57,18 +57,19 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
     @Override
     public User register(RegisterDto registerDto) {
         User user = new User();
+        user.setId(1);
         BeanUtils.copyProperties(registerDto, user);
         userMapper.insert(user);
         Integer userId = user.getId();
         //TODO 初始化流程
-        FlowPathNode node1 = new FlowPathNode("投递人选", "#123", userId);
-        FlowPathNode node2 = new FlowPathNode("笔试阶段", "#123", userId);
-        FlowPathNode node3 = new FlowPathNode("面试阶段", "#123", userId);
-        FlowPathNode node4 = new FlowPathNode("简历推荐", "#123", userId);
-        FlowPathNode node5 = new FlowPathNode("offer阶段", "#123", userId);
-        FlowPathNode node6 = new FlowPathNode("入职", "#123", userId);
-        FlowPathNode node7 = new FlowPathNode("已转正", "#123", userId);
-        FlowPathNode node8 = new FlowPathNode("淘汰", "#123", userId);
+        FlowPathNode node1 = new FlowPathNode("投递人选", "#5e52dd", userId);
+        FlowPathNode node2 = new FlowPathNode("笔试阶段", "#cf7098", userId);
+        FlowPathNode node3 = new FlowPathNode("面试阶段", "#ff654e", userId);
+        FlowPathNode node4 = new FlowPathNode("简历推荐", "#ee4a7e", userId);
+        FlowPathNode node5 = new FlowPathNode("offer阶段", "#eeaf20", userId);
+        FlowPathNode node6 = new FlowPathNode("入职", "#48a7f3", userId);
+        FlowPathNode node7 = new FlowPathNode("已转正", "#b7c3ff", userId);
+        FlowPathNode node8 = new FlowPathNode("淘汰", "#d4d4d4", userId);
 
         flowPathMapper.insert(node1);
         flowPathMapper.insert(node2);
@@ -78,6 +79,7 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
         flowPathMapper.insert(node6);
         flowPathMapper.insert(node7);
         flowPathMapper.insert(node8);
+
 
         List<FlowPathNode> active = new ArrayList<>(Arrays.asList(node1, node2, node3));
         List<FlowPathNode> success = new ArrayList<>(Arrays.asList(node4, node5, node6, node7));

@@ -1,6 +1,7 @@
 package ccw.ruan.user.config;
 
 
+import ccw.ruan.common.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -70,6 +71,7 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("----------------start:{}---------------",request.getRequestURI());
+        JwtUtil.authTest(request);
        return true;
     }
 

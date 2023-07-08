@@ -31,4 +31,7 @@ public interface ResumeDubboService {
      */
     Resume getResumeById(Integer resumeId);
 
+
+
+
 }

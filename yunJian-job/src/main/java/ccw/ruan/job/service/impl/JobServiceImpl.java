@@ -21,10 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * @author 陈翔
@@ -130,13 +129,28 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         jobJson = decodeUnicode(jobJson);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        JobVo resume = null;
+        JobVo jobVo = null;
         try {
-            resume = objectMapper.readValue(jobJson, JobVo.class);
+            jobVo = objectMapper.readValue(jobJson, JobVo.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        System.out.println(resume.toString());
+        System.out.println(jobVo.toString());
+        Job job = new Job();
+        job.setUserId(userId);
+        job.setEducationalRequirements(jobVo.getEducationalRequirements());
+        job.setName(jobVo.getName());
+        job.setJobRequire(jobVo.getRequire());
+        job.setProfessionalLabel(JsonUtil.Object2StringSlice(jobVo.getProfessionalLabel()));
+        job.setProfessionalRequirements(jobVo.getProfessionalRequirements());
+        job.setWorkExperienceRequirements(jobVo.getWorkExperienceRequirements());
+        job.setResponsibility(jobVo.getResponsibility());
+        job.setSexRequirements(jobVo.getSexRequirements());
+        Date currentDate = new Date();
+        LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
+        job.setCreateTime(dateTime);
+        job.setUpdateTime(dateTime);
+        jobMapper.insert(job);
         return "解析完成";
     }
 

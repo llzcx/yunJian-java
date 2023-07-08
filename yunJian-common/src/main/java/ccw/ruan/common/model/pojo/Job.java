@@ -45,7 +45,7 @@ public class Job implements Serializable {
     /**
      * 岗位要求
      */
-    private String require;
+    private String jobRequire;
     /**
      * 岗位要求标签集合
      */

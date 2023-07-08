@@ -214,6 +214,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         ResumeAnalysisVo resume = null;
         resume = JsonUtil.deserialize(result, ResumeAnalysisVo.class);
         resume.setWorkYears(calculateWorkYears(resume.getWorkExperiences()));
+        //保存到es
+        saveToElasticsearch(resume,resumeId);
         System.out.println(resume.toString());
         System.out.println(resumeId);
         Resume resume1 = null;

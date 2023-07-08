@@ -3,6 +3,8 @@ package ccw.ruan.resume.manager.http;
 import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
 import com.dtflys.forest.annotation.*;
 
+import java.math.BigDecimal;
+
 /**
  * @author 陈翔
  */
@@ -29,6 +31,6 @@ public interface PyClient {
      * @return
      */
     @Post(value = "/resume/calculateSimilarity",timeout = 1000000000)
-    String calculateSimilarity(@JSONBody CalculateSimilarityDto calculateSimilarityDto);
+    BigDecimal calculateSimilarity(@JSONBody CalculateSimilarityDto calculateSimilarityDto);
 
 }

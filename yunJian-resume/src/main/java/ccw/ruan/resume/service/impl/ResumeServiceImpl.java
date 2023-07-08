@@ -1,10 +1,9 @@
 package ccw.ruan.resume.service.impl;
 
+import ccw.ruan.common.constant.SimilarTypes;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
-import ccw.ruan.common.model.vo.ResumeAnalysisVo;
-import ccw.ruan.common.model.vo.ResumeMqMessageVo;
-import ccw.ruan.common.model.vo.ResumePair;
+import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
@@ -18,7 +17,6 @@ import ccw.ruan.resume.manager.neo4j.data.node.*;
 import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.resume.manager.neo4j.vo.SchoolVo;
-import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
@@ -48,12 +46,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ccw.ruan.resume.manager.mq.ResumeAnalysis.MQ_RESUME_ANALYSIS_TOPIC;
 import static ccw.ruan.resume.manager.mq.ResumeAnalysis.decodeUnicode;
@@ -128,23 +128,72 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @Override
     public SimilarityVo findSimilarity(Integer userId) {
-        final List<Resume> resumes = resumeMapper.selectByMap(MybatisPlusUtil.getMap("user_id", userId));
         SimilarityVo similarityVo = new SimilarityVo();
-        List<ResumePair> resumePairs = new ArrayList<>();
+        final List<Resume> resumes = resumeMapper.selectByMap(MybatisPlusUtil.getMap("user_id", userId));
+        List<ResumePair> highSimilarity = new ArrayList<>();
+        List<ResumeAnalysisVo> indexResume = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
         int length = resumes.size();
+        for (int i = 0; i < length; i++) {
+            final Resume resume = resumes.get(i);
+            indexResume.add(JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class));
+            ids.add(resume.getId());
+        }
+        String value = "0.8";
+        final BigDecimal value05 = new BigDecimal(value);
         for (int i = 0; i < length - 1; i++) {
             for (int j = i + 1; j < length; j++) {
-                ResumePair pair = new ResumePair(resumes.get(i), resumes.get(j));
-                final CalculateSimilarityDto calculateSimilarityDto = new CalculateSimilarityDto(pair.getResume1().getContent()
-                        , pair.getResume2().getContent());
-                final String s = pyClient.calculateSimilarity(calculateSimilarityDto);
-                Float score = Float.valueOf(s);
-                pair.setScore(score);
-                resumePairs.add(pair);
+                final ResumeAnalysisVo resumeI = indexResume.get(i);
+                final ResumeAnalysisVo resumeJ = indexResume.get(j);
+                BigDecimal sum = new BigDecimal("0");
+                final ResumeCard resumeCard1 =
+                        new ResumeCard(ids.get(i),resumeI.getName(),resumes.get(i).getProcessStage());
+                final ResumeCard resumeCard2 =
+                        new ResumeCard(ids.get(j),resumeJ.getName(),resumes.get(j).getProcessStage());
+
+                final ResumePair resumePair = new ResumePair(resumeCard1, resumeCard2);
+                List<String> labels = new ArrayList<>();
+                resumePair.setLabel(labels);
+                // 计算项目经历相似度
+                final CalculateSimilarityDto dto1
+                        = new CalculateSimilarityDto(resumeI.getProjectExperiences(), resumeJ.getProjectExperiences());
+                final BigDecimal project = pyClient.calculateSimilarity(dto1);
+                if(project.compareTo(value05)>0){
+                    labels.add(SimilarTypes.PROJECT_EXPERIENCE.getMessage());
+                }
+                sum.add(project);
+                // 计算工作经历相似度
+                final CalculateSimilarityDto dto2
+                        = new CalculateSimilarityDto(getWorkExperiencesString(resumeI.getWorkExperiences()),
+                        getWorkExperiencesString(resumeJ.getWorkExperiences()));
+                final BigDecimal work = pyClient.calculateSimilarity(dto2);
+                if(work.compareTo(value05)>0){
+                    labels.add(SimilarTypes.WORK_EXPERIENCE.getMessage());
+                }
+                sum.add(work);
+                //名字
+                if(resumeI.getName().equals(resumeJ.getName())){
+                    labels.add(SimilarTypes.NAME.getMessage());
+                }
+                resumePair.setScore(sum);
+                highSimilarity.add(resumePair);
             }
         }
-        similarityVo.setResumes(resumePairs);
+        final List<ResumePair> collect = highSimilarity.stream()
+                .filter(item -> item.getLabel().size() > 0)
+                .sorted(Comparator.comparing(ResumePair::getScore).reversed())
+                .collect(Collectors.toList());
+        similarityVo.setHighSimilarity(collect);
         return similarityVo;
+    }
+
+    private String getWorkExperiencesString(List<WorkExperience> workExperiences){
+        StringBuilder sum = new StringBuilder();
+        for (WorkExperience item : workExperiences) {
+            sum.append(item.getStartTime()).append(item.getEndTime()).
+                    append(item.getJobName()).append(item.getCompanyName()).append(item.getDescription());
+        }
+        return sum.toString();
     }
 
     /**

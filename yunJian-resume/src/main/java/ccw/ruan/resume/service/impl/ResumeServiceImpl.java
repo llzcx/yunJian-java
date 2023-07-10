@@ -100,14 +100,20 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     public KnowledgeGraphVo findKnowledgeGraphVo(Integer resumeId) {
         final Resume resume = resumeMapper.selectById(resumeId);
         KnowledgeGraphVo knowledgeGraphVo = new KnowledgeGraphVo();
-
+        ResumeAnalysisVo resumeAnalysisVo = null;
+        resumeAnalysisVo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
         // TODO 1.1获取大学命名实体合集
         List<String> schoolNameList = new ArrayList<>();
-
+        assert resumeAnalysisVo != null;
+        if(resumeAnalysisVo.getGraduationInstitution()!=null){
+            schoolNameList.add(resumeAnalysisVo.getGraduationInstitution());
+        }
         // TODO 1.2遍里大学实体，搜索知识图谱
         List<SchoolVo> schoolVoList = new ArrayList<>();
-        schoolNameList.stream().forEach(name -> {
+        schoolNameList.forEach(name -> {
+            System.out.println("name:"+name);
             SchoolVo schoolVo = new SchoolVo();
+            schoolVo.setReplaceName(name);
             final List<UniversityNode> school = schoolRepository.findSchool(name);
             final List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(name);
             final List<UniversitySimpleNameNode> simple = schoolRepository.findSimple(name);

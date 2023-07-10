@@ -14,6 +14,10 @@ import java.util.List;
 @Data
 public class SchoolVo implements Serializable {
     /**
+     * 待替换的词
+     */
+    private String replaceName;
+    /**
      * 大学基本信息
      */
     private List<UniversityNode> universityNode;

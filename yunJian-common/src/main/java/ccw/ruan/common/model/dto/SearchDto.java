@@ -22,10 +22,6 @@ public class SearchDto {
      */
     private WorkYear workYear;
     /**
-     * 项目经历检索
-     */
-    private String projectExperiences;
-    /**
      * 工作经历检索
      */
     private WorkExperience workExperience;

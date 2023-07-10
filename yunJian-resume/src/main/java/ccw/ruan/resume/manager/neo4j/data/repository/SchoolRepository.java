@@ -10,10 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * @author 陈翔
+ */
 @Component
 public interface SchoolRepository extends Neo4jRepository<UniversityLevelNode, Long> {
 
-    @Query("MATCH (p:大学) WHERE p.name =~ $name OPTIONAL MATCH (p)-[:属于]->(q:办学层次) RETURN collect(p)")
+    @Query("MATCH (p:大学) WHERE p.name =~ $name RETURN collect(p)")
     List<UniversityNode> findSchool(@Param("name") String name);
 
     @Query("MATCH (p:大学) WHERE p.name =~ $name OPTIONAL MATCH (p)-[:属于]->(q:办学层次) RETURN collect(q)")

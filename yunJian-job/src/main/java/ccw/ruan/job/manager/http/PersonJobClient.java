@@ -1,6 +1,7 @@
 package ccw.ruan.job.manager.http;
 
 
+import ccw.ruan.job.manager.http.dto.JobPersonFitDto;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.annotation.*;
@@ -20,7 +21,7 @@ import java.util.List;
                 "Accept:*/*",
         }
 )
-public interface PyClient {
+public interface PersonJobClient {
     /**
      * 测试
      * @param name
@@ -33,8 +34,13 @@ public interface PyClient {
      * @param
      * @return
      */
-    @Post("/resume/getScore")
+    @Post("/resume/personJob")
     List<BigDecimal> personJobFit(@JSONBody PersonJobFitDto personJobFitDto);
-
-
+    /**
+     * 计算岗人匹配度
+     * @param
+     * @return
+     */
+    @Post("/resume/jobPerson")
+    List<BigDecimal> jobPersonFit(@JSONBody JobPersonFitDto jobPersonFitDto);
 }

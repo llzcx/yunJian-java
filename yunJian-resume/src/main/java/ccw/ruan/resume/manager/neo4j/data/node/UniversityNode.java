@@ -1,6 +1,7 @@
 package ccw.ruan.resume.manager.neo4j.data.node;
 
 import lombok.Data;
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 
@@ -17,7 +18,7 @@ public class UniversityNode {
     @Property("校训")
     private String schoolMotto;
     @Property("code")
-    private int code;
+    private Long code;
     @Property("校歌")
     private String schoolSong;
     @Property("外文名")

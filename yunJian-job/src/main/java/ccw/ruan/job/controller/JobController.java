@@ -1,9 +1,10 @@
 package ccw.ruan.job.controller;
 
+import ccw.ruan.common.model.vo.JobPersonVo;
 import ccw.ruan.common.model.vo.PersonJobVo;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtUtil;
-import ccw.ruan.job.manager.http.PyClient;
+import ccw.ruan.job.manager.http.PersonJobClient;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import ccw.ruan.job.service.IJobService;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class JobController {
     IJobService jobService;
 
     @Autowired
-    PyClient pyClient;
+    PersonJobClient personJobClient;
 
     @Data
     static
@@ -48,23 +49,34 @@ public class JobController {
         final ArrayList<String> arrayList = new ArrayList<>();
         arrayList.add("java");
         final PersonJobFitDto personJobFitDto = new PersonJobFitDto(stringKV.getText1(), Collections.singletonList(stringKV.getText2()));
-
         // 是否以逗号隔开, 默认true以逗号隔开,如[123,456,789.128]
         nf.setGroupingUsed(false);
-        return pyClient.personJobFit(personJobFitDto);
+        return personJobClient.personJobFit(personJobFitDto);
     }
 
 
     /**
-     * 人岗匹配接口
+     * 人岗匹配接口（给岗位推荐人才）
      * @param jobId 岗位id
      * @param request 从request的token当中解析出用户id
      * @return
      */
-    @GetMapping("/match/{jobId}")
-    public ApiResp<PersonJobVo> match(@PathVariable Integer jobId, HttpServletRequest request) {
+    @GetMapping("/PJMatch/{jobId}")
+    public ApiResp<PersonJobVo> PJMatch(@PathVariable Integer jobId, HttpServletRequest request) {
         final Integer id = JwtUtil.getId(request);
         return ApiResp.success(jobService.personJob(jobId,id));
+    }
+
+    /**
+     * 岗人匹配接口（给人才推荐岗位）
+     * @param resumeId 简历id
+     * @param request 从request的token当中解析出用户id
+     * @return
+     */
+    @GetMapping("/JPMatch/{jobId}")
+    public ApiResp<JobPersonVo> JPMatch(@PathVariable Integer resumeId, HttpServletRequest request) {
+        final Integer id = JwtUtil.getId(request);
+        return ApiResp.success(jobService.jobPerson(resumeId,id));
     }
     @PostMapping("/jobAnalysis")
     public  ApiResp<String> jobAnalysis(HttpServletRequest request,String jobContent){

@@ -55,6 +55,12 @@ public class ResumeController {
         return "succsww";
     }
 
+    /**
+     * 简历上传
+     * @param request
+     * @param file
+     * @return
+     */
     @PostMapping("/upload")
     public ApiResp<String> upload(HttpServletRequest request, MultipartFile file) {
         final Integer userId = JwtUtil.getId(request);
@@ -62,6 +68,11 @@ public class ResumeController {
         return ApiResp.success(resumeService.resumeUpload(userId, file));
     }
 
+    /**
+     * 计算简历相似度
+     * @param request
+     * @return
+     */
     @GetMapping("/similarity")
     public ApiResp<SimilarityVo> similarity(HttpServletRequest request) {
         final Integer userId = JwtUtil.getId(request);
@@ -75,12 +86,23 @@ public class ResumeController {
         return ApiResp.success(resumes);
     }
 
+    /**
+     * 简历分析
+     * @param request
+     * @param resumeId
+     * @return
+     */
     @GetMapping("/analysisResults/{resumeId}")
     public ApiResp<Resume> analysisResults(HttpServletRequest request, @PathVariable String resumeId) {
         Resume resume1 = resumeMapper.selectById(resumeId);
         return ApiResp.success(resume1);
     }
 
+    /**
+     * 知识图谱
+     * @param resumeId
+     * @return
+     */
     @GetMapping("/graph/{resumeId}")
     public ApiResp<KnowledgeGraphVo> graph(@PathVariable String resumeId) {
         return ApiResp.success(resumeService.findKnowledgeGraphVo(Integer.valueOf(resumeId)));
@@ -97,6 +119,12 @@ public class ResumeController {
         return result.getContent();
     }
 
+    /**
+     * 搜索简历接口
+     * @param searchDto
+     * @return
+     * @throws Exception
+     */
     @GetMapping("/search")
     public List<Resume> search(@RequestBody SearchDto searchDto) throws Exception {
         return resumeService.search(searchDto);

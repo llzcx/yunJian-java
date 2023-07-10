@@ -2,13 +2,12 @@ package ccw.ruan.job.service.impl;
 
 import ccw.ruan.common.model.pojo.Job;
 import ccw.ruan.common.model.pojo.Resume;
-import ccw.ruan.common.model.vo.JobVo;
-import ccw.ruan.common.model.vo.PersonJobVo;
-import ccw.ruan.common.model.vo.ResumeAnalysisVo;
-import ccw.ruan.common.model.vo.ResumeLabelsVo;
+import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
-import ccw.ruan.job.manager.http.PyClient;
+import ccw.ruan.common.util.MybatisPlusUtil;
+import ccw.ruan.job.manager.http.PersonJobClient;
 import ccw.ruan.job.manager.http.PyClient1;
+import ccw.ruan.job.manager.http.dto.JobPersonFitDto;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import ccw.ruan.job.mapper.JobMapper;
 import ccw.ruan.job.service.IJobService;
@@ -24,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author 陈翔
@@ -38,46 +38,137 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     ResumeDubboService resumeDubboService;
 
     @Autowired
-    PyClient pyClient;
+    PersonJobClient personJobClient;
     @Autowired
     PyClient1 pyClient1;
 
 
-    private PersonJobVo match(String postInfo,Integer userId){
+    private PersonJobVo personJobMatch(String postInfo, List<Resume> resumes) {
         System.out.println("postInfo:"+postInfo);
         PersonJobVo personJobVo = new PersonJobVo();
-        final List<Resume> resumes = resumeDubboService.getResumesByUserId(userId);
+        // 从resumelist提取出标签
         List<ResumeLabelsVo> resumeLabelsVoList = new ArrayList<>();
         for (int i = 0 ; i < resumes.size() ; i++) {
             resumeLabelsVoList.add(JsonUtil.deserialize(resumes.get(i).getLabelProcessing(),ResumeLabelsVo.class));
         }
         final List<String> resumeInfo = getResumeInfo(resumeLabelsVoList);
-
-        final List<BigDecimal> scores = pyClient.personJobFit(new PersonJobFitDto(postInfo, resumeInfo));
+        //计算得分
+        final List<BigDecimal> scores = personJobClient.personJobFit(new PersonJobFitDto(postInfo, resumeInfo));
+        //回填结果
         List<PersonJobVo.PJResumeVo> pjResumeVos = new ArrayList<>();
-        personJobVo.setList(pjResumeVos);
         for(int i = 0 ; i < resumes.size() ; i++) {
             PersonJobVo.PJResumeVo pjResumeVo = new PersonJobVo.PJResumeVo();
             final Resume resume = resumes.get(i);
-//            pjResumeVo.setResume(resume);
+            pjResumeVo.setResume(resume);
             pjResumeVo.setSkills(resumeLabelsVoList.get(i).getSkillTags());
             pjResumeVo.setScore(scores.get(i));
             pjResumeVos.add(pjResumeVo);
         }
+        personJobVo.setList(pjResumeVos);
         //排序
         personJobVo.sortListByScore();
         return personJobVo;
     }
+    private JobPersonVo jobPersonMatch(String resumeInfo, List<Job> jobs) {
+        System.out.println("resumeInfo:"+resumeInfo);
+        JobPersonVo jobPersonVo = new JobPersonVo();
+        // 从joblist提取出标签
+        final List<String> jobInfo = getJobInfo(jobs);
+        // 计算得分
+        final List<BigDecimal> scores = personJobClient.jobPersonFit(new JobPersonFitDto(resumeInfo, jobInfo));
+        // 回填结果
+        List<JobPersonVo.JPJobVo> pjResumeVos = new ArrayList<>();
+        for(int i = 0 ; i < jobs.size() ; i++) {
+            JobPersonVo.JPJobVo jpJobVo = new JobPersonVo.JPJobVo();
+            final Job job = jobs.get(i);
+            jpJobVo.setJob(job);
+            jpJobVo.setScore(scores.get(i));
+            jpJobVo.setSkills(JsonUtil.deserialize(job.getProfessionalLabel(), List.class));
+            pjResumeVos.add(jpJobVo);
+        }
+        //排序
+        jobPersonVo.setList(pjResumeVos);
+        jobPersonVo.sortListByScore();
+        return jobPersonVo;
+    }
+
+    /**
+     * 人岗匹配-一些硬性要求的判断
+     * @param resumeAnalysisVo
+     * @param job
+     * @return
+     */
+    private Boolean otherMatch(ResumeAnalysisVo resumeAnalysisVo,Job job){
+        final Integer sexRequirements = job.getSexRequirements();
+        final Integer workExperienceRequirements = job.getWorkExperienceRequirements();
+        final Integer educationalRequirements = job.getEducationalRequirements();
+        if(sexRequirements!=-1){
+            String sex = resumeAnalysisVo.getSex();
+            return sexRequirements==1 && "男".equals(sex) ||  sexRequirements==0 && "女".equals(sex);
+        }
+        if(workExperienceRequirements!=-1){
+            Integer workYears = resumeAnalysisVo.getWorkYears();
+            if(workYears==null){
+                return false;
+            }
+            return workYears > workExperienceRequirements;
+        }
+        if(educationalRequirements!=-1){
+            String education = resumeAnalysisVo.getEducation();
+            if(education==null){
+                return false;
+            }
+            Integer educationEnum = 0;
+            return educationEnum.compareTo(educationalRequirements)>0;
+        }
+        return true;
+    }
+
 
     @Override
     public PersonJobVo personJob(Integer jobId,Integer userId) {
         final Job job = jobMapper.selectById(jobId);
-        return match("132",userId);
+        final String professionalLabel = job.getProfessionalLabel();
+        // 拼接简历信息
+        final List<String> list = JsonUtil.deserialize(professionalLabel, List.class);
+        StringBuilder postInfo = new StringBuilder(job.getName());
+        list.forEach(label-> postInfo.append(label).append(" "));
+        //获取简历并进行过滤
+        List<Resume> resumes = resumeDubboService.getResumesByUserId(userId).stream().filter(item-> {
+            final String content = item.getContent();
+            final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(content, ResumeAnalysisVo.class);
+            return otherMatch(resumeAnalysisVo,job);
+        }).collect(Collectors.toList());
+        //最后进行人岗匹配得分计算
+        final PersonJobVo match = personJobMatch(postInfo.toString(), resumes);
+        //排序
+        match.sortListByScore();
+        return match;
     }
 
     @Override
+    public JobPersonVo jobPerson(Integer resumeId, Integer userId) {
+        final Resume resume = resumeDubboService.getResumeById(resumeId);
+        final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
+        // 构造简历分析字符串
+        StringBuilder resumeInfo = new StringBuilder();
+        resumeInfo.append(resumeAnalysisVo.getExpectedJob()).append(" ");
+        resumeAnalysisVo.getWorkExperiences().forEach(item->{
+            resumeInfo.append(item.getJobName()).append(" ");
+        });
+        //查询并过滤达不到要求的岗位
+        final List<Job> jobs = jobMapper
+                .selectList(MybatisPlusUtil.queryWrapperEq("user_id", userId))
+                .stream().filter(item-> otherMatch(resumeAnalysisVo, item)).collect(Collectors.toList());
+        //岗人匹配
+        return jobPersonMatch(resumeInfo.toString(), jobs);
+    }
+
+
+    @Override
     public PersonJobVo personJob(String postInfo, Integer userId) {
-        return match(postInfo,userId);
+        final List<Resume> resumes = resumeDubboService.getResumesByUserId(userId);
+        return personJobMatch(postInfo,resumes);
 
     }
 
@@ -86,14 +177,28 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         for (int i = 0 ; i < resumeLabelsVos.size() ; i++) {
             final ResumeLabelsVo resumeLabelsVo = resumeLabelsVos.get(i);
             StringBuilder resumeInfo = new StringBuilder(" ");
-            for (String skillTag : resumeLabelsVo.getSkillTags()) {
-                resumeInfo.append(skillTag).append(" ");
-            }
             for (String jobTag : resumeLabelsVo.getJobTags()) {
                 resumeInfo.append(jobTag).append(" ");
             }
+            for (String skillTag : resumeLabelsVo.getSkillTags()) {
+                resumeInfo.append(skillTag).append(" ");
+            }
             list.add(resumeInfo.toString());
             System.out.println("resumeInfo:"+ resumeInfo.toString());
+        }
+        return list;
+    }
+    private List<String> getJobInfo(List<Job> jobs){
+        List<String> list = new ArrayList<>();
+        for (int i = 0 ; i < jobs.size() ; i++) {
+            final Job job = jobs.get(i);
+            StringBuilder jobInfo = new StringBuilder(job.getName()+" ");
+            final List<String> labels = JsonUtil.deserialize(job.getProfessionalLabel(), List.class);
+            for (String tag : labels) {
+                jobInfo.append(tag).append(" ");
+            }
+            list.add(jobInfo.toString());
+            System.out.println("JobInfo:"+ jobInfo.toString());
         }
         return list;
     }

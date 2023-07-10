@@ -300,8 +300,10 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
         resumeAnalysisEntity.setId(resumeId.toString());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());
-        resumeAnalysisEntity.
-                setDateOfBirth(ResumeHandle.toDate(ResumeHandle.parseStartTime(resumeAnalysisVo.getDateOfBirth())));
+        if (!"".equals(resumeAnalysisVo.getDateOfBirth())) {
+            resumeAnalysisEntity.
+                    setDateOfBirth(ResumeHandle.toDate(ResumeHandle.parseStartTime(resumeAnalysisVo.getDateOfBirth())));
+        }
         resumeAnalysisEntity.setGraduationInstitution(resumeAnalysisVo.getGraduationInstitution());
         resumeAnalysisEntity.setSex(resumeAnalysisVo.getSex().contains("男"));
         resumeAnalysisEntity.setPhone(resumeAnalysisVo.getPhone());
@@ -342,7 +344,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                     .should(matchQuery("major", kw))
                     .should(matchQuery("expectedJob", kw))
                     .should(matchQuery("projectExperiences", kw))
-                    .should(matchQuery("education", kw))
+                    .should(matchQuery("EducationEnumeration", kw))
                     .should(matchQuery("skillsCertificate", kw))
                     .should(matchQuery("awardsHonors", kw))
                     .should(matchQuery("graduationInstitution", kw));

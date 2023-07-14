@@ -79,7 +79,7 @@ public class ResumeHandle {
             totalWorkMonths += workMonths;
         }
 
-        return totalWorkMonths / 12;
+        return (int) Math.ceil(totalWorkMonths / 12.0);
     }
 
     public static LocalDate parseStartTime(String dateString) {
@@ -141,10 +141,10 @@ public class ResumeHandle {
     }
     public static void main(String[] args) {
         List<WorkExperience> list = new ArrayList<>();
-        WorkExperience workExperience1 = new WorkExperience("2011-1", "2013-2");
-        WorkExperience workExperience2 = new WorkExperience("2020.4", "至今");
-        list.add(workExperience1);
-        list.add(workExperience2);
+        list.add(new WorkExperience("2021.09", "至今"));
+        list.add(new WorkExperience("2020.08", "2021.09"));
+        list.add(new WorkExperience("2019.12", "2020.08"));
+        list.add(new WorkExperience("2018.08", "2019.12"));
         final int year = calculateWorkYears(list);
         System.out.println(year);
     }

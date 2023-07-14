@@ -14,10 +14,8 @@ import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.dtflys.forest.annotation.Post;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +41,8 @@ public class ResumeController {
 
     @Autowired
     IResumeService resumeService;
+
+
     @Autowired
     ResumeMapper resumeMapper;
 
@@ -125,7 +125,7 @@ public class ResumeController {
      * @return
      * @throws Exception
      */
-    @GetMapping("/search")
+    @PostMapping("/search")
     public List<Resume> search(@RequestBody SearchDto searchDto) throws Exception {
         return resumeService.search(searchDto);
     }

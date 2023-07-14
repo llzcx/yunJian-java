@@ -1,9 +1,11 @@
 package ccw.ruan.job.controller;
 
+import ccw.ruan.common.model.pojo.Job;
 import ccw.ruan.common.model.vo.JobPersonVo;
 import ccw.ruan.common.model.vo.PersonJobVo;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtUtil;
+import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.job.manager.http.PersonJobClient;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import ccw.ruan.job.service.IJobService;
@@ -44,17 +46,6 @@ public class JobController {
 
     NumberFormat nf = NumberFormat.getInstance();
 
-    @GetMapping("/test")
-    public List<BigDecimal> test(@RequestBody Pair stringKV) {
-        final ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("java");
-        final PersonJobFitDto personJobFitDto = new PersonJobFitDto(stringKV.getText1(), Collections.singletonList(stringKV.getText2()));
-        // 是否以逗号隔开, 默认true以逗号隔开,如[123,456,789.128]
-        nf.setGroupingUsed(false);
-        return personJobClient.personJobFit(personJobFitDto);
-    }
-
-
     /**
      * 人岗匹配接口（给岗位推荐人才）
      * @param jobId 岗位id
@@ -78,6 +69,14 @@ public class JobController {
         final Integer id = JwtUtil.getId(request);
         return ApiResp.success(jobService.jobPerson(resumeId,id));
     }
+
+
+    /**
+     * 岗位解析
+     * @param request
+     * @param jobContent 岗位字符串内容
+     * @return
+     */
     @PostMapping("/jobAnalysis")
     public  ApiResp<String> jobAnalysis(HttpServletRequest request,String jobContent){
         final Integer id = JwtUtil.getId(request);
@@ -85,7 +84,7 @@ public class JobController {
     }
 
     /**
-     * 人岗匹配接口
+     * 人岗匹配接口（岗位输入是字符串时）
      * @return
      */
     @PostMapping("/match")
@@ -94,6 +93,18 @@ public class JobController {
         return ApiResp.success(jobService.personJob(postInfo,id));
     }
 
+
+
+    /**
+     * 查询岗位列表
+     * @param request 用户id
+     * @return
+     */
+    @GetMapping("/list")
+    public ApiResp<List<Job>> list(HttpServletRequest request) {
+        final Integer id = JwtUtil.getId(request);
+        return ApiResp.success(jobService.list(MybatisPlusUtil.queryWrapperEq("user_id",id)));
+    }
 
 
 

@@ -246,7 +246,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         job.setEducationalRequirements(jobVo.getEducationalRequirements());
         job.setName(jobVo.getName());
         job.setJobRequire(jobVo.getRequire());
-        job.setProfessionalLabel(JsonUtil.Object2StringSlice(jobVo.getProfessionalLabel()));
+        job.setProfessionalLabel(JsonUtil.object2StringSlice(jobVo.getProfessionalLabel()));
         job.setProfessionalRequirements(jobVo.getProfessionalRequirements());
         job.setWorkExperienceRequirements(jobVo.getWorkExperienceRequirements());
         job.setResponsibility(jobVo.getResponsibility());

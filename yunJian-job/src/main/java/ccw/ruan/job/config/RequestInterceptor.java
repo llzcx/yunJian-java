@@ -69,7 +69,6 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("----------------start:{}---------------",request.getRequestURI());
-        JwtGetUtil.authTest(request);
        return true;
     }
 

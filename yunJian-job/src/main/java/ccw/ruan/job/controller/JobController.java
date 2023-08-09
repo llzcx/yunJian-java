@@ -4,10 +4,9 @@ import ccw.ruan.common.model.pojo.Job;
 import ccw.ruan.common.model.vo.JobPersonVo;
 import ccw.ruan.common.model.vo.PersonJobVo;
 import ccw.ruan.common.request.ApiResp;
-import ccw.ruan.common.util.JwtUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.job.manager.http.PersonJobClient;
-import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import ccw.ruan.job.service.IJobService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,7 +50,7 @@ public class JobController {
      */
     @GetMapping("/PJMatch/{jobId}")
     public ApiResp<PersonJobVo> PJMatch(@PathVariable Integer jobId, HttpServletRequest request) {
-        final Integer id = JwtUtil.getId(request);
+        final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(jobService.personJob(jobId,id));
     }
 
@@ -66,7 +62,7 @@ public class JobController {
      */
     @GetMapping("/JPMatch/{jobId}")
     public ApiResp<JobPersonVo> JPMatch(@PathVariable Integer resumeId, HttpServletRequest request) {
-        final Integer id = JwtUtil.getId(request);
+        final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(jobService.jobPerson(resumeId,id));
     }
 
@@ -79,7 +75,7 @@ public class JobController {
      */
     @PostMapping("/jobAnalysis")
     public  ApiResp<String> jobAnalysis(HttpServletRequest request,String jobContent){
-        final Integer id = JwtUtil.getId(request);
+        final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(jobService.jobAnalysis(id,jobContent));
     }
 
@@ -89,7 +85,7 @@ public class JobController {
      */
     @PostMapping("/match")
     public ApiResp<PersonJobVo> match(@RequestBody String postInfo, HttpServletRequest request) {
-        final Integer id = JwtUtil.getId(request);
+        final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(jobService.personJob(postInfo,id));
     }
 
@@ -102,7 +98,7 @@ public class JobController {
      */
     @GetMapping("/list")
     public ApiResp<List<Job>> list(HttpServletRequest request) {
-        final Integer id = JwtUtil.getId(request);
+        final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(jobService.list(MybatisPlusUtil.queryWrapperEq("user_id",id)));
     }
 

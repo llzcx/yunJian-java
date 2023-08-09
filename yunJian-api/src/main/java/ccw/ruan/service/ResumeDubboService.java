@@ -1,5 +1,6 @@
 package ccw.ruan.service;
 
+import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.pojo.Resume;
 
 import java.util.List;
@@ -30,8 +31,6 @@ public interface ResumeDubboService {
      * @return
      */
     Resume getResumeById(Integer resumeId);
-
-
 
 
 }

@@ -141,10 +141,18 @@ public class ResumeHandle {
     }
     public static void main(String[] args) {
         List<WorkExperience> list = new ArrayList<>();
-        list.add(new WorkExperience("2021.09", "至今"));
-        list.add(new WorkExperience("2020.08", "2021.09"));
-        list.add(new WorkExperience("2019.12", "2020.08"));
-        list.add(new WorkExperience("2018.08", "2019.12"));
+        String[] list1 = {"2016.8 至今",
+//                "2021.8 2022.8",
+//                "2017.07 至今"
+//                "2017.9 2019.9",
+//                "2018.08 2019.08",
+//                "2019.08 2020.08",
+//                "2020.08 至今"
+        };
+        for (String s : list1) {
+            final String[] s1 = s.split(" ");
+            list.add(new WorkExperience(s1[0],s1[1]));
+        }
         final int year = calculateWorkYears(list);
         System.out.println(year);
     }

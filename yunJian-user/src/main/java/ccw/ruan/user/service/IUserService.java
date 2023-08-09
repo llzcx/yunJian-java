@@ -1,5 +1,6 @@
 package ccw.ruan.user.service;
 
+import ccw.ruan.common.model.bo.TokenPair;
 import ccw.ruan.common.model.dto.LoginDto;
 import ccw.ruan.common.model.dto.RegisterDto;
 import ccw.ruan.common.model.pojo.User;
@@ -14,7 +15,7 @@ public interface IUserService extends IService<User> {
      * @param loginDto
      * @return
      */
-    String login(LoginDto loginDto);
+    TokenPair login(LoginDto loginDto);
 
     /**
      * 注册
@@ -22,4 +23,18 @@ public interface IUserService extends IService<User> {
      * @return
      */
     User register(RegisterDto registerDto);
+
+    /**
+     * 注册子用户
+     * @param registerDto
+     * @return
+     */
+    User registerInterviewer(RegisterDto registerDto);
+
+    /**
+     * 刷新token
+     * @param refreshToken
+     * @return
+     */
+    TokenPair refreshToken(String refreshToken);
 }

@@ -8,6 +8,17 @@ server:
       force: true
 
 spring:
+  redis:
+    host: ${redis.host:127.0.0.1}
+    port: ${redis.port:6379}
+    timeout: 1000
+    password:
+    lettuce:
+      pool:
+        minIdle: 30
+        maxIdle: 500
+        maxWait: 10000
+        maxActive: 500
   main:
     allow-bean-definition-overriding: true
   cloud:
@@ -24,23 +35,39 @@ spring:
           enabled: true
           lower-case-service-id: true # 服务名小写
       routes:
-        - id: yunJian-job  #路由的ID，没有固定规则但求唯一，建议配合服务名
-          uri: lb://yunJian-job     # 匹配后提供服务的路由地址，lb代表从注册中心获取服务，且以负载均衡方式转发
+        - id: yunJian-job
+          uri: lb://yunJian-job #yunJian-job
           predicates:
-            - Path=/job/** #断言，路径相匹配的进行路由
-        - id: yunJian-resume   #路由的ID，没有固定规则但求唯一，建议配合服务名
-          uri: lb://yunJian-resume     # 匹配后提供服务的路由地址，lb代表从注册中心获取服务，且以负载均衡方式转发
+            - Path=/job/**
+        - id: yunJian-resume
+          uri: lb://yunJian-resume #yunJian-resume
           predicates:
-            - Path=/resume/** #断言，路径相匹配的进行路由
-        - id: yunJian-user   #路由的ID，没有固定规则但求唯一，建议配合服务名
-          uri: lb://yunJian-user     # 匹配后提供服务的路由地址，lb代表从注册中心获取服务，且以负载均衡方式转发
+            - Path=/resume/**
+        - id: yunJian-user
+          uri: lb://yunJian-user #yunJian-user
           predicates:
-            - Path=/user/** #断言，路径相匹配的进行路由
-        - id: yunJian-log   #路由的ID，没有固定规则但求唯一，建议配合服务名
-          uri: lb://yunJian-user     # 匹配后提供服务的路由地址，lb代表从注册中心获取服务，且以负载均衡方式转发
+            - Path=/user/**
+        - id: yunJian-log
+          uri: lb://yunJian-user #yunJian-log
           predicates:
-            - Path=/log/** #断言，路径相匹配的进行路由
-        - id: yunJian-flowPath   #路由的ID，没有固定规则但求唯一，建议配合服务名
-          uri: lb://yunJian-user     # 匹配后提供服务的路由地址，lb代表从注册中心获取服务，且以负载均衡方式转发
+            - Path=/log/**
+        - id: yunJian-flowPath
+          uri: lb://yunJian-user #yunJian-flowPath
           predicates:
-            - Path=/flowPath/** #断言，路径相匹配的进行路由
+            - Path=/flowPath/**
+        - id: yunJian-template
+          uri: lb://yunJian-user #yunJian-template
+          predicates:
+            - Path=/template/**
+        - id: yunJian-interviewer
+          uri: lb://yunJian-user #yunJian-interviewer
+          predicates:
+            - Path=/interviewer/**
+
+#JWT 双token
+jwt:
+  accessTokenHeader: ACCESSTOKEN
+  refreshTokenHeader: REFRESHTOKEN
+  accessTokenExpire: 1800 #（秒）30分钟
+  refreshTokenExpire: 172800 #（秒）2天
+  secret: abcdefghabcdefghabcdefghabcdefgh

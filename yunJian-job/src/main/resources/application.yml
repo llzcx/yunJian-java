@@ -1,7 +1,6 @@
 server:
   port: 8083
   address: 0.0.0.0
-
 spring:
   jackson:
     serialization:
@@ -16,9 +15,9 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://8.130.66.80:3306/ras_position?useSSL=false&amp&serverTimezone=UTC
-      username: root
-      password: 123987
+      url: jdbc:mysql://${mysql.addr:8.130.66.80:3306}/resume_analysis_system?useSSL=false&amp&serverTimezone=UTC
+      username: ${mysql.username:root}
+      password: ${mysql.password:123987}
   redis:
     host: 127.0.0.1
     port: 6379
@@ -30,25 +29,18 @@ spring:
         maxIdle: 500
         maxWait: 10000
         maxActive: 500
-
-
 mybatis-plus:
   global-config:
     db-config:
       table-prefix:
       id-type:
     banner: false
-
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
-
-
-
 logging:
   level:
     ccw.serviceinnovation.oss.mapper: info
-
 dubbo:
   consumer:
     timeout: 30000
@@ -57,24 +49,19 @@ dubbo:
     id: dubbo
     name: dubbo
     port: -1
-
   scan:
     basePackages: ccw.ruan.job
   application:
     # 禁用QOS同一台机器可能会有端口冲突现象
     qos-enable: false
     qos-accept-foreign-ip: false
-      #可选值 interface、instance、all，默认是 interface，即只注册接口级地址
-      #    register-mode: all
-      #只消费应用级
-      #    service-discovery:
-      # FORCE_INTERFACE，只消费接口级地址，如无地址则报错，单订阅 2.x 地址
-      # APPLICATION_FIRST，智能决策接口级/应用级地址，双订阅
-    # FORCE_APPLICATION，只消费应用级地址，如无地址则报错，单订阅 3.x 地址
-    #      migration: APPLICATION_FIRST
     name: yunJian-job-consumer
   registry:
-    address: nacos://127.0.0.1:8848
-    username: nacos
-    password: nacos
+    address: nacos://${nacos.addr:127.0.0.1:8848}
+    username: ${nacos.username:nacos}
+    password: ${nacos.password:nacos}
+
+py:
+  personJob: ${personJob:192.168.50.47:7070}
+  jobAnalysis: ${jobAnalysis:192.168.50.159:7071}
 

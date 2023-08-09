@@ -1,6 +1,7 @@
 package ccw.ruan.resume.dubboImpl;
 
 
+import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.mapper.ResumeMapper;
@@ -50,7 +51,6 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
     public Resume getResumeById(Integer resumeId) {
         return resumeMapper.selectById(resumeId);
     }
-
 
 
 }

@@ -1,16 +1,11 @@
 package ccw.ruan.user.dubboimpl;
 
 import ccw.ruan.common.model.pojo.FlowPathNode;
-import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.service.LogDubboService;
-import ccw.ruan.service.ResumeDubboService;
-import ccw.ruan.user.mapper.FlowPathMapper;
-import ccw.ruan.user.mapper.OperationLogMapper;
 import ccw.ruan.user.service.IFlowPathService;
 import ccw.ruan.user.service.IOperationLogService;
 import ccw.ruan.user.util.RedisUtil;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +43,6 @@ public class LogDubboServiceImpl implements LogDubboService {
 
     @Override
     public FlowPathNode getFirstProcessStage(Integer userId) {
-        return flowPathService.getFirstFlowPathNoe(userId);
+        return flowPathService.getFirstFlowPathNode(userId);
     }
 }

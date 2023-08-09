@@ -1,7 +1,7 @@
 package ccw.ruan.resume.config;
 
 
-import ccw.ruan.common.util.JwtUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -67,7 +67,6 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         log.info("----------------start:{}---------------",request.getRequestURI());
-        JwtUtil.authTest(request);
        return true;
     }
 

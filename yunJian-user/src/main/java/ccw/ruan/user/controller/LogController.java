@@ -2,9 +2,8 @@ package ccw.ruan.user.controller;
 
 import ccw.ruan.common.model.pojo.OperationLog;
 import ccw.ruan.common.model.pojo.Resume;
-import ccw.ruan.common.model.vo.LogVo;
 import ccw.ruan.common.request.ApiResp;
-import ccw.ruan.common.util.JwtUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.service.ResumeDubboService;
 import ccw.ruan.user.mapper.OperationLogMapper;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +54,7 @@ public class LogController {
      */
     @GetMapping("")
     public ApiResp<List<OperationLog>> log(HttpServletRequest request) {
-        final Integer userId = JwtUtil.getId(request);
+        final Integer userId = JwtGetUtil.getId(request);
         final List<Resume> resumes = resumeDubboService.getResumesByUserId(userId);
         LambdaQueryWrapper<OperationLog> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(OperationLog::getResumeId, resumes.stream().map(Resume::getId).collect(Collectors.toList()));

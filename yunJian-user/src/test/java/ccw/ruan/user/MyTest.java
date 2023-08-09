@@ -1,4 +1,4 @@
-package ccw.ruan.user.test;
+package ccw.ruan.user;
  
 import ccw.ruan.common.model.dto.RegisterDto;
 import ccw.ruan.common.request.ApiResp;

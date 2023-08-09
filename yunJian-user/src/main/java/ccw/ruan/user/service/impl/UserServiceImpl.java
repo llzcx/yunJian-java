@@ -1,18 +1,25 @@
 package ccw.ruan.user.service.impl;
 
 
+import ccw.ruan.common.constant.IdentityConstant;
+import ccw.ruan.common.exception.SystemException;
+import ccw.ruan.common.model.bo.TokenPair;
 import ccw.ruan.common.model.dto.LoginDto;
 import ccw.ruan.common.model.dto.RegisterDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
 import ccw.ruan.common.model.pojo.User;
 import ccw.ruan.common.model.vo.FlowPathVo;
-import ccw.ruan.common.util.JwtUtil;
+import ccw.ruan.common.request.ResultCode;
+import ccw.ruan.common.util.JsonUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.user.mapper.FlowPathMapper;
 import ccw.ruan.user.mapper.UserMapper;
 import ccw.ruan.user.service.IUserService;
+import ccw.ruan.user.util.JwtUtil;
 import ccw.ruan.user.util.RedisUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +30,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static ccw.ruan.common.constant.RedisConstant.JWT_TOKEN;
+import static ccw.ruan.common.constant.RedisConstant.YUN_JIAN;
 import static ccw.ruan.user.RedisConstant.FLOW_PATH;
 import static ccw.ruan.user.RedisConstant.RAS;
 
@@ -41,15 +50,18 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
     @Autowired
     RedisUtil redisUtil;
 
+    @Autowired
+    JwtUtil jwtUtil;
+
     @Override
-    public String login(LoginDto loginDto) {
+    public TokenPair login(LoginDto loginDto) {
         List<User> users = userMapper.selectByMap(MybatisPlusUtil.getMap("username", loginDto.getUsername(),
                 "password", loginDto.getPassword()));
         if(users.size()!=1){
             return null;
         }else{
             User user = users.get(0);
-            return JwtUtil.sign(Long.valueOf(user.getId()),user.getUsername(),user.getPassword());
+            return saveToRedis(user.getId(),user.getRole());
         }
 
     }
@@ -57,7 +69,7 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
     @Override
     public User register(RegisterDto registerDto) {
         User user = new User();
-        user.setId(1);
+        user.setRole(IdentityConstant.HR);
         BeanUtils.copyProperties(registerDto, user);
         userMapper.insert(user);
         Integer userId = user.getId();
@@ -87,5 +99,32 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
         FlowPathVo flowPathVo = new FlowPathVo(active,success,fail);
         redisUtil.set(RAS+ FLOW_PATH+userId, JSONObject.toJSONString(flowPathVo));
         return user;
+    }
+
+    @Override
+    public User registerInterviewer(RegisterDto registerDto) {
+        User user = new User();
+        user.setUsername(registerDto.getUsername());
+        user.setPassword(registerDto.getPassword());
+
+        return user;
+    }
+
+    @Override
+    public TokenPair refreshToken(String refreshToken) {
+        final DecodedJWT decodedJWT = jwtUtil.getClaimsByToken(refreshToken);
+        if(decodedJWT!=null){
+            final String id = decodedJWT.getClaim("id").asString();
+            final String identity = decodedJWT.getClaim("identity").asString();
+            return saveToRedis(Integer.valueOf(id),identity);
+        }else{
+            throw new SystemException(ResultCode.TOKEN_TIME_OUT);
+        }
+    }
+
+    private TokenPair saveToRedis(Integer id,String identity){
+        final TokenPair tokenAndSaveToKy = jwtUtil.createTokenAndSaveToKy(id, identity);
+        redisUtil.set(YUN_JIAN+JWT_TOKEN+id, JsonUtil.object2StringSlice(tokenAndSaveToKy));
+        return tokenAndSaveToKy;
     }
 }

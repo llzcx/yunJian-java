@@ -4,9 +4,11 @@ import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathNodeDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
+import ccw.ruan.common.model.pojo.HeadNode;
 import ccw.ruan.common.model.vo.FlowPathVo;
+import ccw.ruan.common.model.vo.InterviewerAndNodeVo;
 import ccw.ruan.common.request.ApiResp;
-import ccw.ruan.common.util.JwtUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.service.ResumeDubboService;
 import ccw.ruan.user.service.IFlowPathService;
@@ -38,7 +40,7 @@ public class FlowPathController {
      */
     @GetMapping
     public ApiResp<FlowPathVo> getFlowPath(HttpServletRequest request) {
-        Integer userId = JwtUtil.getId(request);
+        Integer userId = JwtGetUtil.getId(request);
         return ApiResp.success(flowPathService.flowPathService(userId));
     }
 
@@ -48,7 +50,7 @@ public class FlowPathController {
      */
     @GetMapping("/allNode")
     public ApiResp<List<FlowPathNode>> getAllFlowPathNode(HttpServletRequest request) {
-        Integer userId = JwtUtil.getId(request);
+        Integer userId = JwtGetUtil.getId(request);
         return ApiResp.success(flowPathService.list(MybatisPlusUtil.queryWrapperEq("user_id", userId)));
     }
 
@@ -62,7 +64,7 @@ public class FlowPathController {
      */
     @PutMapping("/updateSorting")
     public ApiResp<Boolean> updateFlowPath(HttpServletRequest request, @RequestBody UpdateFlowPathDto updateFlowPathDto) {
-        Integer userId = JwtUtil.getId(request);
+        Integer userId = JwtGetUtil.getId(request);
         return ApiResp.success(flowPathService.updateFlowPath(userId,updateFlowPathDto));
     }
 
@@ -75,7 +77,7 @@ public class FlowPathController {
     @PostMapping
     public ApiResp<FlowPathVo> addFlowPath(HttpServletRequest request,@RequestBody AddFlowPathNodeDto addFlowPathNodeDto) {
         FlowPathNode flowPath = new FlowPathNode();
-        final Integer userId = JwtUtil.getId(request);
+        final Integer userId = JwtGetUtil.getId(request);
         BeanUtils.copyProperties(addFlowPathNodeDto, flowPath);
         return ApiResp.success(flowPathService.addFlowPathNode(addFlowPathNodeDto,userId));
     }
@@ -88,7 +90,7 @@ public class FlowPathController {
      */
     @PutMapping("/{nodeId}")
     public ApiResp<FlowPathVo> updateFlowPath(HttpServletRequest request,@RequestBody UpdateFlowPathNodeDto updateFlowPathNodeDto, @PathVariable Integer nodeId) {
-        final Integer id = JwtUtil.getId(request);
+        final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(flowPathService.updateColor(id,updateFlowPathNodeDto,nodeId));
     }
 
@@ -111,5 +113,39 @@ public class FlowPathController {
     @PutMapping("/updateState/{resumeId}")
     public ApiResp<Boolean> updateState(Integer nodeId, @PathVariable Integer resumeId) {
         return ApiResp.success(resumeDubboService.updateResumeState(resumeId, nodeId));
+    }
+
+
+    /**
+     * [HR]绑定面试官和流程节点
+     * @param interviewerId 面试官id
+     * @param nodeId 流程节点id
+     * @return
+     */
+    @PostMapping("/interviewer")
+    public ApiResp<HeadNode> addHeadNode(Integer nodeId, Integer interviewerId) {
+        return ApiResp.success(flowPathService.addHeadNode(nodeId,interviewerId));
+    }
+
+
+    /**
+     * [HR]获取底下的面试官和流程节点绑定情况
+     * @param request
+     * @return
+     */
+    @PostMapping("/getInterviewerAndNode")
+    public ApiResp<List<InterviewerAndNodeVo>> listInterviewerSituation(HttpServletRequest request) {
+        final Integer userId = JwtGetUtil.getId(request);
+        return ApiResp.success(flowPathService.listInterviewerSituation(userId));
+    }
+    /**
+     * [面试官]获取管理的流程节点
+     * @param request
+     * @return
+     */
+    @GetMapping("/interviewer/list")
+    public ApiResp<List<FlowPathNode>> listInterviewer(HttpServletRequest request) {
+        final Integer userId = JwtGetUtil.getId(request);
+        return ApiResp.success(flowPathService.listInterviewerNode(userId));
     }
 }

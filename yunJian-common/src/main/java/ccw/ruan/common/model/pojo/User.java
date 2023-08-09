@@ -41,6 +41,8 @@ public class User implements Serializable {
      */
     private String email;
 
+    private String role;
+
     /**
      * 创建时间
      */
@@ -51,5 +53,7 @@ public class User implements Serializable {
      */
     private LocalDateTime updateTime;
 
+
+    private Integer parent;
 
 }

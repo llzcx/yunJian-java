@@ -18,6 +18,22 @@ public enum ResultCode {
     /* 默认失败 */
     COMMON_FAIL(999, "失败"),
 
+    PASSWORD_ERROR(2001,"密码错误"),
+    CODE_ERROR(2002,"验证码错误"),
+    NOT_LOGIN(2003,"未登录"),
+    TOKEN_TIME_OUT(2004,"token已过期"),
+    TOKEN_EXCEPTION(2005,"token异常"),
+    AUTHENTICATION_EXCEPTION(2006,"身份验证异常"),
+    ACCESS_WAS_DENIED(2007,"访问被拒绝"),
+    OPERATION_FAIL(2008,"操作失败"),
+    UNAUTHORIZED_ACCESS(2009,"无权访问"),
+    USERNAME_HAS_ALREADY_BEEN_USED(2010,"用户名已经被使用"),
+    CODE_TIME_OUT(2011,"验证码过期"),
+    USER_NOT_AUTHENTICATED(2012,"用户未认证"),
+    USER_GENDER_MISMATCH(2013,"用户性别不符合"),
+    TOKEN_IS_EMPTY(2014,"token未携带"),
+    REDIS_IS_EMPTY(2015,"redis中为空")
+
     ;
     private Integer code;
     private String message;

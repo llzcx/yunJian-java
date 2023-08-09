@@ -18,6 +18,11 @@ public enum LogTypeEnum {
      * 入职
      */
     ON_BOARDING(3,"发送入职邀约"),
+
+    /**
+     * 面评
+     */
+    FACE_TO_FACE_REVIEW(4,"面评"),
     ;
 
 

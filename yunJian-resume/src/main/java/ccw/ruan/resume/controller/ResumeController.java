@@ -4,7 +4,7 @@ package ccw.ruan.resume.controller;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.request.ApiResp;
-import ccw.ruan.common.util.JwtUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.http.PyClient;
@@ -63,7 +63,7 @@ public class ResumeController {
      */
     @PostMapping("/upload")
     public ApiResp<String> upload(HttpServletRequest request, MultipartFile file) {
-        final Integer userId = JwtUtil.getId(request);
+        final Integer userId = JwtGetUtil.getId(request);
         log.info(String.valueOf(userId));
         return ApiResp.success(resumeService.resumeUpload(userId, file));
     }
@@ -75,13 +75,13 @@ public class ResumeController {
      */
     @GetMapping("/similarity")
     public ApiResp<SimilarityVo> similarity(HttpServletRequest request) {
-        final Integer userId = JwtUtil.getId(request);
+        final Integer userId = JwtGetUtil.getId(request);
         return ApiResp.success(resumeService.findSimilarity(userId));
     }
 
     @GetMapping("/selectResume/{page}/{size}")
     public ApiResp<IPage<Resume>> selectResume(HttpServletRequest request, @PathVariable String page, @PathVariable String size) throws Exception {
-        final Integer userId = JwtUtil.getId(request);
+        final Integer userId = JwtGetUtil.getId(request);
         IPage<Resume> resumes = resumeService.searchResume(userId, Integer.valueOf(page), Integer.valueOf(size));
         return ApiResp.success(resumes);
     }

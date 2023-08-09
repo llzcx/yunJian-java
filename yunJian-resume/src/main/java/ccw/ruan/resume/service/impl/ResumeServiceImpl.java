@@ -301,7 +301,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1.setFullName(resume.getName());
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
-        resume1.setContent(JsonUtil.Object2StringSlice(resume));
+        resume1.setContent(JsonUtil.object2StringSlice(resume));
         resume1.setResumeStatus(1);
         if(workYears> 10){
             resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);

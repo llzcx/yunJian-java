@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ccw.ruan.user.mapper.HeadNodeMapper">
+
+    <select id="selectInterviewerNode" resultType="ccw.ruan.common.model.pojo.FlowPathNode">
+        select * from flow_path_node
+        right join (select node_id from head_node where user_id = #{userId}) as t1
+        on t1.node_id = flow_path_node.id
+    </select>
+</mapper>

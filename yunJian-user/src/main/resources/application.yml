@@ -16,12 +16,12 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://8.130.66.80:3306/ras_user?useSSL=false&amp&serverTimezone=UTC
-      username: root
-      password: 123987
+      url: jdbc:mysql://${mysql.addr:8.130.66.80:3306}/resume_analysis_system?useSSL=false&amp&serverTimezone=UTC
+      username: ${mysql.username:root}
+      password: ${mysql.password:123987}
   redis:
-    host: 127.0.0.1
-    port: 6379
+    host: ${redis.host:127.0.0.1}
+    port: ${redis.port:6379}
     timeout: 1000
     password:
     lettuce:
@@ -74,7 +74,13 @@ dubbo:
     #      migration: APPLICATION_FIRST
     name: yunJian-user-consumer
   registry:
-    address: nacos://127.0.0.1:8848
-    username: nacos
-    password: nacos
+    address: nacos://${nacos.addr:127.0.0.1:8848}
+    username: ${nacos.username:nacos}
+    password: ${nacos.password:nacos}
 
+jwt:
+  accessTokenHeader: ACCESSTOKEN
+  refreshTokenHeader: REFRESHTOKEN
+  accessTokenExpire: 1800 #（秒）30分钟
+  refreshTokenExpire: 172800 #（秒）2天
+  secret: abcdefghabcdefghabcdefghabcdefgh

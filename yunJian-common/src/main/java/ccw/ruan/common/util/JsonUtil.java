@@ -10,13 +10,12 @@ public class JsonUtil {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
 
-    public static String Object2StringSlice(Object object) {
+    public static String object2StringSlice(Object object) {
         try {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             return "";
         }
-
     }
 
 

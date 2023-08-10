@@ -5,6 +5,7 @@ import ccw.ruan.common.exception.SystemException;
 import ccw.ruan.common.model.bo.TokenPair;
 import ccw.ruan.common.request.ResultCode;
 import ccw.ruan.common.util.JsonUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
@@ -131,4 +132,5 @@ public class JwtUtil implements InitializingBean {
     public String getSubject(HttpServletRequest request){
         return getClaimsByToken(request.getHeader(getRefreshTokenHeader())).getSubject();
     }
+
 }

@@ -62,7 +62,7 @@ public class JwtUtil implements InitializingBean {
         //秘钥是密码则省略
         return JWT.create()
                 .withHeader(header)
-                .withClaim("id",id)
+                .withClaim("id",id.toString())
                 .withClaim("identity",identity)
                 .withExpiresAt(expireDate)
                 .sign(algorithm);

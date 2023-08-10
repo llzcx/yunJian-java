@@ -13,6 +13,7 @@ public class JwtGetUtil {
     public static Integer getId(HttpServletRequest request){
         try{
             final String accessToken = request.getHeader("accessToken");
+            System.out.println("accessToken:"+accessToken);
             DecodedJWT decodedJWT= JWT.decode(accessToken);
             String sid = decodedJWT.getClaim("id").asString();
             return Integer.valueOf(sid);

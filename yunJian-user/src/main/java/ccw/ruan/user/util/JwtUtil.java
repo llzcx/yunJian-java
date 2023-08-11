@@ -53,18 +53,17 @@ public class JwtUtil implements InitializingBean {
     }
     /**
      * 生成AccessTokenJWT
-     * @param id 用户id
+     * @param userId 用户id
      * @return
      */
-    public String generateAccessToken(Integer id,String identity) {
+    public String generateAccessToken(Integer userId) {
         Date nowDate = new Date();
         //设置token过期时间
         Date expireDate = new Date(nowDate.getTime() + 1000 * accessTokenExpire);
         //秘钥是密码则省略
         return JWT.create()
                 .withHeader(header)
-                .withClaim("id",id)
-                .withClaim("identity",identity)
+                .withClaim("id",userId)
                 .withExpiresAt(expireDate)
                 .sign(algorithm);
     }
@@ -117,11 +116,10 @@ public class JwtUtil implements InitializingBean {
     /**
      * 创建token并存入redis
      * @param id
-     * @param identity
      * @return
      */
-    public TokenPair createTokenAndSaveToKy(Integer id,String identity){
-        final String accessToken = generateAccessToken(id,identity);
+    public TokenPair createTokenAndSaveToKy(Integer id){
+        final String accessToken = generateAccessToken(id);
         final String refreshToken = generateRefreshToken(id);
         final TokenPair tokenPair = new TokenPair(accessToken, refreshToken);
         //redis保存 方便鉴权

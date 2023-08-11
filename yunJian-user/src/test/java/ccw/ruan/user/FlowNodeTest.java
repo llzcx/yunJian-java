@@ -43,10 +43,5 @@ public class FlowNodeTest {
         System.out.println(firstFlowPathNode);
     }
 
-    @Test
-    public void listInterviewerSituation(){
-        final List<InterviewerAndNodeVo> list = flowPathService.listInterviewerSituation(1);
-        System.out.println(JsonUtil.object2StringSlice(list));
-    }
 
 }

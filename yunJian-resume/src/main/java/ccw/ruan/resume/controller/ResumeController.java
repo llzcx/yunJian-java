@@ -59,7 +59,7 @@ public class ResumeController {
     }
 
     /**
-     * [HR]简历上传
+     * 简历上传
      * @param request
      * @param file
      * @return
@@ -72,7 +72,7 @@ public class ResumeController {
     }
 
     /**
-     * [HR]计算简历相似度
+     * 计算简历相似度
      * @param request
      * @return
      */
@@ -83,19 +83,18 @@ public class ResumeController {
     }
 
     /**
-     * [HR,面试官]简历分析
-     * @param request
+     * 简历分析
      * @param resumeId
      * @return
      */
     @GetMapping("/analysisResults/{resumeId}")
-    public ApiResp<Resume> analysisResults(HttpServletRequest request, @PathVariable String resumeId) {
+    public ApiResp<Resume> analysisResults(@PathVariable String resumeId) {
         Resume resume1 = resumeMapper.selectById(resumeId);
         return ApiResp.success(resume1);
     }
 
     /**
-     * [HR,面试官]知识图谱
+     * 知识图谱
      * @param resumeId
      * @return
      */
@@ -108,7 +107,7 @@ public class ResumeController {
     ResumeRepository repository;
 
     /**
-     * [HR]搜索简历接口
+     * 搜索简历接口
      * @param searchDto
      * @return
      * @throws Exception
@@ -120,7 +119,7 @@ public class ResumeController {
 
 
     /**
-     * [面试官]获取某个流程节点下的所有简历以及对应的面评
+     * 获取某个流程节点下的所有简历以及对应的面评
      * @param nodeId
      * @return
      * @throws Exception

@@ -27,13 +27,6 @@ public interface IUserService extends IService<User> {
     User register(RegisterDto registerDto);
 
     /**
-     * 注册子用户
-     * @param registerDto
-     * @return
-     */
-    User registerInterviewer(RegisterDto registerDto);
-
-    /**
      * 刷新token
      * @param refreshToken
      * @return
@@ -43,9 +36,7 @@ public interface IUserService extends IService<User> {
     /**
      * 获取主用户
      * @param request
-     * @param HR
-     * @param Interviewer
      * @return
      */
-    User getUser(HttpServletRequest request,Boolean HR,Boolean Interviewer);
+    User getUser(HttpServletRequest request);
 }

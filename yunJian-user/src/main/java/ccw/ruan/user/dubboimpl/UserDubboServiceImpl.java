@@ -23,7 +23,7 @@ public class UserDubboServiceImpl implements UserDubboService {
 
 
     @Override
-    public User getUser(HttpServletRequest request, Boolean HR, Boolean Interviewer) {
-        return userService.getUser(request, HR, Interviewer);
+    public User getUser(HttpServletRequest request) {
+        return userService.getUser(request);
     }
 }

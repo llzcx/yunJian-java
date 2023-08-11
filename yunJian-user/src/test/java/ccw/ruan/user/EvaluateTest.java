@@ -42,19 +42,4 @@ public class EvaluateTest {
         }
     }
 
-    @Autowired
-    IFlowPathService flowPathService;
-
-    @Test
-    public void listInterviewerNode(){
-        final List<FlowPathNode> flowPathNodes = flowPathService.listInterviewerNode(2);
-        System.out.println(Arrays.toString(flowPathNodes.toArray()));
-    }
-
-
-    @Test
-    public void addHeadNode(){
-        flowPathService.addHeadNode(67,2);
-        flowPathService.addHeadNode(68,2);
-    }
 }

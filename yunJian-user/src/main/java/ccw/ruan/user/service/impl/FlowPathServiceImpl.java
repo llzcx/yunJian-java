@@ -6,14 +6,10 @@ import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathNodeDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
-import ccw.ruan.common.model.pojo.HeadNode;
-import ccw.ruan.common.model.pojo.User;
 import ccw.ruan.common.model.vo.FlowPathVo;
-import ccw.ruan.common.model.vo.InterviewerAndNodeVo;
 import ccw.ruan.common.request.ResultCode;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.user.mapper.FlowPathMapper;
-import ccw.ruan.user.mapper.HeadNodeMapper;
 import ccw.ruan.user.mapper.UserMapper;
 import ccw.ruan.user.service.IFlowPathService;
 import ccw.ruan.user.util.RedisUtil;
@@ -45,8 +41,6 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
     @Autowired
     RedisUtil redisUtil;
 
-    @Autowired
-    HeadNodeMapper headNodeMapper;
 
     @Autowired
     UserMapper userMapper;
@@ -148,39 +142,4 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
         redisUtil.set(RAS + FLOW_PATH + userId, JSONObject.toJSONString(flowPathVo));
         return flowPathVo;
     }
-
-    @Override
-    public List<FlowPathNode> listInterviewerNode(Integer userId) {
-
-        return headNodeMapper.selectInterviewerNode(userId);
-    }
-
-    @Override
-    public HeadNode addHeadNode(Integer nodeId, Integer interviewerId) {
-        final FlowPathNode flowPathNode = flowPathMapper.selectById(nodeId);
-        final User user = userMapper.selectById(interviewerId);
-        if(flowPathNode==null || user==null || user.getParent()==null){
-            throw new SystemException(ResultCode.AUTHENTICATION_EXCEPTION);
-        }
-        final HeadNode headNode = new HeadNode();
-        headNode.setNodeId(nodeId);
-        headNode.setUserId(interviewerId);
-        headNodeMapper.insert(headNode);
-        return headNode;
-    }
-
-    @Override
-    public List<InterviewerAndNodeVo> listInterviewerSituation(Integer userId) {
-        List<InterviewerAndNodeVo> list = new ArrayList<>();
-        final List<User> parentList = userMapper.selectList(MybatisPlusUtil.queryWrapperEq("parent", userId));
-        for (User user : parentList) {
-            final InterviewerAndNodeVo vo = new InterviewerAndNodeVo();
-            vo.setUser(user);
-            vo.setList(headNodeMapper.selectInterviewerNode(user.getId()));
-            list.add(vo);
-        }
-        return list;
-    }
-
-
 }

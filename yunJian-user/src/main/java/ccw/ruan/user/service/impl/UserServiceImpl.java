@@ -62,7 +62,7 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
             return null;
         }else{
             User user = users.get(0);
-            return saveToRedis(user.getId(),user.getRole());
+            return saveToRedis(user.getId());
         }
 
     }
@@ -70,7 +70,6 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
     @Override
     public User register(RegisterDto registerDto) {
         User user = new User();
-        user.setRole(IdentityConstant.HR);
         BeanUtils.copyProperties(registerDto, user);
         userMapper.insert(user);
         Integer userId = user.getId();
@@ -103,54 +102,30 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
     }
 
     @Override
-    public User registerInterviewer(RegisterDto registerDto) {
-        User user = new User();
-        user.setUsername(registerDto.getUsername());
-        user.setPassword(registerDto.getPassword());
-
-        return user;
-    }
-
-    @Override
     public TokenPair refreshToken(String refreshToken) {
         final DecodedJWT decodedJWT = jwtUtil.getClaimsByToken(refreshToken);
         if(decodedJWT!=null){
             final String id = decodedJWT.getClaim("id").asString();
-            final String identity = decodedJWT.getClaim("identity").asString();
-            return saveToRedis(Integer.valueOf(id),identity);
+            return saveToRedis(Integer.valueOf(id));
         }else{
             throw new SystemException(ResultCode.TOKEN_TIME_OUT);
         }
     }
 
     @Override
-    public User getUser(HttpServletRequest request,Boolean HR,Boolean Interviewer) {
+    public User getUser(HttpServletRequest request) {
         Integer userId = JwtGetUtil.getId(request);
         final User user = userMapper.selectById(userId);
-        final Integer parent = user.getParent();
-        if(parent==null){
-            //HR身份
-            if(HR){
-                return user;
-            }else{
-                throw new SystemException(ResultCode.IDENTITY_ERROR);
-            }
+        if(user!=null){
+            return user;
         }else{
-            //面试官身份
-            if(HR && Interviewer){
-                return user;
-            }else if(HR && !Interviewer){
-                throw new SystemException(ResultCode.IDENTITY_ERROR);
-            } else if(!HR && Interviewer){
-                return userMapper.selectById(parent);
-            }else{
-                throw new SystemException(ResultCode.IDENTITY_ERROR);
-            }
+            throw new SystemException(ResultCode.UNAUTHORIZED_ACCESS);
         }
+
     }
 
-    private TokenPair saveToRedis(Integer id,String identity){
-        final TokenPair tokenAndSaveToKy = jwtUtil.createTokenAndSaveToKy(id, identity);
+    private TokenPair saveToRedis(Integer id){
+        final TokenPair tokenAndSaveToKy = jwtUtil.createTokenAndSaveToKy(id);
         redisUtil.set(YUN_JIAN+JWT_TOKEN+id, JsonUtil.object2StringSlice(tokenAndSaveToKy));
         return tokenAndSaveToKy;
     }

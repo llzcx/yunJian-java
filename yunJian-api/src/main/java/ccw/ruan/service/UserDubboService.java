@@ -11,9 +11,7 @@ public interface UserDubboService {
     /**
      * 获取主用户
      * @param request
-     * @param HR
-     * @param Interviewer
      * @return
      */
-    User getUser(HttpServletRequest request, Boolean HR, Boolean Interviewer);
+    User getUser(HttpServletRequest request);
 }

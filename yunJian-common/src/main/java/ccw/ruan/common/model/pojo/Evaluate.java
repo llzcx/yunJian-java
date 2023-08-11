@@ -8,30 +8,45 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+/**
+ * @author 陈翔
+ */
 @Data
 @TableName("evaluate")
 public class Evaluate {
+
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @TableField("user_id")
+    /**
+     * 用户id
+     */
     private Integer userId;
 
-    @TableField("resume_id")
+
+    /**
+     * 简历id
+     */
     private Integer resumeId;
 
-    @TableField("score")
-    private Integer score;
+    /**
+     * 技能评估
+     */
+    private String skill;
 
-    @TableField("text")
-    private String text;
+    /**
+     * 总结与建议
+     */
+    private String summarize;
 
-    @TableField("create_time")
+    /**
+     * 综合评价
+     */
+    private String composite;
+
+
+    /**
+     * 评价时间
+     */
     private LocalDateTime createTime;
-    
-    // 省略构造方法、getter和setter
-
-    // 可选：您还可以重写 toString 方法以便在打印对象时更友好地显示字段值
-    
-    // 请确保使用了正确的包引入和注解，例如：import java.util.Date;、import lombok.Data;
 }

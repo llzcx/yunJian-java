@@ -2,11 +2,9 @@ package ccw.ruan.user.controller;
 
 import ccw.ruan.common.model.dto.AddEvaluateDto;
 import ccw.ruan.common.model.pojo.Evaluate;
-import ccw.ruan.common.model.pojo.User;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.user.service.EvaluateService;
-
 import ccw.ruan.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,19 +31,19 @@ public class EvaluateController {
     IUserService userService;
 
     /**
-     * [面试官]添加一条面评
+     * 添加一条面评
      * @param addEvaluateDto
      * @param request
      */
     @PostMapping
     public ApiResp<Evaluate> addEvaluate(AddEvaluateDto addEvaluateDto, HttpServletRequest request) {
-        final Integer id = userService.getUser(request, false, true).getId();
+        final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(evaluateService.saveEvaluate(id,addEvaluateDto));
     }
 
 
     /**
-     * [HR,面试官]HR获取面评列表
+     * 获取面评列表
      * @param resumeId
      */
     @PostMapping("/list/{resumeId}")

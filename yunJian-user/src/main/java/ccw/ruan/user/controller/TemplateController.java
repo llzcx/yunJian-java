@@ -33,7 +33,7 @@ public class TemplateController {
     IUserService userService;
 
     /**
-     * [HR,面试官]发送邀约（自动根据模板id判断邀约类型）
+     * 发送邀约（自动根据模板id判断邀约类型）
      * @param resumeId
      * @param templateId 模板id
      * @return
@@ -46,25 +46,25 @@ public class TemplateController {
 
 
     /**
-     * [HR,面试官]获取用户定义的所有模板
+     * 获取用户定义的所有模板
      * @return
      */
     @GetMapping("/list")
     public ApiResp<List<InvitationTemplate>> list(HttpServletRequest request) throws Exception{
-        final Integer userId = userService.getUser(request, true, true).getId();
+        final Integer userId = JwtGetUtil.getId(request);
         final List<InvitationTemplate> list = templateService.list(MybatisPlusUtil.queryWrapperEq("user_id", userId));
         return ApiResp.success(list);
     }
 
 
     /**
-     * [HR,面试官]添加一个模板
+     * 添加一个模板
      * @param addTemplateDto
      * @return
      */
     @PostMapping("")
     public ApiResp<Boolean> add(@RequestBody AddTemplateDto addTemplateDto, HttpServletRequest request) throws Exception{
-        final Integer userId = userService.getUser(request, true, true).getId();
+        final Integer userId = JwtGetUtil.getId(request);
         InvitationTemplate template = new InvitationTemplate();
         BeanUtils.copyProperties(addTemplateDto,template);
         template.setUserId(userId);
@@ -74,7 +74,7 @@ public class TemplateController {
 
 
     /**
-     * [HR,面试官]删除一个模板
+     * 删除一个模板
      * @param templateId
      * @return
      */

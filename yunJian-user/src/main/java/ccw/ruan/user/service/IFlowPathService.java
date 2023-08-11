@@ -5,7 +5,6 @@ import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathNodeDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
-import ccw.ruan.common.model.pojo.HeadNode;
 import ccw.ruan.common.model.vo.FlowPathVo;
 import ccw.ruan.common.model.vo.InterviewerAndNodeVo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -59,28 +58,4 @@ public interface IFlowPathService extends IService<FlowPathNode> {
      * @param nodeId
      */
     FlowPathVo updateColor(Integer id, UpdateFlowPathNodeDto updateFlowPathNodeDto, Integer nodeId);
-
-
-    /**
-     * [面试官]获取管理的流程节点
-     * @param userId
-     * @return
-     */
-    List<FlowPathNode> listInterviewerNode(Integer userId);
-
-
-    /**
-     * 绑定nodeId和interviewerId
-     * @param nodeId
-     * @param interviewerId
-     * @return
-     */
-    HeadNode addHeadNode(Integer nodeId, Integer interviewerId);
-
-    /**
-     * [HR]获取底下的面试官和流程节点绑定情况
-     * @param userId
-     * @return
-     */
-    List<InterviewerAndNodeVo> listInterviewerSituation(Integer userId);
 }

@@ -3,6 +3,8 @@ package ccw.ruan.resume.controller;
 
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
+import ccw.ruan.common.model.vo.ESVo;
+import ccw.ruan.common.model.vo.InterviewerResumeVo;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.server.PathParam;
 
 
 /**
@@ -56,7 +59,7 @@ public class ResumeController {
     }
 
     /**
-     * 简历上传
+     * [HR]简历上传
      * @param request
      * @param file
      * @return
@@ -69,7 +72,7 @@ public class ResumeController {
     }
 
     /**
-     * 计算简历相似度
+     * [HR]计算简历相似度
      * @param request
      * @return
      */
@@ -79,15 +82,8 @@ public class ResumeController {
         return ApiResp.success(resumeService.findSimilarity(userId));
     }
 
-    @GetMapping("/selectResume/{page}/{size}")
-    public ApiResp<IPage<Resume>> selectResume(HttpServletRequest request, @PathVariable String page, @PathVariable String size) throws Exception {
-        final Integer userId = JwtGetUtil.getId(request);
-        IPage<Resume> resumes = resumeService.searchResume(userId, Integer.valueOf(page), Integer.valueOf(size));
-        return ApiResp.success(resumes);
-    }
-
     /**
-     * 简历分析
+     * [HR,面试官]简历分析
      * @param request
      * @param resumeId
      * @return
@@ -99,7 +95,7 @@ public class ResumeController {
     }
 
     /**
-     * 知识图谱
+     * [HR,面试官]知识图谱
      * @param resumeId
      * @return
      */
@@ -111,24 +107,29 @@ public class ResumeController {
     @Autowired
     ResumeRepository repository;
 
-
-    @GetMapping("/testES")
-    public List<ResumeAnalysisEntity> testEs() {
-        Pageable pageable = PageRequest.of(0, 10); // 查询第1页，每页10条记录
-        Page<ResumeAnalysisEntity> result = repository.findResumeWithJavaWorkExperience(pageable);
-        return result.getContent();
-    }
-
     /**
-     * 搜索简历接口
+     * [HR]搜索简历接口
      * @param searchDto
      * @return
      * @throws Exception
      */
     @PostMapping("/search")
-    public List<Resume> search(@RequestBody SearchDto searchDto) throws Exception {
-        return resumeService.search(searchDto);
+    public ApiResp<ESVo> search(@RequestBody SearchDto searchDto) throws Exception {
+        return ApiResp.success(resumeService.search(searchDto));
     }
+
+
+    /**
+     * [面试官]获取某个流程节点下的所有简历以及对应的面评
+     * @param nodeId
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/listResumeFromNode/{nodeId}")
+    public List<InterviewerResumeVo> listResumeFromNode(@PathVariable String nodeId) throws Exception {
+        return resumeService.listResumeFromNode(nodeId);
+    }
+
 
 
 }

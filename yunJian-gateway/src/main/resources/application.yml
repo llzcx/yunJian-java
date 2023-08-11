@@ -59,10 +59,10 @@ spring:
           uri: lb://yunJian-user #yunJian-template
           predicates:
             - Path=/template/**
-        - id: yunJian-interviewer
-          uri: lb://yunJian-user #yunJian-interviewer
+        - id: yunJian-evaluate
+          uri: lb://yunJian-user #yunJian-evaluate
           predicates:
-            - Path=/interviewer/**
+            - Path=/evaluate/**
 
 #JWT 双token
 jwt:

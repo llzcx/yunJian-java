@@ -62,7 +62,7 @@ public interface IFlowPathService extends IService<FlowPathNode> {
 
 
     /**
-     * 获取管理的流程节点
+     * [面试官]获取管理的流程节点
      * @param userId
      * @return
      */

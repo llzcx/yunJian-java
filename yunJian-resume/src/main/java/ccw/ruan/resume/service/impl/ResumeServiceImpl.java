@@ -2,6 +2,7 @@ package ccw.ruan.resume.service.impl;
 
 import ccw.ruan.common.constant.SimilarTypes;
 import ccw.ruan.common.model.dto.SearchDto;
+import ccw.ruan.common.model.pojo.Evaluate;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
@@ -20,6 +21,7 @@ import ccw.ruan.resume.manager.neo4j.vo.SchoolVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
+import ccw.ruan.service.EvaluateDubboService;
 import ccw.ruan.service.LogDubboService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -29,6 +31,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.common.message.Message;
 import org.elasticsearch.index.query.*;
 
@@ -95,6 +98,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+    @DubboReference(version = "1.0.0", group = "evaluate", check = false)
+    private EvaluateDubboService evaluateDubboService;
 
     @Override
     public KnowledgeGraphVo findKnowledgeGraphVo(Integer resumeId) {
@@ -322,7 +328,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
 
     @Override
-    public List<Resume> search(SearchDto searchDto) throws Exception{
+    public ESVo search(SearchDto searchDto) throws Exception{
         final QueryBuilder build = build(searchDto);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withPageable(PageRequest.of(searchDto.getPageNum()-1, searchDto.getPageSize()))
@@ -342,7 +348,21 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                     .filter(resume -> resume.getProcessStage().equals(searchDto.getProcessStage()))
                     .collect(Collectors.toList());
         }
-        return resumes;
+        return new ESVo(resumes,searchHits.getTotalHits(),searchDto.getPageNum(),searchDto.getPageSize());
+    }
+
+    @Override
+    public List<InterviewerResumeVo> listResumeFromNode(String nodeId) {
+        final List<Resume> resumes = resumeMapper.selectList(MybatisPlusUtil.queryWrapperEq("process_stage", nodeId));
+        List<InterviewerResumeVo> ans = new ArrayList<>();
+        for (Resume resume : resumes) {
+            InterviewerResumeVo interviewerResumeVo = new InterviewerResumeVo();
+            interviewerResumeVo.setResume(resume);
+            final List<Evaluate> evaluateList = evaluateDubboService.getEvaluateList(resume.getId());
+            interviewerResumeVo.setEvaluateList(evaluateList);
+            ans.add(interviewerResumeVo);
+        }
+        return ans;
     }
 
     /**

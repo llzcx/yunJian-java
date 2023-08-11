@@ -87,13 +87,13 @@ public class UserController {
     }
 
     /**
-     * 获取子用户列表
+     * [HR]获取子用户列表
      * @param request
      * @return
      */
     @GetMapping("/Interviewer/list")
     public ApiResp<List<User>> listInterviewer(HttpServletRequest request){
-        final Integer id = JwtGetUtil.getId(request);
+        final Integer id = userService.getUser(request,true,false).getId();
         final List<User> parent = userService.list(MybatisPlusUtil.queryWrapperEq("parent", id));
         return ApiResp.success(parent);
     }

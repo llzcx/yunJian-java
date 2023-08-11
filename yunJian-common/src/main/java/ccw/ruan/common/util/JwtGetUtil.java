@@ -3,6 +3,7 @@ package ccw.ruan.common.util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.baomidou.mybatisplus.core.mapper.Mapper;
 
 import javax.servlet.http.HttpServletRequest;
 

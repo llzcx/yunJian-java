@@ -5,6 +5,8 @@ import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
 
 
+import ccw.ruan.common.model.vo.ESVo;
+import ccw.ruan.common.model.vo.InterviewerResumeVo;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.common.model.vo.SimilarityVo;
@@ -58,7 +60,13 @@ public interface IResumeService extends IService<Resume> {
      * @param searchDto
      * @return
      */
-    List<Resume> search(SearchDto searchDto) throws Exception;
+    ESVo search(SearchDto searchDto) throws Exception;
 
 
+    /**
+     * 获取简历列表
+     * @param nodeId
+     * @return
+     */
+    List<InterviewerResumeVo> listResumeFromNode(String nodeId);
 }

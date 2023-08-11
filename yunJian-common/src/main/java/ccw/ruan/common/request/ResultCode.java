@@ -32,7 +32,8 @@ public enum ResultCode {
     USER_NOT_AUTHENTICATED(2012,"用户未认证"),
     USER_GENDER_MISMATCH(2013,"用户性别不符合"),
     TOKEN_IS_EMPTY(2014,"token未携带"),
-    REDIS_IS_EMPTY(2015,"redis中为空")
+    REDIS_IS_EMPTY(2015,"redis中为空"),
+    IDENTITY_ERROR(2016,"您的身份无法访问"),
 
     ;
     private Integer code;

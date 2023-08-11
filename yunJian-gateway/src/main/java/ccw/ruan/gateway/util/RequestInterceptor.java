@@ -8,7 +8,6 @@ import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.request.ResultCode;
 import ccw.ruan.common.util.JsonUtil;
 import cn.hutool.core.text.AntPathMatcher;
-import cn.hutool.json.JSONUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +73,18 @@ public class RequestInterceptor implements GlobalFilter, Ordered {
         };
     }
 
+    String HR = "eyJ0eXBlIjoiSnd0IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJpZGVudGl0eSI6IkhSIiwiaWQiOiIxIiwiZXhwIjoxNzA5NTk1MTQzfQ.vUXTwTW7PxQlpQyv_RporMDZO2-XMekQlDSPel444VM";
+    String I = "eyJ0eXBlIjoiSnd0IiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJpZGVudGl0eSI6IklOVEVSVklFV0VSIiwiaWQiOiIyIiwiZXhwIjoxNzA5NTk1MjIwfQ.vq2mQGMpoXkgsIdCLlxp6zuG2bYsSZC8u_AsFZCknRE";
+
+
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        exchange.getRequest()
+                .mutate()
+                .header("accessToken",
+                        HR)
+                .build();
         if(true){
             return chain.filter(exchange);
         }

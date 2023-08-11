@@ -25,6 +25,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -119,6 +120,32 @@ public class UserServiceImpl  extends ServiceImpl<UserMapper, User> implements I
             return saveToRedis(Integer.valueOf(id),identity);
         }else{
             throw new SystemException(ResultCode.TOKEN_TIME_OUT);
+        }
+    }
+
+    @Override
+    public User getUser(HttpServletRequest request,Boolean HR,Boolean Interviewer) {
+        Integer userId = JwtGetUtil.getId(request);
+        final User user = userMapper.selectById(userId);
+        final Integer parent = user.getParent();
+        if(parent==null){
+            //HR身份
+            if(HR){
+                return user;
+            }else{
+                throw new SystemException(ResultCode.IDENTITY_ERROR);
+            }
+        }else{
+            //面试官身份
+            if(HR && Interviewer){
+                return user;
+            }else if(HR && !Interviewer){
+                throw new SystemException(ResultCode.IDENTITY_ERROR);
+            } else if(!HR && Interviewer){
+                return userMapper.selectById(parent);
+            }else{
+                throw new SystemException(ResultCode.IDENTITY_ERROR);
+            }
         }
     }
 

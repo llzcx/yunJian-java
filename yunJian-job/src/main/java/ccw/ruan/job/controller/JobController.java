@@ -62,7 +62,7 @@ public class JobController {
      * @param request 从request的token当中解析出用户id
      * @return
      */
-    @GetMapping("/JPMatch/{jobId}")
+    @GetMapping("/JPMatch/{resumeId}")
     public ApiResp<JobPersonVo> JPMatch(@PathVariable Integer resumeId, HttpServletRequest request) {
         final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(jobService.jobPerson(resumeId,id));

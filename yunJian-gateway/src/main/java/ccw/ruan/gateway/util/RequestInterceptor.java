@@ -82,6 +82,7 @@ public class RequestInterceptor implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        System.out.println("1");
         exchange.getRequest()
                 .mutate()
                 .header("accessToken",

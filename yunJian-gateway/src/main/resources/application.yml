@@ -24,12 +24,14 @@ spring:
   cloud:
     gateway:
       globalcors:
-        corsConfigurations:
+        cors-configurations:
           '[/**]':
-            allowedHeaders: "*"
-            allowedOrigins: "*"
             allowCredentials: true
+            allowedOrigins: "*"
             allowedMethods: "*"
+            allowedHeaders: "*"
+        add-to-simple-url-handler-mapping: true
+
       discovery:
         locator:
           enabled: true

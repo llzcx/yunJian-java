@@ -7,26 +7,20 @@ import ccw.ruan.common.model.vo.ESVo;
 import ccw.ruan.common.model.vo.InterviewerResumeVo;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtGetUtil;
-import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
-import ccw.ruan.resume.manager.http.PyClient;
+import ccw.ruan.resume.manager.http.SimilarityClient;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 
 
 /**
@@ -50,7 +44,7 @@ public class ResumeController {
     ResumeMapper resumeMapper;
 
     @Autowired
-    PyClient pyClient;
+    SimilarityClient similarityClient;
 
 
     @GetMapping("/test1")

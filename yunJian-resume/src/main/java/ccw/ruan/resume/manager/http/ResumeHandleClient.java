@@ -14,7 +14,7 @@ import com.dtflys.forest.annotation.*;
                 "Accept:*/*",
         }
 )
-public interface PyClient1 {
+public interface ResumeHandleClient {
 
     /**
      * 用作向python发送请求处理简历文件

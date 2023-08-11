@@ -18,7 +18,7 @@ import java.util.List;
                 "Accept:*/*",
         }
 )
-public interface PyClient1 {
+public interface JobAnalysisClient {
     /**
      * 岗位解析
      * @param jobContent

@@ -6,7 +6,7 @@ import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.job.manager.http.PersonJobClient;
-import ccw.ruan.job.manager.http.PyClient1;
+import ccw.ruan.job.manager.http.JobAnalysisClient;
 import ccw.ruan.job.manager.http.dto.JobPersonFitDto;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import ccw.ruan.job.mapper.JobMapper;
@@ -40,7 +40,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Autowired
     PersonJobClient personJobClient;
     @Autowired
-    PyClient1 pyClient1;
+    JobAnalysisClient jobAnalysisClient;
 
 
     private PersonJobVo personJobMatch(String postInfo, List<Resume> resumes) {
@@ -69,6 +69,13 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         personJobVo.sortListByScore();
         return personJobVo;
     }
+
+    /**
+     * 一人匹配多岗位
+     * @param resumeInfo
+     * @param jobs
+     * @return
+     */
     private JobPersonVo jobPersonMatch(String resumeInfo, List<Job> jobs) {
         System.out.println("resumeInfo:"+resumeInfo);
         JobPersonVo jobPersonVo = new JobPersonVo();
@@ -135,6 +142,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         list.forEach(label-> postInfo.append(label).append(" "));
         //获取简历并进行过滤
         List<Resume> resumes = resumeDubboService.getResumesByUserId(userId).stream().filter(item-> {
+            //简历内容
             final String content = item.getContent();
             final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(content, ResumeAnalysisVo.class);
             return otherMatch(resumeAnalysisVo,job);
@@ -229,7 +237,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
      */
     @Override
     public String jobAnalysis(Integer userId,String jobContent) {
-        String jobJson = pyClient1.jobAnalysis(jobContent);
+        String jobJson = jobAnalysisClient.jobAnalysis(jobContent);
         System.out.println(jobJson);
         jobJson = decodeUnicode(jobJson);
 

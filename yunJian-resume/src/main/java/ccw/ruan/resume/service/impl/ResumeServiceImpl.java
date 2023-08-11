@@ -10,8 +10,8 @@ import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.es.WorkExperienceEntity;
-import ccw.ruan.resume.manager.http.PyClient;
-import ccw.ruan.resume.manager.http.PyClient1;
+import ccw.ruan.resume.manager.http.SimilarityClient;
+import ccw.ruan.resume.manager.http.ResumeHandleClient;
 import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
 import ccw.ruan.resume.manager.mq.ResumeAnalysis;
 import ccw.ruan.resume.manager.neo4j.data.node.*;
@@ -29,8 +29,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.common.message.Message;
 import org.elasticsearch.index.query.*;
@@ -56,7 +54,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static ccw.ruan.resume.manager.mq.ResumeAnalysis.MQ_RESUME_ANALYSIS_TOPIC;
 import static ccw.ruan.resume.manager.mq.ResumeAnalysis.decodeUnicode;
@@ -84,10 +81,10 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     ResumeRepository repository;
 
     @Autowired
-    PyClient pyClient;
+    SimilarityClient similarityClient;
 
     @Autowired
-    PyClient1 pyClient1;
+    ResumeHandleClient resumeHandleClient;
 
     @Autowired
     LogDubboService logDubboService;
@@ -169,7 +166,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                 // 计算项目经历相似度
                 final CalculateSimilarityDto dto1
                         = new CalculateSimilarityDto(resumeI.getProjectExperiences(), resumeJ.getProjectExperiences());
-                final BigDecimal project = pyClient.calculateSimilarity(dto1);
+                final BigDecimal project = similarityClient.calculateSimilarity(dto1);
                 if(project.compareTo(value05)>0){
                     labels.add(SimilarTypes.PROJECT_EXPERIENCE.getMessage());
                 }
@@ -178,7 +175,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                 final CalculateSimilarityDto dto2
                         = new CalculateSimilarityDto(getWorkExperiencesString(resumeI.getWorkExperiences()),
                         getWorkExperiencesString(resumeJ.getWorkExperiences()));
-                final BigDecimal work = pyClient.calculateSimilarity(dto2);
+                final BigDecimal work = similarityClient.calculateSimilarity(dto2);
                 if(work.compareTo(value05)>0){
                     labels.add(SimilarTypes.WORK_EXPERIENCE.getMessage());
                 }
@@ -282,7 +279,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      */
     @Override
     public void resumeAnalysis(String originalFilename,String format,Integer resumeId) {
-        String result = pyClient1.resumeFile(originalFilename, format);
+        String result = resumeHandleClient.resumeFile(originalFilename, format);
         System.out.println(result);
         result = decodeUnicode(result);
         ResumeAnalysisVo resume = null;

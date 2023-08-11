@@ -16,7 +16,7 @@ import java.math.BigDecimal;
                 "Accept:*/*",
         }
 )
-public interface PyClient {
+public interface SimilarityClient {
     /**
      * 测试
      * @param name

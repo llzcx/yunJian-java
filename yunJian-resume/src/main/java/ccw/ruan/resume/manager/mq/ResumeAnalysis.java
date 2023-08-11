@@ -1,9 +1,7 @@
 package ccw.ruan.resume.manager.mq;
 
-import ccw.ruan.common.model.pojo.Resume;
-import ccw.ruan.common.model.vo.ResumeAnalysisVo;
 import ccw.ruan.common.model.vo.ResumeMqMessageVo;
-import ccw.ruan.resume.manager.http.PyClient;
+import ccw.ruan.resume.manager.http.SimilarityClient;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.RocketMQ;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +18,7 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static ccw.ruan.resume.constant.OssApplicationConstant.MQ_ADDR;
 
@@ -42,7 +37,7 @@ public class ResumeAnalysis implements RocketMQ {
     public static String MQ_RESUME_ANALYSIS_TOPIC = "MQ_RESUME_ANALYSIS_TOPIC";
 
     @Autowired
-    PyClient pyClient;
+    SimilarityClient similarityClient;
     @Autowired
     IResumeService resumeService;
 

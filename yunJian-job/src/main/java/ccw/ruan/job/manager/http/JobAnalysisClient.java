@@ -1,6 +1,7 @@
 package ccw.ruan.job.manager.http;
 
 
+import ccw.ruan.common.config.PyClient;
 import ccw.ruan.job.manager.http.dto.PersonJobFitDto;
 import com.dtflys.forest.annotation.*;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @author 陈翔
  */
 @BaseRequest(
-        baseURL = "http://{py.jobAnalysis}",     // 默认域名
+        baseURL = PyClient.ZWY,     // 默认域名
         headers = {
                 "Accept:text/plain",                // 默认请求头
                 "Content-Type:application/json",

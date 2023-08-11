@@ -62,6 +62,6 @@ dubbo:
     password: ${nacos.password:nacos}
 
 py:
-  personJob: ${personJob:192.168.50.47:7070}
-  jobAnalysis: ${jobAnalysis:192.168.50.159:7071}
+  personJob: ${personJob:http://192.168.50.47:7070}
+  jobAnalysis: ${jobAnalysis:http://192.168.50.159:7071}
 

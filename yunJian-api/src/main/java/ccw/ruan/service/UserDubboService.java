@@ -14,4 +14,7 @@ public interface UserDubboService {
      * @return
      */
     User getUser(HttpServletRequest request);
+
+
+    Boolean deleteResume(Integer resumeId);
 }

@@ -35,8 +35,6 @@ public class EvaluateTest {
     public void saveEvaluate(){
         for (int i = 1; i <= 2; i++) {
             final AddEvaluateDto addEvaluateDto = new AddEvaluateDto();
-            addEvaluateDto.setText("还不错"+i);
-            addEvaluateDto.setScore(i);
             addEvaluateDto.setResumeId(22+(i-1));
             evaluateService.saveEvaluate(2, addEvaluateDto);
         }

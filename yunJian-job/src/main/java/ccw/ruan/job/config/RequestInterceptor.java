@@ -33,7 +33,7 @@ public class RequestInterceptor implements HandlerInterceptor {
             "/swagger-ui",
             "/swagger-resources",
             "/v3/api-docs",
-            "/test/demo"
+            "/TST/demo"
     );
 
     /**

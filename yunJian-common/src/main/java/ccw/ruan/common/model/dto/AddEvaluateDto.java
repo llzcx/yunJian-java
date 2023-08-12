@@ -15,12 +15,24 @@ import java.time.LocalDateTime;
 
 public class AddEvaluateDto implements Serializable {
 
-    @TableField("resume_id")
+
+    /**
+     * 简历id
+     */
     private Integer resumeId;
 
-    @TableField("score")
-    private Integer score;
+    /**
+     * 技能评估
+     */
+    private String skill;
 
-    @TableField("text")
-    private String text;
+    /**
+     * 总结与建议
+     */
+    private String summarize;
+
+    /**
+     * 综合评价
+     */
+    private String composite;
 }

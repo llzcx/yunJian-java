@@ -14,6 +14,7 @@ import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
+import ccw.ruan.service.UserDubboService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class ResumeController {
 
     @Autowired
     SimilarityClient similarityClient;
+
+    @DubboReference(version = "1.0.0", group = "user", check = false)
+    UserDubboService userDubboService;
 
 
     @GetMapping("/test1")
@@ -86,6 +90,19 @@ public class ResumeController {
         Resume resume1 = resumeMapper.selectById(resumeId);
         return ApiResp.success(resume1);
     }
+
+    /**
+     * 删除简历和日志以及面评
+     * @param resumeId
+     * @return
+     */
+    @DeleteMapping("/{resumeId}")
+    public ApiResp<Boolean> delete(@PathVariable String resumeId) {
+        resumeMapper.deleteById(Integer.valueOf(resumeId));
+        userDubboService.deleteResume(Integer.valueOf(resumeId));
+        return ApiResp.success(true);
+    }
+
 
     /**
      * 知识图谱

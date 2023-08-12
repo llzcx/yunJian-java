@@ -60,6 +60,10 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
     public Boolean updateFlowPath(Integer userId, UpdateFlowPathDto updateFlowPathDto) {
         // 检查大小（多个节点情况）
         final Set<FlowPathNode> set1 = new HashSet<>(flowPathMapper.selectList(MybatisPlusUtil.queryWrapperEq("user_id", userId)));
+        System.out.println(updateFlowPathDto.toString());
+        System.out.println(set1);
+        System.out.println("updateFlowPathDto.getTotal():"+updateFlowPathDto.getTotal());
+        System.out.println("set1.size():"+set1.size());
         if (updateFlowPathDto.getTotal() != set1.size()) {
             throw new SystemException(ResultCode.PARAM_ERROR);
         }
@@ -110,6 +114,7 @@ public class FlowPathServiceImpl extends ServiceImpl<FlowPathMapper, FlowPathNod
         flowPathVo.getSuccess().remove(flowPathNode);
         flowPathVo.getFail().remove(flowPathNode);
         redisUtil.set(RAS + FLOW_PATH + flowPathNode.getUserId(), JSONObject.toJSONString(flowPathVo));
+        flowPathMapper.deleteById(nodeId);
         return flowPathVo;
     }
 

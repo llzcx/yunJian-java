@@ -39,6 +39,7 @@ public class EvaluateServiceImpl extends ServiceImpl<EvaluateMapper, Evaluate> i
         final Evaluate evaluate = new Evaluate();
         BeanUtils.copyProperties(addEvaluateDto, evaluate);
         evaluate.setUserId(userId);
+        evaluate.setCreateTime(LocalDateTime.now());
         evaluateMapper.insert(evaluate);
         //添加日志
         OperationLog operationLog = new OperationLog();

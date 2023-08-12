@@ -25,7 +25,4 @@ public interface ResumeHandleClient {
      */
     @Get(value = "/ResumeFile",timeout = 1000000000)
     String resumeFile(@Query("fileName") String fileName, @Query("fileFormat") String fileFormat);
-
-
-
 }

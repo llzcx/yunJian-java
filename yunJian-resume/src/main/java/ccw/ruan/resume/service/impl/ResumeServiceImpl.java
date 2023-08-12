@@ -31,6 +31,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.common.message.Message;
+import org.aspectj.weaver.ast.Test;
 import org.elasticsearch.index.query.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,9 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -244,7 +247,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume.setPath("E:/img2/"+fileName1+".png");
         System.out.println(resume);
         //设置流程节点
-        resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
+        // resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
         //插入简历
         resumeMapper.insert(resume);
         ResumeMqMessageVo resumeMqMessageVo = new ResumeMqMessageVo();
@@ -320,6 +323,32 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         Date currentDate = new Date();
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume1.setUpdateTime(dateTime);
+        TST test = new TST();
+        test.setId(resumeId);
+        test.setEducation(resume.getEducation());
+        test.setWorkYears(workYears);
+        test.setName(resume.getName());
+        test.setGraduationInstitution(resume.getGraduationInstitution());
+            if ("".equals(resume.getAge())){
+                test.setAge("");
+            }else {
+             test.setAge(resume.getAge());
+            }
+        String fileName = "E:/result.txt";
+        System.out.println(test);
+        try {
+            FileWriter fileWriter = new FileWriter(fileName);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            String content = JsonUtil.object2StringSlice(test);
+            bufferedWriter.write(content);
+            bufferedWriter.close(); // 记得关闭写入流
+
+            System.out.println("写入文件成功！");
+        } catch (IOException e) {
+            System.out.println("写入文件时发生错误：" + e.getMessage());
+        }
+
+
         resumeMapper.updateById(resume1);
     }
 

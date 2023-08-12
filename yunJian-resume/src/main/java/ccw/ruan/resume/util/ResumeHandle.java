@@ -124,7 +124,6 @@ public class ResumeHandle {
             String[] parts = date.split("-");
             int year = Integer.parseInt(parts[0]);
             int month = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
-
             return String.format("%04d-%02d-%02d", year, month, 1);
         }
 
@@ -141,7 +140,7 @@ public class ResumeHandle {
     }
     public static void main(String[] args) {
         List<WorkExperience> list = new ArrayList<>();
-        String[] list1 = {"1990-12-8 1997-12-8",
+        String[] list1 = {"1990/12/8 1997-12-8",
 //                "2021.8 2022.8",
 //                "2017.07 至今"
 //                "2017.9 2019.9",

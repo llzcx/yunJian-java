@@ -4,6 +4,7 @@ import ccw.ruan.common.model.dto.AddFlowPathNodeDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathDto;
 import ccw.ruan.common.model.dto.UpdateFlowPathNodeDto;
 import ccw.ruan.common.model.pojo.FlowPathNode;
+import ccw.ruan.common.model.vo.FlowPathNodeVo;
 import ccw.ruan.common.model.vo.FlowPathVo;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtGetUtil;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,9 +54,17 @@ public class FlowPathController {
      * @param request 从request解析出用户id
      */
     @GetMapping("/allNode")
-    public ApiResp<List<FlowPathNode>> getAllFlowPathNode(HttpServletRequest request) {
+    public ApiResp<List<FlowPathNodeVo>> getAllFlowPathNode(HttpServletRequest request) {
         Integer userId = JwtGetUtil.getId(request);
-        return ApiResp.success(flowPathService.list(MybatisPlusUtil.queryWrapperEq("user_id", userId)));
+        final List<FlowPathNode> list = flowPathService.list(MybatisPlusUtil.queryWrapperEq("user_id", userId));
+        List<FlowPathNodeVo> list1 = new ArrayList<>();
+        list.forEach(item->{
+            FlowPathNodeVo vo = new FlowPathNodeVo();
+            BeanUtils.copyProperties(item, vo);
+            vo.setCnt(resumeDubboService.flowPathNodeCount(item.getId()));
+            list1.add(vo);
+        });
+        return ApiResp.success(list1);
     }
 
     /**

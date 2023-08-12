@@ -34,6 +34,9 @@ public enum ResultCode {
     TOKEN_IS_EMPTY(2014,"token未携带"),
     REDIS_IS_EMPTY(2015,"redis中为空"),
     IDENTITY_ERROR(2016,"您的身份无法访问"),
+    PY_APPLICATION_ERROR(2017,"python程序异常"),
+    JOB_EMPTY(2018,"岗位不存在"),
+    RESUME_EMPTY(2019,"简历不存在"),
 
     ;
     private Integer code;

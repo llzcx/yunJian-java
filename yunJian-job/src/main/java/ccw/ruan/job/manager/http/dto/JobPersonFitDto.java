@@ -13,11 +13,11 @@ import java.util.List;
 @EqualsAndHashCode
 public class JobPersonFitDto implements Serializable {
     private String resume;
-    private List<String> job;
+    private List<String> jobs;
 
-    public JobPersonFitDto(String resume, List<String> job) {
+    public JobPersonFitDto(String resume, List<String> jobs) {
         this.resume = resume;
-        this.job = job;
+        this.jobs = jobs;
     }
 
     public JobPersonFitDto() {

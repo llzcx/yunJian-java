@@ -52,5 +52,10 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
         return resumeMapper.selectById(resumeId);
     }
 
+    @Override
+    public Integer flowPathNodeCount(Integer nodeId) {
+        return resumeMapper.selectCount(MybatisPlusUtil.queryWrapperEq("process_stage",nodeId));
+    }
+
 
 }

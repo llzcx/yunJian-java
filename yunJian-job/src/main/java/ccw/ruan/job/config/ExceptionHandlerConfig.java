@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.ConnectException;
 
 /**
  * RestControllerAdvice，统一异常处理
@@ -83,5 +84,18 @@ public class ExceptionHandlerConfig {
     public ApiResp ioException(IOException ex) {
         log.error(errorInfoToString(ex));
         return ApiResp.fail(ResultCode.COMMON_FAIL);
+    }
+
+
+    /**
+     * py
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(ConnectException.class)
+    @ResponseBody
+    public ApiResp connectException(ConnectException ex) {
+        log.error(errorInfoToString(ex));
+        return ApiResp.fail(ResultCode.PY_APPLICATION_ERROR);
     }
 }

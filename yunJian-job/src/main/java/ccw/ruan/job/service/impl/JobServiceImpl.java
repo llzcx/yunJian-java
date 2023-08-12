@@ -1,8 +1,10 @@
 package ccw.ruan.job.service.impl;
 
+import ccw.ruan.common.exception.SystemException;
 import ccw.ruan.common.model.pojo.Job;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.vo.*;
+import ccw.ruan.common.request.ResultCode;
 import ccw.ruan.common.util.JsonUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.job.manager.http.PersonJobClient;
@@ -135,6 +137,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public PersonJobVo personJob(Integer jobId,Integer userId) {
         final Job job = jobMapper.selectById(jobId);
+        if(job==null){
+            throw new SystemException(ResultCode.JOB_EMPTY);
+        }
         final String professionalLabel = job.getProfessionalLabel();
         // 拼接简历信息
         final List<String> list = JsonUtil.deserialize(professionalLabel, List.class);
@@ -147,6 +152,10 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(content, ResumeAnalysisVo.class);
             return otherMatch(resumeAnalysisVo,job);
         }).collect(Collectors.toList());
+        if(resumes.size()==0){
+            //已经过滤了所有简历
+            return new PersonJobVo();
+        }
         //最后进行人岗匹配得分计算
         final PersonJobVo match = personJobMatch(postInfo.toString(), resumes);
         //排序
@@ -157,6 +166,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public JobPersonVo jobPerson(Integer resumeId, Integer userId) {
         final Resume resume = resumeDubboService.getResumeById(resumeId);
+        if(resume==null){
+            throw new SystemException(ResultCode.RESUME_EMPTY);
+        }
         final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
         // 构造简历分析字符串
         StringBuilder resumeInfo = new StringBuilder();
@@ -169,6 +181,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
                 .selectList(MybatisPlusUtil.queryWrapperEq("user_id", userId))
                 .stream().filter(item-> otherMatch(resumeAnalysisVo, item)).collect(Collectors.toList());
         //岗人匹配
+        if(jobs.size()==0){
+            return new JobPersonVo();
+        }
         return jobPersonMatch(resumeInfo.toString(), jobs);
     }
 

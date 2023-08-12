@@ -117,7 +117,7 @@ public class ResumeHandle {
     }
 
     public static String formatDate(String date) {
-        Pattern pattern = Pattern.compile("^\\d{4}(-\\d{1,2})?$");
+        Pattern pattern = Pattern.compile("^\\d{4}(-\\d{1,2})(-\\d{1,2})?$");
         Matcher matcher = pattern.matcher(date);
 
         if (matcher.matches()) {
@@ -141,7 +141,7 @@ public class ResumeHandle {
     }
     public static void main(String[] args) {
         List<WorkExperience> list = new ArrayList<>();
-        String[] list1 = {"2016.8 至今",
+        String[] list1 = {"1990-12-8 1997-12-8",
 //                "2021.8 2022.8",
 //                "2017.07 至今"
 //                "2017.9 2019.9",
@@ -155,6 +155,7 @@ public class ResumeHandle {
         }
         final int year = calculateWorkYears(list);
         System.out.println(year);
+
     }
 
 }

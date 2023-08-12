@@ -33,4 +33,6 @@ public interface ResumeDubboService {
     Resume getResumeById(Integer resumeId);
 
 
+    Integer flowPathNodeCount(Integer nodeId);
+
 }

@@ -266,7 +266,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume.setPath("E:/img2/"+fileName1+".png");
         System.out.println(resume);
         //设置流程节点
-        // resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
+        //resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
         //插入简历
         resumeMapper.insert(resume);
         ResumeMqMessageVo resumeMqMessageVo = new ResumeMqMessageVo();
@@ -276,7 +276,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         try {
             resumeAnalysis.send(new Message(MQ_RESUME_ANALYSIS_TOPIC,
                     jsonString.getBytes(StandardCharsets.UTF_8)));
-        }catch (Exception e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
         return fileName;
@@ -328,6 +328,11 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1.setPhone(resume.getPhone());
         resume1.setContent(JsonUtil.object2StringSlice(resume));
         resume1.setResumeStatus(1);
+        List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(resume.getGraduationInstitution());
+        for(int i=0;i<schoolLevel.size();i++){
+            String level = String.valueOf(schoolLevel.get(i));
+            resume.getLabelProcessing().getEducationTags().add(level);
+        }
         if(workYears> 10){
             resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);
         }else if(workYears<10&&workYears>5){
@@ -342,32 +347,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         Date currentDate = new Date();
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume1.setUpdateTime(dateTime);
-        TST test = new TST();
-        test.setId(resumeId);
-        test.setEducation(resume.getEducation());
-        test.setWorkYears(workYears);
-        test.setName(resume.getName());
-        test.setGraduationInstitution(resume.getGraduationInstitution());
-            if ("".equals(resume.getAge())){
-                test.setAge("");
-            }else {
-             test.setAge(resume.getAge());
-            }
-        String fileName = "E:/result.txt";
-        System.out.println(test);
-        try {
-            FileWriter fileWriter = new FileWriter(fileName);
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            String content = JsonUtil.object2StringSlice(test);
-            bufferedWriter.write(content);
-            bufferedWriter.close(); // 记得关闭写入流
-
-            System.out.println("写入文件成功！");
-        } catch (IOException e) {
-            System.out.println("写入文件时发生错误：" + e.getMessage());
-        }
-
-
+        System.out.println(resume1.getId());
         resumeMapper.updateById(resume1);
     }
 

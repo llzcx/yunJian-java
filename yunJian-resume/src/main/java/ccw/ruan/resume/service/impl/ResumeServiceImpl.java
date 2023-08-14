@@ -1,5 +1,7 @@
 package ccw.ruan.resume.service.impl;
 
+import ccw.ruan.common.constant.FlowType;
+import ccw.ruan.common.constant.ResumeState;
 import ccw.ruan.common.constant.SimilarTypes;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Evaluate;
@@ -93,6 +95,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     @Value("${resume.path}")
     private String basePath;
 
+    @Value("resumeImage.path")
+    private String resumeImage;
     @Autowired
     private ResumeAnalysis resumeAnalysis;
 
@@ -265,12 +269,12 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         Date currentDate = new Date();
         Resume resume = new Resume();
-        resume.setResumeStatus(0);
+        resume.setResumeStatus(ResumeState.incomplete.getCode());
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume.setCreateTime(dateTime);
         resume.setUpdateTime(dateTime);
         resume.setUserId(userId);
-        resume.setPath("E:/img2/"+fileName1+".png");
+        resume.setPath(resumeImage+fileName1+".png");
         System.out.println(resume);
         //设置流程节点
         //resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
@@ -322,7 +326,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1 = resumeMapper.selectById(resumeId);
         System.out.println(resume1.toString());
         int workYears = calculateWorkYears(resume.getWorkExperiences());
-        TalentPortrait talentPortrait = talentPortraitMapper.getTalentPortrait("陈伯薇");
+        TalentPortrait talentPortrait = talentPortraitMapper.getTalentPortrait(resume.getName());
         System.out.println(talentPortrait);
         resume.setResumeHighlights(talentPortrait.getSparkle());
         resume.setRiskWarning(talentPortrait.getRiskWarning());
@@ -332,7 +336,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
         resume1.setContent(JsonUtil.object2StringSlice(resume));
-        resume1.setResumeStatus(1);
+        resume1.setResumeStatus(ResumeState.complete.getCode());
         /*
         List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(resume.getGraduationInstitution());
         for(int i=0;i<schoolLevel.size();i++){

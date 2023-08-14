@@ -9,4 +9,5 @@ import java.util.List;
  */
 public interface JobDubboService {
    List<Job> getJobs(Integer userId);
+   List<String> analyzeJobData(String data);
 }

@@ -27,7 +27,7 @@ public class MyTest {
 
 
 
-   @Test
+    @Test
     public void es()
     {
         final List<Resume> list = resumeService.list();

@@ -2,10 +2,10 @@ package ccw.ruan.resume.service.impl;
 
 import ccw.ruan.common.constant.SimilarTypes;
 import ccw.ruan.common.model.dto.SearchDto;
-import ccw.ruan.common.model.pojo.Evaluate;
-import ccw.ruan.common.model.pojo.Resume;
+import ccw.ruan.common.model.pojo.*;
 import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
+import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
@@ -19,10 +19,14 @@ import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.resume.manager.neo4j.vo.SchoolVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
+import ccw.ruan.resume.mapper.ResumeMsgMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
 import ccw.ruan.service.EvaluateDubboService;
+import ccw.ruan.service.JobDubboService;
 import ccw.ruan.service.LogDubboService;
+import ccw.ruan.service.UserDubboService;
+import cn.hutool.core.lang.hash.Hash;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -43,9 +47,12 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.crypto.Data;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -53,7 +60,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -94,6 +103,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
 
     @Autowired
+    ResumeMsgMapper resumeMsgMapper;
+
+    @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
     @Autowired
@@ -101,6 +113,13 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @DubboReference(version = "1.0.0", group = "evaluate", check = false)
     private EvaluateDubboService evaluateDubboService;
+
+
+    @DubboReference(version = "1.0.0", group = "job", check = false)
+    private JobDubboService jobDubboService;
+
+    @DubboReference(version = "1.0.0", group = "user", check = false)
+    private UserDubboService userDubboService;
 
     @Override
     public KnowledgeGraphVo findKnowledgeGraphVo(Integer resumeId) {
@@ -354,8 +373,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
 
     @Override
-    public ESVo search(SearchDto searchDto) throws Exception{
-        final QueryBuilder build = build(searchDto);
+    public ESVo search(SearchDto searchDto,Integer userId) throws Exception{
+        final QueryBuilder build = build(searchDto, userId);
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withPageable(PageRequest.of(searchDto.getPageNum()-1, searchDto.getPageSize()))
                 .withQuery(build)
@@ -391,6 +410,124 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         return ans;
     }
 
+    @Override
+    public GlobalResumeVo view(String resumeId,Integer userId) {
+        GlobalResumeVo vo = new GlobalResumeVo();
+        BoolQueryBuilder boolQuery = boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("userId", userId));
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQuery)
+                .build();
+        //简历列表
+        List<ResumeAnalysisEntity> resumeList = elasticsearchRestTemplate
+                .search(searchQuery, ResumeAnalysisEntity.class).stream()
+                .map(SearchHit::getContent).collect(Collectors.toList());
+        //job列表
+        final List<Job> jobs = jobDubboService.getJobs(userId);
+        //流程列表
+        final FlowPathVo flowNodes = userDubboService.getFlowNodes(userId);
+        final List<FlowPathNode> allNode = new ArrayList<>();
+        allNode.addAll(flowNodes.getActive());
+        allNode.addAll(flowNodes.getSuccess());
+        allNode.addAll(flowNodes.getFail());
+        final HashMap<Integer,Integer> NodeMap = new HashMap<>();
+        //简历总数
+        vo.setNum1(resumeList.size());
+        //岗位总数
+        vo.setNum2(jobs.size());
+        //公司需求
+        Integer needs = 0;
+        for (Job job : jobs) {
+            needs += job.getNeed();
+        }
+        vo.setNum3(needs);
+        //完成率
+        Integer finish = 0;
+        //男性
+        Integer nanx = 0;
+        //女性
+        Integer nvx = 0;
+        final Set<Integer> success = flowNodes.getSuccess()
+                .stream().map(FlowPathNode::getId).collect(Collectors.toSet());
+        for (ResumeAnalysisEntity item : resumeList) {
+            final Resume resume = resumeMapper.selectById(item.getId());
+            Integer nodeId  =resume.getProcessStage();
+            int value = NodeMap.getOrDefault(nodeId, 0);
+            NodeMap.put(nodeId,value+1);
+            if(success.contains(resume.getProcessStage())){
+                finish+=1;
+            }
+            if(item.getSex()){
+                nanx+=1;
+            }else{
+                nvx+=1;
+            }
+        }
+        vo.setNum4(convertToPercentage(finish,resumeList.size()));
+        vo.setNum5(nanx);
+        vo.setNum6(nvx);
+        List<Integer> ages = new ArrayList<>();
+        int num_26 = 0,num_26_30 = 0,num_30_34 = 0,num_34_38 = 0,num_38_42 = 0,num_42 = 0;
+        int year_0 = 0,year_0_3 = 0,year_3_5 = 0,year_5_10 = 0,year_10 = 0;
+        Integer gaozhong = 0,boshi = 0,shuoshi = 0,benke = 0,dazhuan = 0;
+        for (ResumeAnalysisEntity item : resumeList) {
+            final int age = getAge(item.getDateOfBirth());
+            if(age<26){
+                num_26 += 1;
+            }else if(age < 30){
+                num_26_30 += 1;
+            }else if(age < 34){
+                num_30_34 += 1;
+            }else if(age < 38){
+                num_34_38 += 1;
+            }else if(age < 42){
+                num_38_42 += 1;
+            }else{
+                num_42 += 1;
+            }
+            final Integer workYear = item.getWorkYear();
+            if(workYear==0){
+                year_0 += 1;
+            }else if(workYear <= 3){
+                year_0_3 += 1;
+            }else if(workYear <= 5){
+                year_3_5 += 1;
+            }else if(workYear <= 10){
+                year_5_10 += 1;
+            }else{
+                year_10 += 1;
+            }
+        }
+        vo.setAges(Arrays.asList(num_26,num_26_30,num_30_34,num_34_38,num_38_42,num_42));
+        List<GlobalResumeVo.Stage> list = new ArrayList<>();
+        for (FlowPathNode node : allNode) {
+            list.add(new GlobalResumeVo.Stage(node.getName(),NodeMap.get(node.getId())));
+        }
+        vo.setStages(list);
+        vo.setExperiences(Arrays.asList(year_0,year_0_3,year_3_5,year_5_10,year_10));
+        return vo;
+    }
+    public static String convertToPercentage(Integer numerator, Integer denominator) {
+        if (denominator == 0) {
+            throw new IllegalArgumentException("Denominator cannot be zero");
+        }
+
+        double percentage = (double) numerator / denominator * 100;
+        return String.format("%.2f%%", percentage);
+    }
+
+    // 当前时间
+    static LocalDate currentDate = LocalDate.of(2023,4, 1);
+    public static Integer getAge(Date birthday){
+        if (birthday==null){
+            return 0;
+        }
+        // 将 Date 转换为 LocalDate
+        LocalDate birthDate = birthday.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        // 计算年龄
+        return Period.between(birthDate, currentDate).getYears();
+
+    }
     /**
      * 把解析结果存储到es当中
      *
@@ -434,8 +571,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         return true;
     }
 
-    public static QueryBuilder build(SearchDto searchDto) throws Exception {
+    public static QueryBuilder build(SearchDto searchDto,Integer userId) throws Exception {
         BoolQueryBuilder boolQuery = boolQuery();
+        boolQuery.must(termQuery("userId", userId));
         final String kw = searchDto.getFullText();
         if(StringUtils.isNotBlank(kw)){
             //TODO 进行全文检索
@@ -564,6 +702,16 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         System.out.println(boolQuery.toString());
         return boolQuery;
+    }
+
+    private void createMsg(Integer resumeId){
+        ResumeMsg resumeMsg = new ResumeMsg();
+        final Resume resume = resumeMapper.selectById(resumeId);
+        String name = resume.getFullName()==null? String.valueOf(resumeId) :resume.getFullName();
+        resumeMsg.setMsg(name+"的简历分析完成");
+        resumeMsg.setResumeId(resumeId);
+        resumeMsg.setRead(false);
+        resumeMsgMapper.insert(resumeMsg);
     }
 
 }

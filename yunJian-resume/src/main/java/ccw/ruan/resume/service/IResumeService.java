@@ -6,6 +6,7 @@ import ccw.ruan.common.model.pojo.Resume;
 
 
 import ccw.ruan.common.model.vo.ESVo;
+import ccw.ruan.common.model.vo.GlobalResumeVo;
 import ccw.ruan.common.model.vo.InterviewerResumeVo;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -60,7 +62,7 @@ public interface IResumeService extends IService<Resume> {
      * @param searchDto
      * @return
      */
-    ESVo search(SearchDto searchDto) throws Exception;
+    ESVo search(SearchDto searchDto,Integer userId) throws Exception;
 
 
     /**
@@ -69,4 +71,6 @@ public interface IResumeService extends IService<Resume> {
      * @return
      */
     List<InterviewerResumeVo> listResumeFromNode(String nodeId);
+
+    GlobalResumeVo view(String resumeId,Integer userId);
 }

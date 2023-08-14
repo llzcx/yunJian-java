@@ -38,6 +38,11 @@ public class Job implements Serializable {
     private String name;
 
     /**
+     * 人才需求数
+     */
+    private Integer need;
+
+    /**
      * 岗位职责
      */
     private String responsibility;

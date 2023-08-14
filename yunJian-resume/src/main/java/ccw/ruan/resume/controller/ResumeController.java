@@ -3,15 +3,19 @@ package ccw.ruan.resume.controller;
 
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
+import ccw.ruan.common.model.pojo.ResumeMsg;
 import ccw.ruan.common.model.vo.ESVo;
+import ccw.ruan.common.model.vo.GlobalResumeVo;
 import ccw.ruan.common.model.vo.InterviewerResumeVo;
 import ccw.ruan.common.request.ApiResp;
 import ccw.ruan.common.util.JwtGetUtil;
+import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.http.SimilarityClient;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
+import ccw.ruan.resume.mapper.ResumeMsgMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.service.JobDubboService;
 import ccw.ruan.service.UserDubboService;
@@ -43,6 +47,9 @@ public class ResumeController {
 
     @Autowired
     ResumeMapper resumeMapper;
+
+    @Autowired
+    ResumeMsgMapper resumeMsgMapper;
 
     @Autowired
     SimilarityClient similarityClient;
@@ -124,8 +131,8 @@ public class ResumeController {
      * @throws Exception
      */
     @PostMapping("/search")
-    public ApiResp<ESVo> search(@RequestBody SearchDto searchDto) throws Exception {
-        return ApiResp.success(resumeService.search(searchDto));
+    public ApiResp<ESVo> search(@RequestBody SearchDto searchDto,HttpServletRequest request) throws Exception {
+        return ApiResp.success(resumeService.search(searchDto,JwtGetUtil.getId(request)));
     }
 
 
@@ -138,6 +145,29 @@ public class ResumeController {
     @GetMapping("/listResumeFromNode/{nodeId}")
     public List<InterviewerResumeVo> listResumeFromNode(@PathVariable String nodeId) throws Exception {
         return resumeService.listResumeFromNode(nodeId);
+    }
+
+
+    /**
+     * 获取简历可视化消息
+     * @param resumeId
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/view/{resumeId}")
+    public GlobalResumeVo view(@PathVariable String resumeId,HttpServletRequest request) throws Exception {
+        return resumeService.view(resumeId,JwtGetUtil.getId(request));
+    }
+
+    /**
+     * 获取所有简历分析消息（已读和未读）
+     * @return
+     * @throws Exception
+     */
+    @GetMapping("/resumeMsg")
+    public List<ResumeMsg> resumeMsg(HttpServletRequest request) throws Exception {
+        final Integer id = JwtGetUtil.getId(request);
+        return resumeMsgMapper.selectList(MybatisPlusUtil.queryWrapperEq("user_id", id));
     }
 
 

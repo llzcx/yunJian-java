@@ -1,6 +1,7 @@
 package ccw.ruan.service;
 
 import ccw.ruan.common.model.pojo.User;
+import ccw.ruan.common.model.vo.FlowPathVo;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,4 +18,6 @@ public interface UserDubboService {
 
 
     Boolean deleteResume(Integer resumeId);
+
+    FlowPathVo getFlowNodes(Integer userId);
 }

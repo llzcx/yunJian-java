@@ -85,5 +85,17 @@ public class ResumeAnalysisVo implements Serializable {
      * 人才画像解析结果
      */
     private ResumeLabelsVo labelProcessing;
+    /**
+     * 简历亮点
+     * */
+    private  String resumeHighlights;
+    /**
+     * 风险提示
+     * */
+    private  String riskWarning;
+    /**
+     * 智能预测
+     * */
+    private  String intelligentPrediction;
 
 }

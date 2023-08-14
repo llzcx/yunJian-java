@@ -2,6 +2,9 @@ package ccw.ruan.resume.service.impl;
 
 import ccw.ruan.common.constant.SimilarTypes;
 import ccw.ruan.common.model.dto.SearchDto;
+import ccw.ruan.common.model.pojo.Evaluate;
+import ccw.ruan.common.model.pojo.Resume;
+import ccw.ruan.common.model.pojo.TalentPortrait;
 import ccw.ruan.common.model.pojo.*;
 import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
@@ -19,6 +22,7 @@ import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.resume.manager.neo4j.vo.SchoolVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
+import ccw.ruan.resume.mapper.TalentPortraitMapper;
 import ccw.ruan.resume.mapper.ResumeMsgMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
@@ -79,6 +83,9 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> implements IResumeService {
     @Autowired
     ResumeMapper resumeMapper;
+
+    @Autowired
+    TalentPortraitMapper talentPortraitMapper;
 
     @Autowired
     SchoolRepository schoolRepository;
@@ -310,6 +317,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         ResumeAnalysisVo resume = null;
         resume = JsonUtil.deserialize(result, ResumeAnalysisVo.class);
         resume.setWorkYears(calculateWorkYears(resume.getWorkExperiences()));
+        //保存到es
+        saveToElasticsearch(resume,resumeId);
         System.out.println(resume.toString());
         System.out.println(resumeId);
         Resume resume1 = null;
@@ -318,18 +327,24 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         saveToElasticsearch(resume,resumeId,resume1.getUserId());
         System.out.println(resume.getWorkExperiences());
         int workYears = calculateWorkYears(resume.getWorkExperiences());
-        System.out.println(workYears);
+        TalentPortrait talentPortrait = talentPortraitMapper.getTalentPortrait("陈伯薇");
+        System.out.println(talentPortrait);
+        resume.setResumeHighlights(talentPortrait.getSparkle());
+        resume.setRiskWarning(talentPortrait.getRiskWarning());
+        resume.setIntelligentPrediction(talentPortrait.getIntelligentPrediction());
         resume.setWorkYears(workYears);
         resume1.setFullName(resume.getName());
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
         resume1.setContent(JsonUtil.object2StringSlice(resume));
         resume1.setResumeStatus(1);
+        /*
         List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(resume.getGraduationInstitution());
         for(int i=0;i<schoolLevel.size();i++){
             String level = String.valueOf(schoolLevel.get(i));
             resume.getLabelProcessing().getEducationTags().add(level);
         }
+        */
         if(workYears> 10){
             resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);
         }else if(workYears<10&&workYears>5){
@@ -345,6 +360,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume1.setUpdateTime(dateTime);
         System.out.println(resume1.getId());
+        System.out.println(resume1);
         resumeMapper.updateById(resume1);
     }
 

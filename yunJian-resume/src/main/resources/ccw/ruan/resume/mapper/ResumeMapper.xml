@@ -8,4 +8,7 @@
     <select id="selectById" resultType="ccw.ruan.common.model.pojo.Resume">
         select * from resume where id=#{resumeId} and resume_status = 1
     </select>
+    <select id="selectResume" resultType="ccw.ruan.common.model.pojo.Resume">
+        select * from resume where id=#{resumeId}
+    </select>
 </mapper>

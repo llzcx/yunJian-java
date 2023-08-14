@@ -25,4 +25,6 @@ public interface ResumeMapper extends BaseMapper<Resume> {
     Resume selectById(@Param("resumeId") Serializable resumeId);
 
 
+    Resume selectResume(@Param("resumeId")Integer resumeId);
+
 }

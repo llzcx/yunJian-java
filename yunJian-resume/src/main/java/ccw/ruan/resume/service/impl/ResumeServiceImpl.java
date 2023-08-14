@@ -293,13 +293,11 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         String result = resumeHandleClient.resumeFile(originalFilename, format);
         System.out.println(result);
         result = decodeUnicode(result);
-        ResumeAnalysisVo resume = null;
+        ResumeAnalysisVo resume;
         resume = JsonUtil.deserialize(result, ResumeAnalysisVo.class);
         resume.setWorkYears(calculateWorkYears(resume.getWorkExperiences()));
         System.out.println(resume.toString());
-        System.out.println(resumeId);
-        Resume resume1 = null;
-        resume1 = resumeMapper.selectById(resumeId);
+        Resume resume1 = resumeMapper.selectResume(resumeId);
         //保存到es
         saveToElasticsearch(resume,resumeId,resume1.getUserId());
         System.out.println(resume.getWorkExperiences());
@@ -334,10 +332,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         Date currentDate = new Date();
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume1.setUpdateTime(dateTime);
-        System.out.println(resume1.getId());
-        System.out.println(resume1);
-        createMsg(resumeId);
         resumeMapper.updateById(resume1);
+        createMsg(resumeId,resume1.getUserId());
     }
 
 
@@ -686,13 +682,14 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         return boolQuery;
     }
 
-    private void createMsg(Integer resumeId){
+    private void createMsg(Integer resumeId,Integer userId){
         ResumeMsg resumeMsg = new ResumeMsg();
         final Resume resume = resumeMapper.selectById(resumeId);
         String name = resume.getFullName()==null? String.valueOf(resumeId) :resume.getFullName();
         resumeMsg.setMsg(name+"的简历分析完成。");
         resumeMsg.setResumeId(resumeId);
         resumeMsg.setIsRead(false);
+        resumeMsg.setUserId(userId);
         resumeMsgMapper.insert(resumeMsg);
     }
 

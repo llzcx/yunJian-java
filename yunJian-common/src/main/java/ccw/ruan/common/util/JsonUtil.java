@@ -1,5 +1,7 @@
 package ccw.ruan.common.util;
 
+import ccw.ruan.common.exception.SystemException;
+import ccw.ruan.common.request.ResultCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,9 +25,8 @@ public class JsonUtil {
         try {
             return objectMapper.readValue(json, valueType);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            throw new SystemException(ResultCode.JSON_ERROR);
         }
-        return null;
     }
 
 }

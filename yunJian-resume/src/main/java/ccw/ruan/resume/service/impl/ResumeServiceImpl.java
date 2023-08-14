@@ -2,9 +2,11 @@ package ccw.ruan.resume.service.impl;
 
 import ccw.ruan.common.constant.ResumeState;
 import ccw.ruan.common.constant.SimilarTypes;
+import ccw.ruan.common.exception.SystemException;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.*;
 import ccw.ruan.common.model.vo.*;
+import ccw.ruan.common.request.ResultCode;
 import ccw.ruan.common.util.JsonUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
@@ -122,13 +124,16 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     @Override
     public KnowledgeGraphVo findKnowledgeGraphVo(Integer resumeId) {
         final Resume resume = resumeMapper.selectById(resumeId);
+        if(resume==null){
+            throw new SystemException(ResultCode.RESUME_EMPTY);
+        }
         KnowledgeGraphVo knowledgeGraphVo = new KnowledgeGraphVo();
         ResumeAnalysisVo resumeAnalysisVo = null;
         resumeAnalysisVo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
         // TODO 1.1获取大学命名实体合集
         List<String> schoolNameList = new ArrayList<>();
         assert resumeAnalysisVo != null;
-        if(resumeAnalysisVo.getGraduationInstitution()!=null){
+        if(resumeAnalysisVo.getGraduationInstitution()!=null && !"".equals(resumeAnalysisVo.getGraduationInstitution().trim())){
             schoolNameList.add(resumeAnalysisVo.getGraduationInstitution());
         }
         // TODO 1.2遍里大学实体，搜索知识图谱

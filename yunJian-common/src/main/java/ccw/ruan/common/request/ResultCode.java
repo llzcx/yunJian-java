@@ -37,6 +37,7 @@ public enum ResultCode {
     PY_APPLICATION_ERROR(2017,"python程序异常"),
     JOB_EMPTY(2018,"岗位不存在"),
     RESUME_EMPTY(2019,"简历不存在"),
+    JSON_ERROR(2020,"Json解析异常")
 
     ;
     private Integer code;

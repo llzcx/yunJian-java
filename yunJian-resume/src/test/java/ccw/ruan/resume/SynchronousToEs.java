@@ -1,12 +1,7 @@
 package ccw.ruan.resume;
 
-import ccw.ruan.common.model.pojo.Resume;
-import ccw.ruan.common.model.vo.ResumeAnalysisVo;
-import ccw.ruan.common.util.JsonUtil;
-import ccw.ruan.resume.mapper.ResumeMapper;
-import ccw.ruan.resume.service.IResumeService;
+
 import ccw.ruan.resume.service.impl.ResumeServiceImpl;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,12 +29,4 @@ public class SynchronousToEs {
     @Autowired
     ResumeServiceImpl resumeService;
 
-    @Autowired
-    ResumeMapper resumeMapper;
-    @Test
-    public void test(){
-
-
-
-    }
 }

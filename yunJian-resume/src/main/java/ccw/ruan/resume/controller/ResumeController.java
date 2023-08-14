@@ -1,6 +1,7 @@
 package ccw.ruan.resume.controller;
 
 
+import ccw.ruan.common.constant.ResumeStatusConstant;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.pojo.ResumeMsg;
@@ -59,7 +60,8 @@ public class ResumeController {
 
     @GetMapping("/test1")
     public void test1() {
-        final List<Resume> resumes = resumeMapper.selectList(null);
+        final List<Resume> resumes = resumeMapper.selectList(
+                MybatisPlusUtil.queryWrapperEq("resume_status", ResumeStatusConstant.OK));
         for (Resume resume : resumes) {
             ResumeAnalysisVo vo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
             resumeService.saveToElasticsearch(vo, resume.getId(), resume.getUserId());

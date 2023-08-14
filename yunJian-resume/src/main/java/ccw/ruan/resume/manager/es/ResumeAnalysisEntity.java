@@ -22,7 +22,7 @@ public class ResumeAnalysisEntity {
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String name;
     @Field(type = FieldType.Integer, analyzer = "keyword")
-    private String userId;
+    private Integer userId;
     @Field(type = FieldType.Date,format = DateFormat.date)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;

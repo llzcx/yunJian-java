@@ -1,5 +1,6 @@
 package ccw.ruan.resume.service.impl;
 
+import ccw.ruan.common.constant.ResumeStatusConstant;
 import ccw.ruan.common.constant.SimilarTypes;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Evaluate;
@@ -8,7 +9,6 @@ import ccw.ruan.common.model.pojo.TalentPortrait;
 import ccw.ruan.common.model.pojo.*;
 import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
-import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
@@ -30,7 +30,6 @@ import ccw.ruan.service.EvaluateDubboService;
 import ccw.ruan.service.JobDubboService;
 import ccw.ruan.service.LogDubboService;
 import ccw.ruan.service.UserDubboService;
-import cn.hutool.core.lang.hash.Hash;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -39,7 +38,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.common.message.Message;
-import org.aspectj.weaver.ast.Test;
 import org.elasticsearch.index.query.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,15 +49,10 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.redis.hash.HashMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.crypto.Data;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -170,7 +163,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     @Override
     public SimilarityVo findSimilarity(Integer userId) {
         SimilarityVo similarityVo = new SimilarityVo();
-        final List<Resume> resumes = resumeMapper.selectByMap(MybatisPlusUtil.getMap("user_id", userId));
+        final List<Resume> resumes = resumeMapper.getResumeList(userId);
         List<ResumePair> highSimilarity = new ArrayList<>();
         List<ResumeAnalysisVo> indexResume = new ArrayList<>();
         List<Integer> ids = new ArrayList<>();
@@ -291,15 +284,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         return fileName;
     }
-    @Override
-    public IPage<Resume> searchResume(Integer userId, Integer page, Integer size) throws  Exception{
-         Page<Resume> page1 = new Page<>(page,size);
-         QueryWrapper<Resume> wrapper = new QueryWrapper<>();
-         wrapper.ge("user_id",userId);
-         IPage<Resume> iPage = resumeMapper.selectPage(page1,wrapper);
-            System.out.println(iPage);
-         return iPage;
-     }
 
     /**
      * 简历文件解析函数
@@ -317,8 +301,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         ResumeAnalysisVo resume = null;
         resume = JsonUtil.deserialize(result, ResumeAnalysisVo.class);
         resume.setWorkYears(calculateWorkYears(resume.getWorkExperiences()));
-        //保存到es
-        saveToElasticsearch(resume,resumeId);
         System.out.println(resume.toString());
         System.out.println(resumeId);
         Resume resume1 = null;
@@ -391,7 +373,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @Override
     public List<InterviewerResumeVo> listResumeFromNode(String nodeId) {
-        final List<Resume> resumes = resumeMapper.selectList(MybatisPlusUtil.queryWrapperEq("process_stage", nodeId));
+        final List<Resume> resumes = resumeMapper.selectList(
+                MybatisPlusUtil.queryWrapperEq("process_stage", nodeId,"resume_status", ResumeStatusConstant.OK));
         List<InterviewerResumeVo> ans = new ArrayList<>();
         for (Resume resume : resumes) {
             InterviewerResumeVo interviewerResumeVo = new InterviewerResumeVo();
@@ -525,9 +508,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      * 把解析结果存储到es当中
      *
      * @param resumeAnalysisVo
-     * @return
      */
-    public Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo,Integer resumeId,Integer userId) {
+    public void saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo, Integer resumeId, Integer userId) {
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
         resumeAnalysisEntity.setId(resumeId.toString());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());
@@ -537,6 +519,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         resumeAnalysisEntity.setGraduationInstitution(resumeAnalysisVo.getGraduationInstitution());
         resumeAnalysisEntity.setSex(resumeAnalysisVo.getSex().contains("男"));
+        resumeAnalysisEntity.setUserId(userId);
         resumeAnalysisEntity.setPhone(resumeAnalysisVo.getPhone());
         resumeAnalysisEntity.setMailBox(resumeAnalysisVo.getMailBox());
         resumeAnalysisEntity.setEducation(resumeAnalysisVo.getEducation());
@@ -561,7 +544,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resumeAnalysisEntity.setSkillsCertificate(resumeAnalysisVo.getSkillsCertificate());
         resumeAnalysisEntity.setAwardsHonors(resumeAnalysisVo.getAwardsHonors());
         repository.save(resumeAnalysisEntity);
-        return true;
     }
 
     public static QueryBuilder build(SearchDto searchDto,Integer userId) throws Exception {

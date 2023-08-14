@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ccw.ruan.resume.mapper.ResumeMapper">
 
+    <select id="getResumeList" resultType="ccw.ruan.common.model.pojo.Resume">
+        select * from resume where user_id=#{userId} and resume_status = 1
+    </select>
+    <select id="selectById" resultType="ccw.ruan.common.model.pojo.Resume">
+        select * from resume where id=#{resumeId} and resume_status = 1
+    </select>
 </mapper>

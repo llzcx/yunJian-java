@@ -51,11 +51,7 @@ public interface IResumeService extends IService<Resume> {
      * @return
      */
     void resumeAnalysis(String originalFilename,String format,Integer resumeId) throws Exception;
-    /**
-     * 人才库分页查找简历
-     * @return
-     */
-    IPage<Resume> searchResume(Integer userId, Integer page, Integer size) throws  Exception;
+
 
     /**
      * 搜索简历

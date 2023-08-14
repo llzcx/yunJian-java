@@ -52,16 +52,15 @@ public class ResumeAnalysis implements RocketMQ {
         //设置集群模式
         consumer.setMessageModel(MessageModel.CLUSTERING);
         //注册监听回调实现类来处理broker推送过来的消息,MessageListenerConcurrently是并发消费
-        consumer.registerMessageListener(new MessageListenerConcurrently() {
-            @Override
-            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> messages, ConsumeConcurrentlyContext context) {
-                for (MessageExt message : messages) {
-                    byte[] body = message.getBody();
-                    String json = new String(body);
-                    ResumeMqMessageVo resumeMqMessageVo = JSON.parseObject(json, ResumeMqMessageVo.class);
-                    String originalFilename = resumeMqMessageVo.getFilePath();
-                    System.out.println(originalFilename);
-                    String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+        consumer.registerMessageListener((MessageListenerConcurrently) (messages, context) -> {
+            for (MessageExt message : messages) {
+                byte[] body = message.getBody();
+                String json = new String(body);
+                ResumeMqMessageVo resumeMqMessageVo = JSON.parseObject(json, ResumeMqMessageVo.class);
+                String originalFilename = resumeMqMessageVo.getFilePath();
+                System.out.println(originalFilename);
+                String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+                try {
                     if(".docx".equals(suffix)){
                         resumeService.resumeAnalysis(originalFilename,"docx",resumeMqMessageVo.getResumeId());
                     }else if(".pdf".equals(suffix)){
@@ -69,9 +68,11 @@ public class ResumeAnalysis implements RocketMQ {
                     }else {
                         resumeService.resumeAnalysis(originalFilename,"png",resumeMqMessageVo.getResumeId());
                     }
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
-                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
+            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         });
         consumer.start();//消费者启动完成
         log.info("consumer:{} Started.",MQ_RESUME_ANALYSIS_CONSUMER);

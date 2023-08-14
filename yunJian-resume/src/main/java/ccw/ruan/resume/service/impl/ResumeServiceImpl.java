@@ -98,8 +98,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     @Autowired
     ResumeHandleClient resumeHandleClient;
 
-    @Autowired
-    LogDubboService logDubboService;
+
 
 
     @Autowired
@@ -120,6 +119,10 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @DubboReference(version = "1.0.0", group = "user", check = false)
     private UserDubboService userDubboService;
+
+
+    @DubboReference(version = "1.0.0", group = "log", check = false)
+    LogDubboService logDubboService;
 
     @Override
     public KnowledgeGraphVo findKnowledgeGraphVo(Integer resumeId) {
@@ -300,25 +303,19 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      * @return
      */
     @Override
-    public void resumeAnalysis(String originalFilename,String format,Integer resumeId) {
+    public void resumeAnalysis(String originalFilename,String format,Integer resumeId) throws Exception{
         String result = resumeHandleClient.resumeFile(originalFilename, format);
         System.out.println(result);
         result = decodeUnicode(result);
         ResumeAnalysisVo resume = null;
         resume = JsonUtil.deserialize(result, ResumeAnalysisVo.class);
         resume.setWorkYears(calculateWorkYears(resume.getWorkExperiences()));
-        //保存到es
-        saveToElasticsearch(resume,resumeId);
         System.out.println(resume.toString());
         System.out.println(resumeId);
         Resume resume1 = null;
-        try {
-            resume1 = resumeMapper.selectById(resumeId);
-            System.out.println(resume1.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        resume1 = resumeMapper.selectById(resumeId);
+        //保存到es
+        saveToElasticsearch(resume,resumeId,resume1.getUserId());
         System.out.println(resume.getWorkExperiences());
         int workYears = calculateWorkYears(resume.getWorkExperiences());
         System.out.println(workYears);
@@ -514,7 +511,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      * @param resumeAnalysisVo
      * @return
      */
-    public Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo,Integer resumeId) {
+    public Boolean saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo,Integer resumeId,Integer userId) {
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
         resumeAnalysisEntity.setId(resumeId.toString());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());

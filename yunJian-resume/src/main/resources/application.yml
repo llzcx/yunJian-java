@@ -88,4 +88,4 @@ rocketmq:
 resume:
   path: ${resume.path:E:\resume\}
 es:
-  addr:${es.addr:101.35.43.156:9200}
+  addr: ${es.addr:101.35.43.156:9200}

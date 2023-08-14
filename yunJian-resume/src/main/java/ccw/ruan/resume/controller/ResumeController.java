@@ -4,19 +4,18 @@ package ccw.ruan.resume.controller;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.pojo.ResumeMsg;
-import ccw.ruan.common.model.vo.ESVo;
-import ccw.ruan.common.model.vo.GlobalResumeVo;
-import ccw.ruan.common.model.vo.InterviewerResumeVo;
+import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.request.ApiResp;
+import ccw.ruan.common.util.JsonUtil;
 import ccw.ruan.common.util.JwtGetUtil;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.http.SimilarityClient;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
-import ccw.ruan.common.model.vo.SimilarityVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.mapper.ResumeMsgMapper;
 import ccw.ruan.resume.service.IResumeService;
+import ccw.ruan.resume.service.impl.ResumeServiceImpl;
 import ccw.ruan.service.JobDubboService;
 import ccw.ruan.service.UserDubboService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +41,7 @@ public class ResumeController {
     JobDubboService jobDubboService;
 
     @Autowired
-    IResumeService resumeService;
+    ResumeServiceImpl resumeService;
 
 
     @Autowired
@@ -59,8 +58,13 @@ public class ResumeController {
 
 
     @GetMapping("/test1")
-    public String test1() {
-        return "succsww";
+    public void test1() {
+        final List<Resume> resumes = resumeMapper.selectList(null);
+        for (Resume resume : resumes) {
+            ResumeAnalysisVo vo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
+            resumeService.saveToElasticsearch(vo, resume.getId(), resume.getUserId());
+            System.out.println(resume.getFullName()+"save success");
+        }
     }
 
     /**

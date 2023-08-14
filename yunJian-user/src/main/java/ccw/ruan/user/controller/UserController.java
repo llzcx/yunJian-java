@@ -30,15 +30,6 @@ public class UserController {
 
 
     /**
-     * 测试接口
-     * @return
-     */
-    @GetMapping("/test1")
-    public String test1(){
-        return "user!"+jobDubboService.get();
-    }
-
-    /**
      * 登录
      * @param loginDto
      * @return

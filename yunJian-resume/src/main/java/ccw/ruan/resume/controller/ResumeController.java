@@ -156,13 +156,13 @@ public class ResumeController {
 
     /**
      * 获取简历可视化消息
-     * @param resumeId
+     * @param request
      * @return
      * @throws Exception
      */
-    @GetMapping("/view/{resumeId}")
-    public ApiResp<GlobalResumeVo> view(@PathVariable String resumeId,HttpServletRequest request) throws Exception {
-        return ApiResp.success(resumeService.view(resumeId,JwtGetUtil.getId(request)));
+    @GetMapping("/view")
+    public ApiResp<GlobalResumeVo> view(HttpServletRequest request) throws Exception {
+        return ApiResp.success(resumeService.view(JwtGetUtil.getId(request)));
     }
 
     /**

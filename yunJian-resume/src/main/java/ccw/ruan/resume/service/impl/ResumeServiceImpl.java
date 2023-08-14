@@ -381,7 +381,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     }
 
     @Override
-    public GlobalResumeVo view(String resumeId,Integer userId) {
+    public GlobalResumeVo view(Integer userId) {
         GlobalResumeVo vo = new GlobalResumeVo();
         BoolQueryBuilder boolQuery = boolQuery();
         boolQuery.must(QueryBuilders.termQuery("userId", userId));

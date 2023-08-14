@@ -68,5 +68,5 @@ public interface IResumeService extends IService<Resume> {
      */
     List<InterviewerResumeVo> listResumeFromNode(String nodeId);
 
-    GlobalResumeVo view(String resumeId,Integer userId);
+    GlobalResumeVo view(Integer userId);
 }

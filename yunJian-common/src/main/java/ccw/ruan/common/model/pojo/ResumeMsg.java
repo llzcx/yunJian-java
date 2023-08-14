@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 public class ResumeMsg {
 
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.AUTO,value="id")
     private Integer id;
 
     private Boolean isRead;

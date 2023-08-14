@@ -47,7 +47,7 @@ public class GlobalResumeVo implements Serializable{
     private List<Integer> ages;
 
     /**
-     * 按照后面条件顺序的学历分布情况 ["博士","硕士","本科","大专"]
+     * 按照后面条件顺序的学历分布情况 ["博士","硕士","本科","大专","高中"]
      */
     private List<Integer> educations;
 

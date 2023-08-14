@@ -437,7 +437,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         vo.setNum4(convertToPercentage(finish,resumeList.size()));
         vo.setNum5(nanx);
         vo.setNum6(nvx);
-        List<Integer> ages = new ArrayList<>();
         int num_26 = 0,num_26_30 = 0,num_30_34 = 0,num_34_38 = 0,num_38_42 = 0,num_42 = 0;
         int year_0 = 0,year_0_3 = 0,year_3_5 = 0,year_5_10 = 0,year_10 = 0;
         Integer gaozhong = 0,boshi = 0,shuoshi = 0,benke = 0,dazhuan = 0;
@@ -468,6 +467,19 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             }else{
                 year_10 += 1;
             }
+            final String education = item.getEducation();
+
+            if("高中".equals(education)){
+                gaozhong+=1;
+            }else if("大专".equals(education)){
+                dazhuan+=1;
+            } else if("本科".equals(education)){
+                benke+=1;
+            }else if("硕士".equals(education)){
+                shuoshi+=1;
+            }else if("博士".equals(education)){
+                boshi+=1;
+            }
         }
         vo.setAges(Arrays.asList(num_26,num_26_30,num_30_34,num_34_38,num_38_42,num_42));
         List<GlobalResumeVo.Stage> list = new ArrayList<>();
@@ -476,6 +488,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         vo.setStages(list);
         vo.setExperiences(Arrays.asList(year_0,year_0_3,year_3_5,year_5_10,year_10));
+        vo.setEducations(Arrays.asList(boshi,shuoshi,benke,dazhuan,gaozhong));
         return vo;
     }
     public static String convertToPercentage(Integer numerator, Integer denominator) {

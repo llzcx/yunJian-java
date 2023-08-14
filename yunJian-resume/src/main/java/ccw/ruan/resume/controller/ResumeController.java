@@ -18,6 +18,7 @@ import ccw.ruan.resume.mapper.ResumeMsgMapper;
 import ccw.ruan.resume.service.impl.ResumeServiceImpl;
 import ccw.ruan.service.JobDubboService;
 import ccw.ruan.service.UserDubboService;
+import com.google.protobuf.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,8 +161,8 @@ public class ResumeController {
      * @throws Exception
      */
     @GetMapping("/view/{resumeId}")
-    public GlobalResumeVo view(@PathVariable String resumeId,HttpServletRequest request) throws Exception {
-        return resumeService.view(resumeId,JwtGetUtil.getId(request));
+    public ApiResp<GlobalResumeVo> view(@PathVariable String resumeId,HttpServletRequest request) throws Exception {
+        return ApiResp.success(resumeService.view(resumeId,JwtGetUtil.getId(request)));
     }
 
     /**
@@ -170,12 +171,21 @@ public class ResumeController {
      * @throws Exception
      */
     @GetMapping("/resumeMsg")
-    public List<ResumeMsg> resumeMsg(HttpServletRequest request) throws Exception {
+    public ApiResp<List<ResumeMsg>> resumeMsg(HttpServletRequest request) throws Exception {
         final Integer id = JwtGetUtil.getId(request);
-        return resumeMsgMapper.selectList(MybatisPlusUtil.queryWrapperEq("user_id", id));
+        return ApiResp.success(resumeMsgMapper.selectList(MybatisPlusUtil.queryWrapperEq("user_id", id)));
     }
 
-
+    /**
+     * 将消息设置为已读
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/resumeMsg/read/{msgId}")
+    public ApiResp<Boolean> read(@PathVariable String msgId) throws Exception {
+        resumeMsgMapper.updateById(new ResumeMsg(Integer.valueOf(msgId),true));
+        return ApiResp.success(true);
+    }
 
 }
 

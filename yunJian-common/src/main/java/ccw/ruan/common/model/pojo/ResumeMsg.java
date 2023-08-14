@@ -25,4 +25,12 @@ public class ResumeMsg {
     
     private LocalDateTime createTime;
 
+
+    public ResumeMsg() {
+    }
+
+    public ResumeMsg(Integer id, Boolean read) {
+        this.id = id;
+        this.read = read;
+    }
 }

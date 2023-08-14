@@ -5,13 +5,15 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * 面试流程
  * @author 陈翔
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class FlowPathNode {
+public class FlowPathNode implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;

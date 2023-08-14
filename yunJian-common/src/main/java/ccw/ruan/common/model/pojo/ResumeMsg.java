@@ -1,6 +1,7 @@
 package ccw.ruan.common.model.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -16,8 +17,10 @@ public class ResumeMsg {
 
     @TableId(type = IdType.AUTO)
     private Integer id;
-    
-    private Boolean read;
+
+    private Boolean isRead;
+
+    private Integer userId;
     
     private String msg;
 
@@ -31,6 +34,6 @@ public class ResumeMsg {
 
     public ResumeMsg(Integer id, Boolean read) {
         this.id = id;
-        this.read = read;
+        this.isRead = read;
     }
 }

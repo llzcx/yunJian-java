@@ -264,7 +264,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume.setPath(resumeImage+fileName1+".png");
         System.out.println(resume);
         //设置流程节点
-        //resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
+        resume.setProcessStage(logDubboService.getFirstProcessStage(userId).getId());
         //插入简历
         resumeMapper.insert(resume);
         ResumeMqMessageVo resumeMqMessageVo = new ResumeMqMessageVo();
@@ -315,13 +315,11 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1.setPhone(resume.getPhone());
         resume1.setContent(JsonUtil.object2StringSlice(resume));
         resume1.setResumeStatus(ResumeState.COMPLETE.getCode());
-        /*
         List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(resume.getGraduationInstitution());
         for(int i=0;i<schoolLevel.size();i++){
             String level = String.valueOf(schoolLevel.get(i));
             resume.getLabelProcessing().getEducationTags().add(level);
         }
-        */
         if(workYears> 10){
             resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);
         }else if(workYears<10&&workYears>5){
@@ -338,6 +336,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1.setUpdateTime(dateTime);
         System.out.println(resume1.getId());
         System.out.println(resume1);
+        createMsg(resumeId);
         resumeMapper.updateById(resume1);
     }
 
@@ -691,9 +690,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         ResumeMsg resumeMsg = new ResumeMsg();
         final Resume resume = resumeMapper.selectById(resumeId);
         String name = resume.getFullName()==null? String.valueOf(resumeId) :resume.getFullName();
-        resumeMsg.setMsg(name+"的简历分析完成");
+        resumeMsg.setMsg(name+"的简历分析完成。");
         resumeMsg.setResumeId(resumeId);
-        resumeMsg.setRead(false);
+        resumeMsg.setIsRead(false);
         resumeMsgMapper.insert(resumeMsg);
     }
 

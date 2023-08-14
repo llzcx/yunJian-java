@@ -1,13 +1,8 @@
 package ccw.ruan.resume.service.impl;
 
-import ccw.ruan.common.constant.ResumeStatusConstant;
-import ccw.ruan.common.constant.FlowType;
 import ccw.ruan.common.constant.ResumeState;
 import ccw.ruan.common.constant.SimilarTypes;
 import ccw.ruan.common.model.dto.SearchDto;
-import ccw.ruan.common.model.pojo.Evaluate;
-import ccw.ruan.common.model.pojo.Resume;
-import ccw.ruan.common.model.pojo.TalentPortrait;
 import ccw.ruan.common.model.pojo.*;
 import ccw.ruan.common.model.vo.*;
 import ccw.ruan.common.util.JsonUtil;
@@ -15,8 +10,8 @@ import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.manager.es.ResumeAnalysisEntity;
 import ccw.ruan.resume.manager.es.ResumeRepository;
 import ccw.ruan.resume.manager.es.WorkExperienceEntity;
-import ccw.ruan.resume.manager.http.SimilarityClient;
 import ccw.ruan.resume.manager.http.ResumeHandleClient;
+import ccw.ruan.resume.manager.http.SimilarityClient;
 import ccw.ruan.resume.manager.http.dto.CalculateSimilarityDto;
 import ccw.ruan.resume.manager.mq.ResumeAnalysis;
 import ccw.ruan.resume.manager.neo4j.data.node.*;
@@ -24,8 +19,8 @@ import ccw.ruan.resume.manager.neo4j.data.repository.SchoolRepository;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.resume.manager.neo4j.vo.SchoolVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
-import ccw.ruan.resume.mapper.TalentPortraitMapper;
 import ccw.ruan.resume.mapper.ResumeMsgMapper;
+import ccw.ruan.resume.mapper.TalentPortraitMapper;
 import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.util.ResumeHandle;
 import ccw.ruan.service.EvaluateDubboService;
@@ -33,15 +28,11 @@ import ccw.ruan.service.JobDubboService;
 import ccw.ruan.service.LogDubboService;
 import ccw.ruan.service.UserDubboService;
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.common.message.Message;
 import org.elasticsearch.index.query.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -265,7 +256,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         Date currentDate = new Date();
         Resume resume = new Resume();
-        resume.setResumeStatus(ResumeState.incomplete.getCode());
+        resume.setResumeStatus(ResumeState.INCOMPLETE.getCode());
         LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
         resume.setCreateTime(dateTime);
         resume.setUpdateTime(dateTime);
@@ -323,7 +314,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resume1.setEmail(resume.getMailBox());
         resume1.setPhone(resume.getPhone());
         resume1.setContent(JsonUtil.object2StringSlice(resume));
-        resume1.setResumeStatus(ResumeState.complete.getCode());
+        resume1.setResumeStatus(ResumeState.COMPLETE.getCode());
         /*
         List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(resume.getGraduationInstitution());
         for(int i=0;i<schoolLevel.size();i++){
@@ -378,7 +369,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     @Override
     public List<InterviewerResumeVo> listResumeFromNode(String nodeId) {
         final List<Resume> resumes = resumeMapper.selectList(
-                MybatisPlusUtil.queryWrapperEq("process_stage", nodeId,"resume_status", ResumeStatusConstant.OK));
+                MybatisPlusUtil.queryWrapperEq("process_stage", nodeId,"resume_status", ResumeState.COMPLETE.getCode()));
         List<InterviewerResumeVo> ans = new ArrayList<>();
         for (Resume resume : resumes) {
             InterviewerResumeVo interviewerResumeVo = new InterviewerResumeVo();

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  * @author 陈翔
  */
 @BaseRequest(
-        baseURL = PyClient.CX,     // 默认域名
+        baseURL = PyClient.R9000P,     // 默认域名
         headers = {
                 "Accept:text/plain",                // 默认请求头
                 "Content-Type:application/json",

@@ -1,8 +1,7 @@
 package ccw.ruan.resume.dubboImpl;
 
 
-import ccw.ruan.common.constant.ResumeStatusConstant;
-import ccw.ruan.common.model.pojo.FlowPathNode;
+import ccw.ruan.common.constant.ResumeState;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.mapper.ResumeMapper;
@@ -55,7 +54,7 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
 
     @Override
     public Integer flowPathNodeCount(Integer nodeId) {
-        return resumeMapper.selectCount(MybatisPlusUtil.queryWrapperEq("process_stage",nodeId,"resume_status", ResumeStatusConstant.OK));
+        return resumeMapper.selectCount(MybatisPlusUtil.queryWrapperEq("process_stage",nodeId,"resume_status", ResumeState.COMPLETE.getCode()));
     }
 
 

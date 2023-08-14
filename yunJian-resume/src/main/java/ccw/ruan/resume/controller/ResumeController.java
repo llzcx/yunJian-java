@@ -1,7 +1,7 @@
 package ccw.ruan.resume.controller;
 
 
-import ccw.ruan.common.constant.ResumeStatusConstant;
+import ccw.ruan.common.constant.ResumeState;
 import ccw.ruan.common.model.dto.SearchDto;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.model.pojo.ResumeMsg;
@@ -15,7 +15,6 @@ import ccw.ruan.resume.manager.http.SimilarityClient;
 import ccw.ruan.resume.manager.neo4j.vo.KnowledgeGraphVo;
 import ccw.ruan.resume.mapper.ResumeMapper;
 import ccw.ruan.resume.mapper.ResumeMsgMapper;
-import ccw.ruan.resume.service.IResumeService;
 import ccw.ruan.resume.service.impl.ResumeServiceImpl;
 import ccw.ruan.service.JobDubboService;
 import ccw.ruan.service.UserDubboService;
@@ -61,7 +60,7 @@ public class ResumeController {
     @GetMapping("/test1")
     public void test1() {
         final List<Resume> resumes = resumeMapper.selectList(
-                MybatisPlusUtil.queryWrapperEq("resume_status", ResumeStatusConstant.OK));
+                MybatisPlusUtil.queryWrapperEq("resume_status", ResumeState.COMPLETE.getCode()));
         for (Resume resume : resumes) {
             ResumeAnalysisVo vo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
             resumeService.saveToElasticsearch(vo, resume.getId(), resume.getUserId());

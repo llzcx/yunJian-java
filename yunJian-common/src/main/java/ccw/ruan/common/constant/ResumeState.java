@@ -10,11 +10,11 @@ public enum ResumeState {
     /**
      * 解析完成
      */
-    complete(1,"完成"),
+    COMPLETE(1,"完成"),
     /**
      * 未解析完成
      */
-    incomplete(0,"未完成"),
+    INCOMPLETE(0,"未完成"),
     ;
 
 

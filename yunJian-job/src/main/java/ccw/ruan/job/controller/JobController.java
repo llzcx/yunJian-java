@@ -9,6 +9,7 @@ import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.job.manager.http.PersonJobClient;
 import ccw.ruan.job.service.IJobService;
 import ccw.ruan.service.UserDubboService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,27 @@ public class JobController {
     public  ApiResp<String> jobAnalysis(HttpServletRequest request,String jobContent){
         final Integer id = JwtGetUtil.getId(request);
         return ApiResp.success(jobService.jobAnalysis(id,jobContent));
+    }
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    /**
+     * 批量解析
+     * @param request
+     * @param json 岗位字符串内容
+     * @return
+     */
+    @PostMapping("/batchAnalysis")
+    public  ApiResp<String> batchAnalysis(HttpServletRequest request,@RequestBody String json) throws Exception{
+        System.out.println("json:"+json);
+        String[] list = objectMapper.readValue(json, String[].class);
+        final Integer id = JwtGetUtil.getId(request);
+        for (String s : list) {
+            jobService.jobAnalysis(id,s);
+        }
+        return ApiResp.success("成功");
+
     }
 
     /**

@@ -42,10 +42,12 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -335,7 +337,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         System.out.println(resume.toString());
         Resume resume1 = resumeMapper.selectResume(resumeId);
         //保存到es
-        saveToElasticsearch(resume,resumeId,resume1.getUserId());
+        saveToElasticsearch(resume,resumeId,resume1.getUserId(),resume1.getProcessStage());
         System.out.println(resume.getWorkExperiences());
         int workYears = 0;
         try {
@@ -413,11 +415,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             }
         });
         resumes = finalResumes;
-        if(searchDto.getProcessStage()!=null){
-            resumes = finalResumes.stream()
-                    .filter(resume -> resume.getProcessStage().equals(searchDto.getProcessStage()))
-                    .collect(Collectors.toList());
-        }
         return new ESVo(resumes,searchHits.getTotalHits(),searchDto.getPageNum(),searchDto.getPageSize());
     }
 
@@ -457,6 +454,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         allNode.addAll(flowNodes.getSuccess());
         allNode.addAll(flowNodes.getFail());
         final HashMap<Integer,Integer> NodeMap = new HashMap<>();
+        for (FlowPathNode flowPathNode : allNode) {
+            NodeMap.put(flowPathNode.getId(),0);
+        }
         //简历总数
         vo.setNum1(resumeList.size());
         //岗位总数
@@ -572,7 +572,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
      *
      * @param resumeAnalysisVo
      */
-    public void saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo, Integer resumeId, Integer userId) {
+    public void saveToElasticsearch(ResumeAnalysisVo resumeAnalysisVo, Integer resumeId, Integer userId,Integer nodeId) {
         ResumeAnalysisEntity resumeAnalysisEntity = new ResumeAnalysisEntity();
         resumeAnalysisEntity.setId(resumeId.toString());
         resumeAnalysisEntity.setName(resumeAnalysisVo.getName());
@@ -583,6 +583,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resumeAnalysisEntity.setGraduationInstitution(resumeAnalysisVo.getGraduationInstitution());
         resumeAnalysisEntity.setSex(resumeAnalysisVo.getSex().contains("男"));
         resumeAnalysisEntity.setUserId(userId);
+        resumeAnalysisEntity.setNodeId(nodeId);
         resumeAnalysisEntity.setPhone(resumeAnalysisVo.getPhone());
         resumeAnalysisEntity.setMailBox(resumeAnalysisVo.getMailBox());
         resumeAnalysisEntity.setEducation(resumeAnalysisVo.getEducation());
@@ -612,6 +613,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     public static QueryBuilder build(SearchDto searchDto,Integer userId) throws Exception {
         BoolQueryBuilder boolQuery = boolQuery();
         boolQuery.must(termQuery("userId", userId));
+        if(searchDto.getProcessStage()!=null){
+            boolQuery.must(termQuery("nodeId", searchDto.getProcessStage()));
+        }
         final String kw = searchDto.getFullText();
         if(StringUtils.isNotBlank(kw)){
             //TODO 进行全文检索
@@ -755,5 +759,14 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     public void deleteFromEs(Integer id) {
         elasticsearchRestTemplate.delete(id, IndexCoordinates.of("resume"));
+    }
+
+    public void updateEs(String documentId,Integer nodeId){
+        IndexCoordinates index = IndexCoordinates.of("resume");
+        UpdateQuery updateQuery = UpdateQuery.builder(documentId)
+                .withDocument(Document.create().append("nodeId", nodeId))
+                .build();
+
+        elasticsearchRestTemplate.update(updateQuery, index);
     }
 }

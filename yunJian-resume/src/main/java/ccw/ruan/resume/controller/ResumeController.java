@@ -64,7 +64,7 @@ public class ResumeController {
                 MybatisPlusUtil.queryWrapperEq("resume_status", ResumeState.COMPLETE.getCode()));
         for (Resume resume : resumes) {
             ResumeAnalysisVo vo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
-            resumeService.saveToElasticsearch(vo, resume.getId(), resume.getUserId());
+            resumeService.saveToElasticsearch(vo, resume.getId(), resume.getUserId(),resume.getProcessStage());
             System.out.println(resume.getFullName()+"save success");
         }
     }

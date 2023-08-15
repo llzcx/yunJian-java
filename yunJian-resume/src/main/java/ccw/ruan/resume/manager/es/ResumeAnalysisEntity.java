@@ -32,6 +32,8 @@ public class ResumeAnalysisEntity {
     private Boolean sex;
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String phone;
+    @Field(type = FieldType.Integer, analyzer = "keyword")
+    private Integer nodeId;
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String mailBox;
     @Field(type = FieldType.Text, analyzer = "keyword")

@@ -49,6 +49,6 @@ public enum EducationType {
                 return item.getCode();
             }
         }
-        return 0;
+        return -1;
     }
 }

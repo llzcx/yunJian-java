@@ -51,8 +51,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         PersonJobVo personJobVo = new PersonJobVo();
         // 从resumelist提取出标签
         List<ResumeLabelsVo> resumeLabelsVoList = new ArrayList<>();
-        for (int i = 0 ; i < resumes.size() ; i++) {
-            resumeLabelsVoList.add(JsonUtil.deserialize(resumes.get(i).getLabelProcessing(),ResumeLabelsVo.class));
+        for (Resume value : resumes) {
+            resumeLabelsVoList.add(JsonUtil.deserialize(value.getLabelProcessing(), ResumeLabelsVo.class));
         }
         final List<String> resumeInfo = getResumeInfo(resumeLabelsVoList);
         //计算得分
@@ -111,25 +111,40 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     private Boolean otherMatch(ResumeAnalysisVo resumeAnalysisVo,Job job){
         final Integer sexRequirements = job.getSexRequirements();
         final Integer workExperienceRequirements = job.getWorkExperienceRequirements();
-        final Integer educationalRequirements = job.getEducationalRequirements();
+        final String educationalRequirements = job.getEducationalRequirements();
+        String sex = resumeAnalysisVo.getSex();
         if(sexRequirements!=-1){
-            String sex = resumeAnalysisVo.getSex();
-            return sexRequirements==1 && "男".equals(sex) ||  sexRequirements==0 && "女".equals(sex);
+            if(sex==null){
+                return false;
+            }
+            if(sexRequirements==1 && "男".equals(sex)){
+                return false;
+            }
+            if(sexRequirements==0 && "女".equals(sex)){
+                return false;
+            }
         }
+        Integer workYears = resumeAnalysisVo.getWorkYears();
         if(workExperienceRequirements!=-1){
-            Integer workYears = resumeAnalysisVo.getWorkYears();
+            //有工作年限要求
             if(workYears==null){
                 return false;
             }
-            return workYears > workExperienceRequirements;
+            if(workYears < workExperienceRequirements){
+                return false;
+            }
         }
-        if(educationalRequirements!=-1){
-            String education = resumeAnalysisVo.getEducation();
+        String education = resumeAnalysisVo.getEducation();
+        if(!"无要求".equals(educationalRequirements)){
+            //岗位有学历要求
             if(education==null){
                 return false;
             }
             Integer educationEnum = EducationType.getEnum(resumeAnalysisVo.getEducation());
-            return educationEnum.compareTo(educationalRequirements)>0;
+            Integer educationalRequirementsEnum = EducationType.getEnum(educationalRequirements);
+            if(educationEnum.compareTo(educationalRequirementsEnum)<0){
+                return false;
+            }
         }
         return true;
     }

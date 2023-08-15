@@ -35,7 +35,7 @@ public class JobPersonVo implements Serializable {
     }
 
     public void sortListByScore() {
-        list = list.stream().filter(item -> item.getScore().compareTo(new BigDecimal("0.5")) > 0).collect(Collectors.toList());
+        list = list.stream().filter(item -> item.getScore().compareTo(new BigDecimal("0.75")) > 0).collect(Collectors.toList());
         list.sort((o1, o2) -> {
             // 根据 score 进行比较
             return o2.getScore().compareTo(o1.getScore());

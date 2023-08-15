@@ -20,7 +20,7 @@ public class PersonJobVo implements Serializable {
 
     private List<PJResumeVo> list;
 
-    private static BigDecimal base = new BigDecimal("0.5");
+    private static BigDecimal base = new BigDecimal("0.75");
 
     @Data
     public static class PJResumeVo {

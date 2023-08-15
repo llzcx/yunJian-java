@@ -31,7 +31,7 @@ public class JobVo implements Serializable {
     /**
      * 学历要求
      */
-    private Integer educationalRequirements;
+    private String educationalRequirements;
     /**
      * 专业要求
      */

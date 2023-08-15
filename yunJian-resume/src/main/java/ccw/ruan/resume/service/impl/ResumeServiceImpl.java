@@ -411,6 +411,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                 finalResumes.add(resume);
             }
         });
+        resumes = finalResumes;
         if(searchDto.getProcessStage()!=null){
             resumes = finalResumes.stream()
                     .filter(resume -> resume.getProcessStage().equals(searchDto.getProcessStage()))

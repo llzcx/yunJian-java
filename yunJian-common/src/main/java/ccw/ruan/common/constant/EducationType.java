@@ -10,23 +10,27 @@ public enum EducationType {
     /**
      * 高中
      */
-    HIGH_SCHOOL(1,"高中"),
+    POLYTECHNIC_SCHOOL(1,"中专"),
+    /**
+     * 高中
+     */
+    HIGH_SCHOOL(2,"高中"),
     /**
      * 大专
      */
-    JUNIOR_COLLEGE(2,"大专"),
+    JUNIOR_COLLEGE(3,"大专"),
     /**
      * 本科
      */
-    UNDERGRADUATE_COURSE(3,"本科"),
+    UNDERGRADUATE_COURSE(4,"本科"),
     /**
      * 硕士
      */
-    MASTER(4,"硕士"),
+    MASTER(5,"硕士"),
     /**
      * 博士
      */
-    DOCTOR(5,"博士"),
+    DOCTOR(6,"博士"),
     ;
 
 

@@ -415,7 +415,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             }
         });
         resumes = finalResumes;
-        return new ESVo(resumes,resumes.size(),searchDto.getPageNum(),searchDto.getPageSize());
+        return new ESVo(resumes,searchHits.getTotalHits(),searchDto.getPageNum(),searchDto.getPageSize());
     }
 
     @Override

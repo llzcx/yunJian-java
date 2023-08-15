@@ -1,5 +1,6 @@
 package ccw.ruan.job.service.impl;
 
+import ccw.ruan.common.constant.EducationType;
 import ccw.ruan.common.exception.SystemException;
 import ccw.ruan.common.model.pojo.Job;
 import ccw.ruan.common.model.pojo.Resume;
@@ -127,7 +128,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
             if(education==null){
                 return false;
             }
-            Integer educationEnum = 0;
+            Integer educationEnum = EducationType.getEnum(resumeAnalysisVo.getEducation());
             return educationEnum.compareTo(educationalRequirements)>0;
         }
         return true;
@@ -154,7 +155,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         }).collect(Collectors.toList());
         if(resumes.size()==0){
             //已经过滤了所有简历
-            return new PersonJobVo();
+            final PersonJobVo personJobVo = new PersonJobVo();
+            personJobVo.setList(new ArrayList<>());
+            return personJobVo;
         }
         //最后进行人岗匹配得分计算
         final PersonJobVo match = personJobMatch(postInfo.toString(), resumes);
@@ -185,7 +188,9 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
                 .stream().filter(item-> otherMatch(resumeAnalysisVo, item)).collect(Collectors.toList());
         //岗人匹配
         if(jobs.size()==0){
-            return new JobPersonVo();
+            final JobPersonVo jobPersonVo = new JobPersonVo();
+            jobPersonVo.setList(new ArrayList<>());
+            return jobPersonVo;
         }
         return jobPersonMatch(resumeInfo.toString(), jobs);
     }

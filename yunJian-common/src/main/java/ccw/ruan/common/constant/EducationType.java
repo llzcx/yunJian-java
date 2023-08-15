@@ -38,4 +38,13 @@ public enum EducationType {
         this.code = code;
         this.message = message;
     }
+
+    public static Integer getEnum(String msg) {
+        for (EducationType item : values()) {
+            if (item.getMessage().equals(msg)) {
+                return item.getCode();
+            }
+        }
+        return 0;
+    }
 }

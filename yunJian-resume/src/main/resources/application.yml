@@ -2,6 +2,7 @@ server:
   port: 8092
   address: 0.0.0.0
 
+
 spring:
   jackson:
     serialization:
@@ -91,5 +92,6 @@ es:
   addr: ${es.addr:101.35.43.156:9200}
 resumeImage:
   path: ${resumeImage.path:E:\img2\}
-
+forest:
+  log-enabled: false
 

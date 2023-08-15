@@ -42,6 +42,8 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
@@ -100,9 +102,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
 
     @Autowired
     ResumeMsgMapper resumeMsgMapper;
-
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
 
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
@@ -173,10 +172,15 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             indexResume.add(JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class));
             ids.add(resume.getId());
         }
-        String value = "0.8";
-        final BigDecimal value05 = new BigDecimal(value);
-        for (int i = 0; i < length - 1; i++) {
+        String value = "0.9";
+        final BigDecimal value08 = new BigDecimal(value);
+        boolean flag = true;
+        for (int i = 0; i < length - 1 && flag; i++) {
             for (int j = i + 1; j < length; j++) {
+                if(highSimilarity.size()>=15){
+                    flag = false;
+                    break;
+                }
                 final ResumeAnalysisVo resumeI = indexResume.get(i);
                 final ResumeAnalysisVo resumeJ = indexResume.get(j);
                 if(resumeI==null || resumeJ==null){
@@ -186,7 +190,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                 final ResumeCard resumeCard1 =
                         new ResumeCard(ids.get(i),resumeI.getName()==null?"未知姓名":resumeI.getName(),resumes.get(i).getProcessStage());
                 final ResumeCard resumeCard2 =
-                        new ResumeCard(ids.get(j),resumeJ.getName()==null?"未知姓名":resumeI.getName(),resumes.get(j).getProcessStage());
+                        new ResumeCard(ids.get(j),resumeJ.getName()==null?"未知姓名":resumeJ.getName(),resumes.get(j).getProcessStage());
 
                 final ResumePair resumePair = new ResumePair(resumeCard1, resumeCard2);
                 List<String> labels = new ArrayList<>();
@@ -196,10 +200,10 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                     final CalculateSimilarityDto dto1
                             = new CalculateSimilarityDto(resumeI.getProjectExperiences(), resumeJ.getProjectExperiences());
                     final BigDecimal project = similarityClient.calculateSimilarity(dto1);
-                    if(project.compareTo(value05)>0){
+                    if(project.compareTo(value08)>0){
                         labels.add(SimilarTypes.PROJECT_EXPERIENCE.getMessage());
                     }
-                    sum.add(project);
+                    sum = sum.add(project);
                 }
                 if(resumeI.getWorkExperiences()!=null && resumeJ.getWorkExperiences()!=null){
                     // 计算工作经历相似度
@@ -207,23 +211,27 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                             = new CalculateSimilarityDto(getWorkExperiencesString(resumeI.getWorkExperiences()),
                             getWorkExperiencesString(resumeJ.getWorkExperiences()));
                     final BigDecimal work = similarityClient.calculateSimilarity(dto2);
-                    if(work.compareTo(value05)>0){
+                    if(work.compareTo(value08)>0){
                         labels.add(SimilarTypes.WORK_EXPERIENCE.getMessage());
                     }
-                    sum.add(work);
+                    sum = sum.add(work);
                 }
                 if(resumeI.getName()!=null && resumeJ.getName()!=null){
                     //名字
                     if(resumeI.getName().equals(resumeJ.getName())){
                         labels.add(SimilarTypes.NAME.getMessage());
+                        sum = sum.add(new BigDecimal("1.0"));
                     }
+                }
+                if(labels.size()>0){
                     resumePair.setScore(sum);
                     highSimilarity.add(resumePair);
                 }
+
             }
         }
         final List<ResumePair> collect = highSimilarity.stream()
-                .filter(item -> item.getLabel().size() > 0)
+//                .filter(item -> item.getLabel().size() > 0)
                 .sorted(Comparator.comparing(ResumePair::getScore).reversed())
                 .collect(Collectors.toList());
         similarityVo.setHighSimilarity(collect);
@@ -724,4 +732,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         resumeMsgMapper.insert(resumeMsg);
     }
 
+    public void deleteFromEs(Integer id) {
+        elasticsearchRestTemplate.delete(id, IndexCoordinates.of("resume"));
+    }
 }

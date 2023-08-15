@@ -111,8 +111,10 @@ public class ResumeController {
      */
     @DeleteMapping("/{resumeId}")
     public ApiResp<Boolean> delete(@PathVariable String resumeId) {
-        resumeMapper.deleteById(Integer.valueOf(resumeId));
-        userDubboService.deleteResume(Integer.valueOf(resumeId));
+        final Integer id = Integer.valueOf(resumeId);
+        resumeMapper.deleteById(id);
+        userDubboService.deleteResume(id);
+        resumeService.deleteFromEs(id);
         return ApiResp.success(true);
     }
 

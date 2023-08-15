@@ -196,7 +196,8 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                 List<String> labels = new ArrayList<>();
                 resumePair.setLabel(labels);
                 // 计算项目经历相似度
-                if(resumeI.getProjectExperiences()!=null && resumeJ.getProjectExperiences()!=null){
+                if(resumeI.getProjectExperiences()!=null && resumeJ.getProjectExperiences()!=null
+                && !"".equals(resumeI.getProjectExperiences().trim()) && !"".equals(resumeJ.getProjectExperiences().trim())){
                     final CalculateSimilarityDto dto1
                             = new CalculateSimilarityDto(resumeI.getProjectExperiences(), resumeJ.getProjectExperiences());
                     final BigDecimal project = similarityClient.calculateSimilarity(dto1);

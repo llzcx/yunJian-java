@@ -376,13 +376,16 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         System.out.println("size:" + searchHits.toList().size());
         System.out.println("total:" + searchHits.getTotalHits());
         final List<ResumeAnalysisEntity> resumeAnalysisEntityList = searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
-        List<Resume> resumes = new ArrayList<>();
-        List<Resume> finalResumes = resumes;
+        List<Resume> resumes = null;
+        List<Resume> finalResumes = new ArrayList<>();
         resumeAnalysisEntityList.forEach(item->{
-            finalResumes.add(resumeMapper.selectById(item.getId()));
+            final Resume resume = resumeMapper.selectById(item.getId());
+            if(resume!=null){
+                finalResumes.add(resume);
+            }
         });
         if(searchDto.getProcessStage()!=null){
-            resumes = resumes.stream()
+            resumes = finalResumes.stream()
                     .filter(resume -> resume.getProcessStage().equals(searchDto.getProcessStage()))
                     .collect(Collectors.toList());
         }

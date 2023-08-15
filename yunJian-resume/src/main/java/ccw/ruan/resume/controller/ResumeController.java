@@ -58,7 +58,7 @@ public class ResumeController {
     UserDubboService userDubboService;
 
 
-    @GetMapping("/test1")
+    @GetMapping("/synchronous")
     public void test1() {
         final List<Resume> resumes = resumeMapper.selectList(
                 MybatisPlusUtil.queryWrapperEq("resume_status", ResumeState.COMPLETE.getCode()));

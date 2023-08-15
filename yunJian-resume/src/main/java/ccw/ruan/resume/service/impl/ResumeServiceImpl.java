@@ -329,6 +329,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         saveToElasticsearch(resume,resumeId,resume1.getUserId());
         System.out.println(resume.getWorkExperiences());
         int workYears = calculateWorkYears(resume.getWorkExperiences());
+        System.out.println(resume.getName());
         TalentPortrait talentPortrait = talentPortraitMapper.getTalentPortrait(resume.getName());
         System.out.println(talentPortrait);
         resume.setResumeHighlights(talentPortrait.getSparkle());

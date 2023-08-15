@@ -166,17 +166,20 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
     @Override
     public JobPersonVo jobPerson(Integer resumeId, Integer userId) {
         final Resume resume = resumeDubboService.getResumeById(resumeId);
+        final ResumeLabelsVo deserialize = JsonUtil.deserialize(resume.getLabelProcessing(), ResumeLabelsVo.class);
         if(resume==null){
             throw new SystemException(ResultCode.RESUME_EMPTY);
         }
-        final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
         // 构造简历分析字符串
         StringBuilder resumeInfo = new StringBuilder();
-        resumeInfo.append(resumeAnalysisVo.getExpectedJob()).append(" ");
-        resumeAnalysisVo.getWorkExperiences().forEach(item->{
-            resumeInfo.append(item.getJobName()).append(" ");
-        });
+        for (String jobTag : deserialize.getJobTags()) {
+            resumeInfo.append(jobTag).append(" ");
+        }
+        for (String skill : deserialize.getSkillTags()) {
+            resumeInfo.append(skill).append(" ");
+        }
         //查询并过滤达不到要求的岗位
+        final ResumeAnalysisVo resumeAnalysisVo = JsonUtil.deserialize(resume.getContent(), ResumeAnalysisVo.class);
         final List<Job> jobs = jobMapper
                 .selectList(MybatisPlusUtil.queryWrapperEq("user_id", userId))
                 .stream().filter(item-> otherMatch(resumeAnalysisVo, item)).collect(Collectors.toList());
@@ -199,7 +202,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements IJobS
         List<String> list = new ArrayList<>();
         for (int i = 0 ; i < resumeLabelsVos.size() ; i++) {
             final ResumeLabelsVo resumeLabelsVo = resumeLabelsVos.get(i);
-            StringBuilder resumeInfo = new StringBuilder(" ");
+            StringBuilder resumeInfo = new StringBuilder();
             for (String jobTag : resumeLabelsVo.getJobTags()) {
                 resumeInfo.append(jobTag).append(" ");
             }

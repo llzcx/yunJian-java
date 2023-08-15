@@ -675,7 +675,9 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             if (maxAge != null) {
                 dateRange.to(sdf.format(maxBirthDateTime));
             }
-            boolQuery.must(dateRange);
+            if(minAge!=null || maxAge!=null){
+                boolQuery.must(dateRange);
+            }
             if (StringUtils.isNotBlank(basic.getMajor())) {
                 boolQuery.must(matchQuery("major", basic.getMajor()));
             }

@@ -115,6 +115,7 @@ public class ResumeController {
         resumeMapper.deleteById(id);
         userDubboService.deleteResume(id);
         resumeService.deleteFromEs(id);
+        resumeMsgMapper.delete(MybatisPlusUtil.queryWrapperEq("resume_id",resumeId));
         return ApiResp.success(true);
     }
 

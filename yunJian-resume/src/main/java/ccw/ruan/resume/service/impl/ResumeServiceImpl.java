@@ -766,7 +766,6 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         UpdateQuery updateQuery = UpdateQuery.builder(documentId)
                 .withDocument(Document.create().append("nodeId", nodeId))
                 .build();
-
         elasticsearchRestTemplate.update(updateQuery, index);
     }
 }

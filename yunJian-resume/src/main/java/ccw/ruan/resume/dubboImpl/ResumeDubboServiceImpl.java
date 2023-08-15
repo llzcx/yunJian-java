@@ -5,6 +5,8 @@ import ccw.ruan.common.constant.ResumeState;
 import ccw.ruan.common.model.pojo.Resume;
 import ccw.ruan.common.util.MybatisPlusUtil;
 import ccw.ruan.resume.mapper.ResumeMapper;
+import ccw.ruan.resume.service.IResumeService;
+import ccw.ruan.resume.service.impl.ResumeServiceImpl;
 import ccw.ruan.service.LogDubboService;
 import ccw.ruan.service.ResumeDubboService;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -29,6 +31,9 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
     LogDubboService logDubboService;
 
 
+    @Autowired
+    ResumeServiceImpl resumeService;
+
 
     @Override
     public Boolean updateResumeState(Integer resumeId, Integer nodeId) {
@@ -39,6 +44,7 @@ public class ResumeDubboServiceImpl implements ResumeDubboService {
         resume.setProcessStage(nodeId);
         logDubboService.stateChangeLog(resumeId, state1,nodeId);
         resumeMapper.updateById(resume);
+        resumeService.updateEs(resumeId.toString(),nodeId);
         return true;
     }
 

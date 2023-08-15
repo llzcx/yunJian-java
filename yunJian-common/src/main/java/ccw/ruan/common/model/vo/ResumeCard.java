@@ -6,9 +6,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode
 public class ResumeCard {
+    /**
+     * 简历id
+     */
     private Integer id;
     /**
-     * z
+     * 完整名字
      */
     private String fullName;
     /**

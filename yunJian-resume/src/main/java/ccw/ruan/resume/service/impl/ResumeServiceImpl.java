@@ -179,38 +179,47 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
             for (int j = i + 1; j < length; j++) {
                 final ResumeAnalysisVo resumeI = indexResume.get(i);
                 final ResumeAnalysisVo resumeJ = indexResume.get(j);
+                if(resumeI==null || resumeJ==null){
+                    continue;
+                }
                 BigDecimal sum = new BigDecimal("0");
                 final ResumeCard resumeCard1 =
-                        new ResumeCard(ids.get(i),resumeI.getName(),resumes.get(i).getProcessStage());
+                        new ResumeCard(ids.get(i),resumeI.getName()==null?"未知姓名":resumeI.getName(),resumes.get(i).getProcessStage());
                 final ResumeCard resumeCard2 =
-                        new ResumeCard(ids.get(j),resumeJ.getName(),resumes.get(j).getProcessStage());
+                        new ResumeCard(ids.get(j),resumeJ.getName()==null?"未知姓名":resumeI.getName(),resumes.get(j).getProcessStage());
 
                 final ResumePair resumePair = new ResumePair(resumeCard1, resumeCard2);
                 List<String> labels = new ArrayList<>();
                 resumePair.setLabel(labels);
                 // 计算项目经历相似度
-                final CalculateSimilarityDto dto1
-                        = new CalculateSimilarityDto(resumeI.getProjectExperiences(), resumeJ.getProjectExperiences());
-                final BigDecimal project = similarityClient.calculateSimilarity(dto1);
-                if(project.compareTo(value05)>0){
-                    labels.add(SimilarTypes.PROJECT_EXPERIENCE.getMessage());
+                if(resumeI.getProjectExperiences()!=null && resumeJ.getProjectExperiences()!=null){
+                    final CalculateSimilarityDto dto1
+                            = new CalculateSimilarityDto(resumeI.getProjectExperiences(), resumeJ.getProjectExperiences());
+                    final BigDecimal project = similarityClient.calculateSimilarity(dto1);
+                    if(project.compareTo(value05)>0){
+                        labels.add(SimilarTypes.PROJECT_EXPERIENCE.getMessage());
+                    }
+                    sum.add(project);
                 }
-                sum.add(project);
-                // 计算工作经历相似度
-                final CalculateSimilarityDto dto2
-                        = new CalculateSimilarityDto(getWorkExperiencesString(resumeI.getWorkExperiences()),
-                        getWorkExperiencesString(resumeJ.getWorkExperiences()));
-                final BigDecimal work = similarityClient.calculateSimilarity(dto2);
-                if(work.compareTo(value05)>0){
-                    labels.add(SimilarTypes.WORK_EXPERIENCE.getMessage());
+                if(resumeI.getWorkExperiences()!=null && resumeJ.getWorkExperiences()!=null){
+                    // 计算工作经历相似度
+                    final CalculateSimilarityDto dto2
+                            = new CalculateSimilarityDto(getWorkExperiencesString(resumeI.getWorkExperiences()),
+                            getWorkExperiencesString(resumeJ.getWorkExperiences()));
+                    final BigDecimal work = similarityClient.calculateSimilarity(dto2);
+                    if(work.compareTo(value05)>0){
+                        labels.add(SimilarTypes.WORK_EXPERIENCE.getMessage());
+                    }
+                    sum.add(work);
                 }
-                sum.add(work);
-                //名字
-                if(resumeI.getName().equals(resumeJ.getName())){
-                    labels.add(SimilarTypes.NAME.getMessage());
+                if(resumeI.getName()!=null && resumeJ.getName()!=null){
+                    //名字
+                    if(resumeI.getName().equals(resumeJ.getName())){
+                        labels.add(SimilarTypes.NAME.getMessage());
+                    }
+                    resumePair.setScore(sum);
+                    highSimilarity.add(resumePair);
                 }
-                resumePair.setScore(sum);
-                highSimilarity.add(resumePair);
             }
         }
         final List<ResumePair> collect = highSimilarity.stream()
@@ -224,8 +233,21 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
     private String getWorkExperiencesString(List<WorkExperience> workExperiences){
         StringBuilder sum = new StringBuilder();
         for (WorkExperience item : workExperiences) {
-            sum.append(item.getStartTime()).append(item.getEndTime()).
-                    append(item.getJobName()).append(item.getCompanyName()).append(item.getDescription());
+            if(item.getStartTime()!=null){
+                sum.append(item.getStartTime());
+            }
+            if(item.getEndTime()!=null){
+                sum.append(item.getEndTime());
+            }
+            if(item.getJobName()!=null){
+                sum.append(item.getJobName());
+            }
+            if(item.getCompanyName()!=null){
+                sum.append(item.getCompanyName());
+            }
+            if(item.getDescription()!=null){
+                sum.append(item.getDescription());
+            }
         }
         return sum.toString();
     }

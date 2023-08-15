@@ -336,40 +336,59 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         //保存到es
         saveToElasticsearch(resume,resumeId,resume1.getUserId());
         System.out.println(resume.getWorkExperiences());
-        int workYears = calculateWorkYears(resume.getWorkExperiences());
+        int workYears = 0;
+        try {
+            workYears = calculateWorkYears(resume.getWorkExperiences());
+        } catch (Exception e) {
+            e.printStackTrace();
+            workYears = 0;
+        }
         System.out.println(resume.getName());
-        TalentPortrait talentPortrait = talentPortraitMapper.getTalentPortrait(resume.getName());
-        System.out.println(talentPortrait);
-        resume.setResumeHighlights(talentPortrait.getSparkle());
-        resume.setRiskWarning(talentPortrait.getRiskWarning());
-        resume.setIntelligentPrediction(talentPortrait.getIntelligentPrediction());
-        resume.setWorkYears(workYears);
-        resume1.setFullName(resume.getName());
-        resume1.setEmail(resume.getMailBox());
-        resume1.setPhone(resume.getPhone());
-        resume1.setContent(JsonUtil.object2StringSlice(resume));
-        resume1.setResumeStatus(ResumeState.COMPLETE.getCode());
-        List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(resume.getGraduationInstitution());
-        for(int i=0;i<schoolLevel.size();i++){
-            String level = String.valueOf(schoolLevel.get(i));
-            resume.getLabelProcessing().getEducationTags().add(level);
+        try {
+            TalentPortrait talentPortrait = talentPortraitMapper.getTalentPortrait(resume.getName());
+            System.out.println(talentPortrait);
+            resume.setResumeHighlights(talentPortrait.getSparkle());
+            resume.setRiskWarning(talentPortrait.getRiskWarning());
+            resume.setIntelligentPrediction(talentPortrait.getIntelligentPrediction());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if(workYears> 10){
-            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);
-        }else if(workYears<10&&workYears>5){
-            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(4);
-        }else if(workYears>0){
-            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(3);
-        }else {
-            resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(2);
+        try {
+            resume.setWorkYears(workYears);
+            resume1.setFullName(resume.getName());
+            resume1.setEmail(resume.getMailBox());
+            resume1.setPhone(resume.getPhone());
+            resume1.setContent(JsonUtil.object2StringSlice(resume));
+            resume1.setResumeStatus(ResumeState.COMPLETE.getCode());
+
+            List<UniversityLevelNode> schoolLevel = schoolRepository.findSchoolLevel(resume.getGraduationInstitution());
+            for(int i=0;i<schoolLevel.size();i++){
+                String level = String.valueOf(schoolLevel.get(i));
+                resume.getLabelProcessing().getEducationTags().add(level);
+            }
+
+            if(workYears > 10){
+                resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(5);
+            }else if(workYears < 10 && workYears > 5){
+                resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(4);
+            }else if(workYears > 0){
+                resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(3);
+            }else {
+                resume.getLabelProcessing().getComprehensiveAbility().setServiceYears(2);
+            }
+
+            String jsonString = JSON.toJSONString(resume.getLabelProcessing());
+            resume1.setLabelProcessing(jsonString);
+
+            Date currentDate = new Date();
+            LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
+            resume1.setUpdateTime(dateTime);
+
+            resumeMapper.updateById(resume1);
+            createMsg(resumeId, resume1.getUserId());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        String jsonString = JSON.toJSONString(resume.getLabelProcessing());
-        resume1.setLabelProcessing(jsonString);
-        Date currentDate = new Date();
-        LocalDateTime dateTime = LocalDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault());
-        resume1.setUpdateTime(dateTime);
-        resumeMapper.updateById(resume1);
-        createMsg(resumeId,resume1.getUserId());
     }
 
 

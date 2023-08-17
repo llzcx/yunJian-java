@@ -19,14 +19,14 @@ public class ResumeAnalysisEntity {
 
     @Id
     private String id;
-    @Field(type = FieldType.Text, analyzer = "keyword")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String name;
     @Field(type = FieldType.Integer, analyzer = "keyword")
     private Integer userId;
     @Field(type = FieldType.Date,format = DateFormat.date)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
-    @Field(type = FieldType.Text, analyzer = "keyword")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String graduationInstitution;
     @Field(type = FieldType.Boolean)
     private Boolean sex;
@@ -36,7 +36,7 @@ public class ResumeAnalysisEntity {
     private Integer nodeId;
     @Field(type = FieldType.Text, analyzer = "keyword")
     private String mailBox;
-    @Field(type = FieldType.Text, analyzer = "keyword")
+    @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String education;
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String major;

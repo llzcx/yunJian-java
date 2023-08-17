@@ -618,23 +618,23 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         }
         final String kw = searchDto.getFullText();
         if(StringUtils.isNotBlank(kw)){
-            //TODO 进行全文检索
-            boolQuery.should(boolQuery()
-                    .should(matchQuery("name", kw).operator(Operator.AND))
-                    .should(termQuery("name.keyword", kw)))
+            System.out.println("全文检索："+kw);
+            boolQuery.must(boolQuery()
+                    .should(matchQuery("name", kw))
+                    .should(termQuery("name.keyword", kw))
                     .should(matchQuery("major", kw))
                     .should(matchQuery("expectedJob", kw))
                     .should(matchQuery("projectExperiences", kw))
                     .should(matchQuery("EducationEnumeration", kw))
                     .should(matchQuery("skillsCertificate", kw))
                     .should(matchQuery("awardsHonors", kw))
-                    .should(matchQuery("graduationInstitution", kw));
-            BoolQueryBuilder nestedQuery = boolQuery();
-            nestedQuery.should(matchQuery("workExperiences.jobName", kw));
-            nestedQuery.should(matchQuery("workExperiences.companyName", kw));
-            nestedQuery.should(matchQuery("workExperiences.description", kw));
-            boolQuery.should(nestedQuery);
-            return boolQuery;
+                    .should(matchQuery("graduationInstitution", kw))
+                    .should(boolQuery()
+                            .should(matchQuery("workExperiences.jobName", kw))
+                            .should(matchQuery("workExperiences.companyName", kw))
+                            .should(matchQuery("workExperiences.description", kw))
+                    )
+            );
         }
         //基本信息
         SearchDto.Basic basic = searchDto.getBasic();

@@ -179,7 +179,7 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
         boolean flag = true;
         for (int i = 0; i < length - 1 && flag; i++) {
             for (int j = i + 1; j < length; j++) {
-                if(highSimilarity.size()>=15){
+                if(highSimilarity.size()>=3){
                     flag = false;
                     break;
                 }
@@ -209,15 +209,18 @@ public class ResumeServiceImpl extends ServiceImpl<ResumeMapper, Resume> impleme
                     sum = sum.add(project);
                 }
                 if(resumeI.getWorkExperiences()!=null && resumeJ.getWorkExperiences()!=null){
-                    // 计算工作经历相似度
-                    final CalculateSimilarityDto dto2
-                            = new CalculateSimilarityDto(getWorkExperiencesString(resumeI.getWorkExperiences()),
-                            getWorkExperiencesString(resumeJ.getWorkExperiences()));
-                    final BigDecimal work = similarityClient.calculateSimilarity(dto2);
-                    if(work.compareTo(value08)>0){
-                        labels.add(SimilarTypes.WORK_EXPERIENCE.getMessage());
+                    String workStr1 = getWorkExperiencesString(resumeI.getWorkExperiences());
+                    String workStr2 = getWorkExperiencesString(resumeJ.getWorkExperiences());
+                    if(!"".equals(workStr1.trim()) && !"".equals(workStr2.trim())){
+                        // 计算工作经历相似度
+                        final CalculateSimilarityDto dto2
+                                = new CalculateSimilarityDto(workStr1,workStr2);
+                        final BigDecimal work = similarityClient.calculateSimilarity(dto2);
+                        if(work.compareTo(value08)>0){
+                            labels.add(SimilarTypes.WORK_EXPERIENCE.getMessage());
+                        }
+                        sum = sum.add(work);
                     }
-                    sum = sum.add(work);
                 }
                 if(resumeI.getName()!=null && resumeJ.getName()!=null){
                     //名字
